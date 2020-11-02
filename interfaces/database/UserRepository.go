@@ -2,7 +2,7 @@ package database
 
 import (
     "errors"
-
+    "github.com/jinzhu/gorm"
     "github.com/hiroyaonoe/todoapp-server/domain"
 )
 

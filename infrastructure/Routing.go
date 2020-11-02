@@ -12,6 +12,7 @@ type Routing struct {
 }
 
 func NewRouting(db *DB) *Routing {
+    c := NewConfig()
     r := &Routing{
         DB: db,
         Gin: gin.Default(),
@@ -23,7 +24,7 @@ func NewRouting(db *DB) *Routing {
 
 func (r *Routing) setRouting() {
     userController := controllers.NewUserController(r.DB)
-    r.Gin.GET("/users/:id", func (c *gin.Context) { userController.Get(c) })
+    r.Gin.GET("/user/:id", func (c *gin.Context) { userController.Get(c) })
 }
 
 func (r *Routing) Run() {
