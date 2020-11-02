@@ -8,6 +8,7 @@ services:
         container_name: go-container
         depends_on:
             - mysql
+            - test-mysql
         # プロセスが終了してコンテナが終了してしまわないように上書きする
         command: /bin/sh -c "while sleep 1000; do :; done"
         volumes:
@@ -22,3 +23,13 @@ services:
             MYSQL_PASSWORD: golang # 使わないけど一応記述
             MYSQL_DATABASE: golang # 使わないけど一応記述
         container_name: mysql-container
+
+    # テスト用データベース
+    test-mysql:
+        image: mysql:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: golang
+            MYSQL_USER: golang # 使わないけど一応記述
+            MYSQL_PASSWORD: golang # 使わないけど一応記述
+            MYSQL_DATABASE: golang # 使わないけど一応記述
+        container_name: test-mysql-container
