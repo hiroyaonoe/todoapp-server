@@ -1,29 +1,34 @@
+/*
+domain is Enterprise Business Rules.
+どこにも依存しない．
+*/
 package domain
 
+import (
+	"time"
+)
+
 type User struct {
-    ID int
-    ScreenName string
-    DisplayName string
-    Password string
-    Email *string
-    CreatedAt int64
-    UpdatedAt int64
+    ID int `gorm:"primary_key"`
+    Name string
+    Password string `sql:"not null"`
+    Email *string `sql:"not null"`
+    CreatedAt time.Time
+    UpdatedAt time.Time
 }
 
 // この struct はビジネスロジックだと思うので、 usecase で書くべきなのかと思ったけど、
 // ここに定義した。
 type UserForGet struct {
     ID int `json:"id"`
-    ScreenName string `json:"screenName"`
-    DisplayName string `json:"displayName"`
+    Name string `json:"name"`
     Email *string `json:"email"`
 }
 
 func (u *User) BuildForGet() UserForGet {
     user := UserForGet{}
     user.ID = u.ID
-    user.ScreenName = u.ScreenName
-    user.DisplayName = u.DisplayName
+    user.Name = u.Name
     if u.Email != nil {
         user.Email = u.Email
     } else {
