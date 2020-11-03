@@ -12,7 +12,7 @@ type User struct {
     ID int `gorm:"primary_key"`
     Name string
     Password string `sql:"not null"`
-    Email *string `sql:"not null"`
+    Email *string `sql:"not null;unique"`
     CreatedAt time.Time
     UpdatedAt time.Time
 }
