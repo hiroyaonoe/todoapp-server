@@ -1,3 +1,8 @@
+/*
+infrastructure is Frameworks & Drivers.
+DBのドライバー,Ginをinterfacesとつなぐ．
+interfacesに依存．
+*/
 package infrastructure
 
 type Config struct {

@@ -11,7 +11,7 @@ type UserInteractor struct {
 
 func (interactor *UserInteractor) Get(id int) (user domain.UserForGet, resultStatus *ResultStatus) {
     db := interactor.DB.Connect()
-    // Users の取得
+    // User の取得
     foundUser, err := interactor.User.FindByID(db, id)
     if err != nil {
         return domain.UserForGet{}, NewResultStatus(404, err)

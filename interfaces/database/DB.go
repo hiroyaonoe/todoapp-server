@@ -1,3 +1,7 @@
+/*
+database is Interface Adapters.
+
+*/
 package database
 
 import (

@@ -1,3 +1,6 @@
+/*
+usecase is Application Business Rules.
+*/
 package usecase
 
 import (
