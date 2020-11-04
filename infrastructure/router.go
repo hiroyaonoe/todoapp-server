@@ -25,7 +25,7 @@ func NewRouting(db *DB) *Routing {
 func (r *Routing) setRouting() {
     taskController := controllers.NewTaskController(r.DB)
     userController := controllers.NewUserController(r.DB)
-    authController := controllers.NewAuthController(r.DB)
+    // authController := controllers.NewAuthController(r.DB)
 
     engine := r.Gin
 
