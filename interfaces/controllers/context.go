@@ -1,3 +1,5 @@
+//go:generate mockgen -source=$GOFILE -destination=mock_$GOFILE -package=controllers
+
 package controllers
 
 type Context interface {
