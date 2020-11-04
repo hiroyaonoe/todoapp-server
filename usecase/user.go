@@ -5,6 +5,8 @@ usecase is Application Business Rules.
 package usecase
 
 import (
+    "http"
+    
     "github.com/hiroyaonoe/todoapp-server/domain/entity"
     "github.com/hiroyaonoe/todoapp-server/domain/repository"
 )
@@ -19,7 +21,7 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
     // User の取得
     user, err := interactor.User.FindByID(db, id)
     if err != nil {
-        return entity.User{}, NewResultStatus(404, err)
+        return entity.User{}, NewResultStatus(http.StatusNotFound, err)
     }
-    return user, NewResultStatus(200, nil)
+    return user, NewResultStatus(http.StatusOK, nil)
 }
