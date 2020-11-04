@@ -1,5 +1,6 @@
 /*
 repository is Enterprise Business Rules.
+データベースへの処理がどうあるべきかインターフェースの形で記述
 どこにも依存しない．
 */
 package repository

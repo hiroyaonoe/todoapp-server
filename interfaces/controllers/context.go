@@ -1,7 +1,3 @@
-/*
-controllers is Interface Adapters.
-
-*/
 package controllers
 
 type Context interface {

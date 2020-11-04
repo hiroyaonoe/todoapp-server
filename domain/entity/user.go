@@ -1,5 +1,6 @@
 /*
 entity is Enterprise Business Rules.
+エンティティがどうあるべきか記述
 どこにも依存しない．
 */
 package entity
