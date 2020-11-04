@@ -1,8 +1,8 @@
 /*
-domain is Enterprise Business Rules.
+entity is Enterprise Business Rules.
 どこにも依存しない．
 */
-package domain
+package entity
 
 import (
 	"time"

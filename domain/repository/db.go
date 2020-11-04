@@ -1,7 +1,4 @@
-/*
-usecase is Application Business Rules.
-*/
-package usecase
+package repository
 
 import (
     "github.com/jinzhu/gorm"

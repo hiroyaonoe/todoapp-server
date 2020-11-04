@@ -5,13 +5,12 @@ import (
 )
 
 type DBRepository struct {
-    DB DB
 }
 
 func (db *DBRepository) Begin() *gorm.DB {
-    return db.DB.Begin()
+    return db.Begin()
 }
 
 func (db *DBRepository) Connect() *gorm.DB {
-    return db.DB.Connect()
+    return db.Connect()
 }
