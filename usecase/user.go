@@ -14,13 +14,12 @@ type UserInteractor struct {
     User repository.UserRepository
 }
 
-func (interactor *UserInteractor) Get(id int) (user entity.UserForGet, resultStatus *ResultStatus) {
+func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *ResultStatus) {
     db := interactor.DB.Connect()
     // User の取得
-    foundUser, err := interactor.User.FindByID(db, id)
+    user, err := interactor.User.FindByID(db, id)
     if err != nil {
-        return entity.UserForGet{}, NewResultStatus(404, err)
+        return entity.User{}, NewResultStatus(404, err)
     }
-    user = foundUser.BuildForGet()
     return user, NewResultStatus(200, nil)
 }
