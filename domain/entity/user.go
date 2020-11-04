@@ -13,7 +13,7 @@ type User struct {
     ID int `gorm:"primary_key" json:"id"`
     Name string `json:"name"`
     Password string `sql:"not null" json:"-"`
-    Email *string `sql:"not null;unique" json:"email"`
+    Email string `sql:"not null;unique" json:"email"`
     CreatedAt time.Time `json:"-"`
     UpdatedAt time.Time `json:"-"`
 }

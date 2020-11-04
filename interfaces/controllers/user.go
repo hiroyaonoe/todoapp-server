@@ -15,10 +15,10 @@ type UserController struct {
     Interactor usecase.UserInteractor
 }
 
-func NewUserController(db database.DB) *UserController {
+func NewUserController(db database.DBRepository) *UserController {
     return &UserController{
         Interactor: usecase.UserInteractor{
-            DB: &database.DBRepository{ DB: db },
+            DB: &db,
             User: &database.UserRepository{},
         },
     }
@@ -26,7 +26,7 @@ func NewUserController(db database.DB) *UserController {
 
 func (controller *UserController) Get(c Context) {
 
-    id, _ := strconv.Atoi(c.Param("id"))
+    id, _ := strconv.Atoi(c.Cookie("id"))
 
     user, res := controller.Interactor.Get(id)
     if res.Error != nil {
