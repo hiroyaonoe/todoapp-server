@@ -28,26 +28,28 @@ func (r *Routing) setRouting() {
     authController := controllers.NewAuthController(r.DB)
 
     engine := r.Gin
-    
+
     // middleware
 
 
     
-    engine.GET("/login", func (c *gin.Context) { authController.Login(c) })
+    engine.POST("/login", func (c *gin.Context) { authController.Login(c) })
 
     v1 := engine.Group("/api/v1")
-    v1.POST("/tasks", func (c *gin.Context) { taskController.Create(c) })
-    v1.GET("/tasks/:id", func (c *gin.Context) { taskController.GetbyID(c) })
-    v1.PUT("/tasks/:id", func (c *gin.Context) { taskController.Update(c) })
-    v1.Delete("/tasks/:id", func (c *gin.Context) { taskController.Delete(c) })
-    v1.PUT("/tasks/:id/completed", func (c *gin.Context) { taskController.Switch(c) })
-    v1.GET("/tasks/date/:date", func (c *gin.Context) { taskController.GetbyDate(c) })
-    v1.GET("/tasks/date/from/:start/to/:end", func (c *gin.Context) { taskController.GetbyPeriod(c) })
+    tasks := v1.Group("/tasks")
+    tasks.POST("", func (c *gin.Context) { taskController.Create(c) })
+    tasks.GET("/:id", func (c *gin.Context) { taskController.GetbyID(c) })
+    tasks.PUT("/:id", func (c *gin.Context) { taskController.Update(c) })
+    tasks.Delete("/:id", func (c *gin.Context) { taskController.Delete(c) })
+    tasks.PUT("/:id/completed", func (c *gin.Context) { taskController.Switch(c) })
+    tasks.GET("/date/:date", func (c *gin.Context) { taskController.GetbyDate(c) })
+    tasks.GET("/date/from/:start/to/:end", func (c *gin.Context) { taskController.GetbyPeriod(c) })
 
-    v1.GET("/user", func (c *gin.Context) { userController.Get(c) })
-    v1.POST("/user", func (c *gin.Context) { userController.Create(c) })
-    v1.PUT("/user", func (c *gin.Context) { userController.Update(c) })
-    v1.DELETE("/user", func (c *gin.Context) { userController.Delete(c) })
+    user := v1.Group("/user")
+    user.GET("", func (c *gin.Context) { userController.Get(c) })
+    user.POST("", func (c *gin.Context) { userController.Create(c) })
+    user.PUT("", func (c *gin.Context) { userController.Update(c) })
+    user.DELETE("", func (c *gin.Context) { userController.Delete(c) })
 
 
 
