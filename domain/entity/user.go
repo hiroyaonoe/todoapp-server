@@ -26,15 +26,10 @@ type User struct {
 //     Email *string `json:"email"`
 // }
 
-// func (u *User) BuildForGet() UserForGet {
-//     user := UserForGet{}
-//     user.ID = u.ID
-//     user.Name = u.Name
-//     if u.Email != nil {
-//         user.Email = u.Email
-//     } else {
-//         empty := ""
-//         user.Email = &empty
-//     }
-//     return user
-// }
+func (u *User) BuildForGet() User {
+    user := User{}
+    user.ID = u.ID
+    user.Name = u.Name
+    user.Email = u.Email
+    return user
+}
