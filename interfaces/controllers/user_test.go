@@ -25,9 +25,10 @@ func TestUserControllerGet(t *testing.T) {
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 		// prepareMockContext func(context *MockContext)
-		wantMessage string
+		// wantMessage string
 		wantData    entity.User
 		wantErr     bool
+		wantErrMsg string
 		wantCode    int
 	}{
 		{
@@ -46,13 +47,34 @@ func TestUserControllerGet(t *testing.T) {
 					UpdatedAt: time.Unix(100, 0),
 				}, nil)
 			},
-			wantMessage: "success",
+			// wantMessage: "success",
 			wantData: entity.User{
 				ID:    3,
 				Name:  "username",
 				Email: "example@example.com",
 			},
 			wantErr:  false,
+			wantCode: http.StatusOK,
+		},
+		{
+			name:   "ユーザーが存在しない場合にErrRecordNotFoundを返す",
+			userid: "3",
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{
+					ID:        3,
+					Name:      "username",
+					Password:  "password",
+					Email:     "example@example.com",
+					CreatedAt: time.Unix(100, 0),
+					UpdatedAt: time.Unix(100, 0),
+				}, nil)
+			},
+			// wantMessage: "success",
+			wantErr:  true,
+			wantErrMsg: "user not found",
 			wantCode: http.StatusOK,
 		},
 	}
@@ -83,26 +105,24 @@ func TestUserControllerGet(t *testing.T) {
 				},
 			}
 
-			userController.Get(context)
+			err := userController.Get(context)
+			
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetMe() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
 			if w.Code != tt.wantCode {
 				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
 			}
 
 			if !tt.wantErr {
-				actualH := struct {
-					Message string
-					Data    entity.User
-				}{}
-				err := json.Unmarshal(w.Body.Bytes(), &actualH)
+				actual := entity.User{}
+				err := json.Unmarshal(w.Body.Bytes(), &actual)
 				if err != nil {
 					t.Fatal(err)
 				}
-				if actualH.Message != tt.wantMessage {
-					t.Errorf("Get() message = %s, want = %s", actualH.Message, tt.wantMessage)
-				}
-				if !reflect.DeepEqual(actualH.Data, tt.wantData) {
-					t.Errorf("Get() user = %+v, want = %+v", actualH.Data, tt.wantData)
+				if !reflect.DeepEqual(actual, tt.wantData) {
+					t.Errorf("Get() user = %+v, want = %+v", actual, tt.wantData)
 				}
 			}
 		})
