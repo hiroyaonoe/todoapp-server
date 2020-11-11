@@ -69,6 +69,30 @@ func TestUserController_Get(t *testing.T) {
 			wantErr:     true,
 			wantCode:    http.StatusNotFound,
 		},
+		{
+			name:   "Cookieが空ならStatusBadRequest",
+			userid: "",
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantMessage: "strconv.Atoi: parsing \"\": invalid syntax",
+			wantData:    entity.User{},
+			wantErr:     true,
+			wantCode:    http.StatusBadRequest,
+		},
+		{
+			name:   "CookieがintでないならStatusBadRequest",
+			userid: "a",
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantMessage: "strconv.Atoi: parsing \"a\": invalid syntax",
+			wantData:    entity.User{},
+			wantErr:     true,
+			wantCode:    http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
