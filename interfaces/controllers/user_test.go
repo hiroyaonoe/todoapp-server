@@ -57,25 +57,18 @@ func TestUserControllerGet(t *testing.T) {
 			wantCode: http.StatusOK,
 		},
 		{
-			name:   "ユーザーが存在しない場合にErrRecordNotFoundを返す",
+			name:   "ユーザーが存在しない場合にErrUserNotFoundを返す",
 			userid: "3",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{
-					ID:        3,
-					Name:      "username",
-					Password:  "password",
-					Email:     "example@example.com",
-					CreatedAt: time.Unix(100, 0),
-					UpdatedAt: time.Unix(100, 0),
-				}, nil)
+				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{}, entity.ErrRecordNotFound)
 			},
-			// wantMessage: "success",
+			wantMessage: entity.ErrUserNotFound.Error(),
+			wantData: entity.User{},
 			wantErr:  true,
-			wantErrMsg: "user not found",
-			wantCode: http.StatusOK,
+			wantCode: http.StatusNotFound,
 		},
 	}
 
