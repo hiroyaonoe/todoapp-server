@@ -65,9 +65,9 @@ func TestUserControllerGet(t *testing.T) {
 				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{}, entity.ErrRecordNotFound)
 			},
 			wantMessage: entity.ErrUserNotFound.Error(),
-			wantData: entity.User{},
-			wantErr:  true,
-			wantCode: http.StatusNotFound,
+			wantData:    entity.User{},
+			wantErr:     true,
+			wantCode:    http.StatusNotFound,
 		},
 	}
 
@@ -102,7 +102,7 @@ func TestUserControllerGet(t *testing.T) {
 			if w.Code != tt.wantCode {
 				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
 			}
-			
+
 			actualH := struct {
 				Message string
 				Data    entity.User
@@ -117,7 +117,7 @@ func TestUserControllerGet(t *testing.T) {
 			if !reflect.DeepEqual(actualH.Data, tt.wantData) {
 				t.Errorf("Get() user = %+v, want = %+v", actualH.Data, tt.wantData)
 			}
-			
+
 		})
 	}
 }

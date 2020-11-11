@@ -3,11 +3,13 @@ package entity
 import (
 	"errors"
 )
+
 //Errors of user
 var (
 	// ErrUserNotFound user not found error
 	ErrUserNotFound = errors.New("user not found")
 )
+
 //Errors of go
 var (
 	// ErrRecordNotFound record not found error
