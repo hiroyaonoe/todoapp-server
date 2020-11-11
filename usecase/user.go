@@ -19,14 +19,14 @@ type UserInteractor struct {
 func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *ResultStatus) {
 	db := interactor.DB.Connect()
 	// User の取得
-	foundUser, err := interactor.User.FindByID(db, id)
+	user, err := interactor.User.FindByID(db, id)
 	if err == entity.ErrRecordNotFound {
 		return entity.User{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
 	}
 	if err != nil {
 		return entity.User{}, NewResultStatus(http.StatusInternalServerError, err)
 	}
-	(&foundUser).BuildForGet()
+	// (&user).BuildForGet()
 	return user, NewResultStatus(http.StatusOK, nil)
 }
 
@@ -38,6 +38,6 @@ func (interactor *UserInteractor) Create(user *entity.User) (resultStatus *Resul
 		user = &entity.User{}
 		return NewResultStatus(http.StatusInternalServerError, err)
 	}
-	user.BuildForGet()
+	// user.BuildForGet()
 	return NewResultStatus(http.StatusOK, nil)
 }
