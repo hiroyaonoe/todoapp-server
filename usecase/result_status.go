@@ -1,13 +1,15 @@
 package usecase
 
 type ResultStatus struct {
-	Error      error
 	StatusCode int
+	StatusMessage string
 }
 
-func NewResultStatus(statusCode int, err error) *ResultStatus {
+func NewResultStatus(statusCode int, msg string) *ResultStatus {
 	return &ResultStatus{
-		Error:      err,
 		StatusCode: statusCode,
+		StatusMessage: msg,
 	}
 }
+
+

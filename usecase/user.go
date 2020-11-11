@@ -16,7 +16,7 @@ type UserInteractor struct {
 	User repository.UserRepository
 }
 
-func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *ResultStatus) {
+func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *ResultStatus, err error){
 	db := interactor.DB.Connect()
 	// User の取得
 	foundUser, err := interactor.User.FindByID(db, id)
@@ -24,8 +24,8 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
 		return entity.User{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
 	}
 	if err != nil {
-		return entity.User{}, NewResultStatus(http.StatusNotFound, err)
+		return entity.User{}, NewResultStatus(http.StatusNotFound, "user not found"), err
 	}
 	user = foundUser.BuildForGet()
-	return user, NewResultStatus(http.StatusOK, nil)
+	return user, NewResultStatus(http.StatusOK, ""), nil
 }

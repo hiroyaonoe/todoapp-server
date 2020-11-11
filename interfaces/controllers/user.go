@@ -24,14 +24,15 @@ func NewUserController(db database.DBRepository) *UserController {
 	}
 }
 
-func (controller *UserController) Get(c Context) {
+func (controller *UserController) Get(c Context) error {
 	cookie, _ := c.Cookie("id")
 	id, _ := strconv.Atoi(cookie)
 
-	user, res := controller.Interactor.Get(id)
-	if res.Error != nil {
-		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
-		return
+	user, res, err := controller.Interactor.Get(id)
+	if err != nil {
+		c.JSON(res.StatusCode, res)
+		return err
 	}
-	c.JSON(res.StatusCode, NewH("success", user))
+	c.JSON(res.StatusCode, user)
+	return nil
 }

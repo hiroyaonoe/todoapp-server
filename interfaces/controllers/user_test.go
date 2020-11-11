@@ -25,9 +25,10 @@ func TestUserControllerGet(t *testing.T) {
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 		// prepareMockContext func(context *MockContext)
-		wantMessage string
+		// wantMessage string
 		wantData    entity.User
 		wantErr     bool
+		wantErrMsg string
 		wantCode    int
 	}{
 		{
@@ -46,7 +47,7 @@ func TestUserControllerGet(t *testing.T) {
 					UpdatedAt: time.Unix(100, 0),
 				}, nil)
 			},
-			wantMessage: "success",
+			// wantMessage: "success",
 			wantData: entity.User{
 				ID:    3,
 				Name:  "username",
@@ -97,12 +98,15 @@ func TestUserControllerGet(t *testing.T) {
 				},
 			}
 
-			userController.Get(context)
+			err := userController.Get(context)
+			
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetMe() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
 			if w.Code != tt.wantCode {
 				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
 			}
-
 			actualH := struct {
 				Message string
 				Data    entity.User
