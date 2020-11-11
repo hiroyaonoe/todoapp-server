@@ -12,7 +12,7 @@ import (
 type User struct {
 	ID        int       `gorm:"primary_key" json:"id"`
 	Name      string    `json:"name"`
-	Password  string    `sql:"not null" json:"-"`
+	Password  string    `sql:"not null" json:"password"`
 	Email     string    `sql:"not null;unique" json:"email"`
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
@@ -26,11 +26,7 @@ type UserForGet struct {
 	Email *string `json:"email"`
 }
 
-func (u *User) BuildForGet() {
-	user := User{}
-	user.ID = u.ID
-	user.Name = u.Name
-	user.Email = u.Email
-	u = &user
+func (u *User) HidePassword() {
+	u.Password = ""
 	return
 }

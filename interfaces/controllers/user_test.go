@@ -25,10 +25,10 @@ func TestUserController_Get(t *testing.T) {
 		userid              string
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
-		wantMessage string
-		wantData    entity.User
-		wantErr     bool
-		wantCode    int
+		wantMessage         string
+		wantData            entity.User
+		wantErr             bool
+		wantCode            int
 	}{
 		{
 			name:   "正しくユーザが取得できる",
@@ -151,40 +151,32 @@ func TestUserController_Create(t *testing.T) {
 
 	tests := []struct {
 		name                string
-		createUser          entity.User
+		body                string
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
-		wantMessage string
-		wantData    entity.User
-		wantErr     bool
-		wantCode    int
+		wantMessage         string
+		wantData            entity.User
+		wantErr             bool
+		wantCode            int
 	}{
 		{
-			name:   "正しくユーザを作成できる",
-			createUser: entity.User{
-				Name:      "username",
-				Password:  "password",
-				Email:     "example@example.com",
-			},
+			name: "正しくユーザを作成できる",
+			body: `{
+				"name":"username",
+				"password":"password",
+				"email":"example@example.com"
+			}`,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Create(gomock.Any(), gomock.Any()).
-				DoAndReturn(func(db *gorm.DB, user *entity.User) error {
-					user.ID = 3
-					user.CreatedAt = time.Unix(100, 0)
-					user.UpdatedAt = time.Unix(100, 0)
-					// user = &entity.User{
-					// 	ID:        3,
-					// 	Name:      "username",
-					// 	Password:  "password",
-					// 	Email:     "example@example.com",
-					// 	CreatedAt: time.Unix(100, 0),
-					// 	UpdatedAt: time.Unix(100, 0),
-					// }
-					return nil
-				})
+					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
+						user.ID = 3
+						user.CreatedAt = time.Unix(100, 0)
+						user.UpdatedAt = time.Unix(100, 0)
+						return nil
+					})
 			},
 			wantMessage: "success",
 			wantData: entity.User{
@@ -195,6 +187,22 @@ func TestUserController_Create(t *testing.T) {
 			wantErr:  false,
 			wantCode: http.StatusOK,
 		},
+		{
+			name: "RequestBodyが不正ならStatusBadRequest",
+			body: `{
+				"id":10,
+				"title":"title",
+				"userid":3
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantMessage: "invalid user",
+			wantData:    entity.User{},
+			wantErr:     true,
+			wantCode:    http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
@@ -202,11 +210,11 @@ func TestUserController_Create(t *testing.T) {
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
-			body, err := json.Marshal(&tt.createUser)
-			if err != nil {
-				t.Fatal(err)
-			}
-			context.Request, _ = http.NewRequest("POST", "/user", bytes.NewBuffer(body))
+			//body, err := json.Marshal(tt.body)
+			// if err != nil {
+			// 	t.Fatal(err)
+			// }
+			context.Request, _ = http.NewRequest("POST", "/user", bytes.NewBufferString(tt.body))
 
 			// モックの準備
 			ctrl := gomock.NewController(t)
@@ -233,7 +241,7 @@ func TestUserController_Create(t *testing.T) {
 				Message string
 				Data    entity.User
 			}{}
-			err = json.Unmarshal(w.Body.Bytes(), &actualH)
+			err := json.Unmarshal(w.Body.Bytes(), &actualH)
 			if err != nil {
 				t.Fatal(err)
 			}

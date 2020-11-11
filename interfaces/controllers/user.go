@@ -50,6 +50,14 @@ func (controller *UserController) Create(c Context) {
 		return
 	}
 
+	fields := []string{user.Name, user.Password, user.Email}
+	for _, field := range fields {
+		if field == "" {
+			c.JSON(http.StatusBadRequest, NewH("invalid user", nil))
+			return
+		}
+	}
+
 	res := controller.Interactor.Create(&user)
 	if res.Error != nil {
 		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))

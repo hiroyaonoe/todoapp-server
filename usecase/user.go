@@ -26,7 +26,7 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
 	if err != nil {
 		return entity.User{}, NewResultStatus(http.StatusInternalServerError, err)
 	}
-	// (&user).BuildForGet()
+	(&user).HidePassword()
 	return user, NewResultStatus(http.StatusOK, nil)
 }
 
@@ -38,6 +38,6 @@ func (interactor *UserInteractor) Create(user *entity.User) (resultStatus *Resul
 		user = &entity.User{}
 		return NewResultStatus(http.StatusInternalServerError, err)
 	}
-	// user.BuildForGet()
+	user.HidePassword()
 	return NewResultStatus(http.StatusOK, nil)
 }
