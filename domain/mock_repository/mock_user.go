@@ -50,12 +50,11 @@ func (mr *MockUserRepositoryMockRecorder) FindByID(db, id interface{}) *gomock.C
 }
 
 // Create mocks base method
-func (m *MockUserRepository) Create(db *gorm.DB, u entity.User) (entity.User, error) {
+func (m *MockUserRepository) Create(db *gorm.DB, u *entity.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Create", db, u)
-	ret0, _ := ret[0].(entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Create indicates an expected call of Create
@@ -65,12 +64,11 @@ func (mr *MockUserRepositoryMockRecorder) Create(db, u interface{}) *gomock.Call
 }
 
 // Update mocks base method
-func (m *MockUserRepository) Update(db *gorm.DB, u entity.User) (entity.User, error) {
+func (m *MockUserRepository) Update(db *gorm.DB, u *entity.User) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", db, u)
-	ret0, _ := ret[0].(entity.User)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Update indicates an expected call of Update
