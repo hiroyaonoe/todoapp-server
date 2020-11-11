@@ -14,14 +14,14 @@ func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user entity.User, err
 	return
 }
 
-func (repo *UserRepository) Create(db *gorm.DB, u entity.User) (user entity.User, err error) {
-	err = db.Create(&u).Error
-	return u, err
+func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
+	err = db.Create(u).Error
+	return
 }
 
-func (repo *UserRepository) Update(db *gorm.DB, u entity.User) (user entity.User, err error) {
-	err = db.Save(&u).Error
-	return u, err
+func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
+	err = db.Save(u).Error
+	return
 }
 
 func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {

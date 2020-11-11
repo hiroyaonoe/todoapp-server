@@ -24,8 +24,20 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
 		return entity.User{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
 	}
 	if err != nil {
-		return entity.User{}, NewResultStatus(http.StatusNotFound, err)
+		return entity.User{}, NewResultStatus(http.StatusInternalServerError, err)
 	}
-	user = foundUser.BuildForGet()
+	(&foundUser).BuildForGet()
 	return user, NewResultStatus(http.StatusOK, nil)
+}
+
+func (interactor *UserInteractor) Create(user *entity.User) (resultStatus *ResultStatus) {
+	db := interactor.DB.Connect()
+	// 新規Userを作成
+	err := interactor.User.Create(db, user)
+	if err != nil {
+		user = &entity.User{}
+		return NewResultStatus(http.StatusInternalServerError, err)
+	}
+	user.BuildForGet()
+	return NewResultStatus(http.StatusOK, nil)
 }

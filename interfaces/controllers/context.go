@@ -5,4 +5,5 @@ type Context interface {
 	JSON(code int, obj interface{})
 	Cookie(name string) (string, error)
 	SetCookie(name, value string, maxAge int, path, domain string, secure, httpOnly bool)
+	ShouldBindJSON(obj interface{}) error
 }

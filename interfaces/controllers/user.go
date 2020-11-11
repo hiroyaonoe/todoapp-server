@@ -5,8 +5,10 @@ routerから要求された処理をusecaseにつなぐ
 package controllers
 
 import (
+	"net/http"
 	"strconv"
 
+	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/interfaces/database"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
@@ -29,6 +31,22 @@ func (controller *UserController) Get(c Context) {
 	id, _ := strconv.Atoi(cookie)
 
 	user, res := controller.Interactor.Get(id)
+	if res.Error != nil {
+		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
+		return
+	}
+	c.JSON(res.StatusCode, NewH("success", user))
+}
+
+func (controller *UserController) Create(c Context) {
+	user := entity.User{}
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, NewH(err.Error(), nil))
+		return
+	}
+
+	res := controller.Interactor.Create(&user)
 	if res.Error != nil {
 		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
 		return
