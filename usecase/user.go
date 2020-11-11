@@ -20,6 +20,9 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
 	db := interactor.DB.Connect()
 	// User の取得
 	foundUser, err := interactor.User.FindByID(db, id)
+	if err == entity.ErrRecordNotFound {
+		return entity.User{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
+	}
 	if err != nil {
 		return entity.User{}, NewResultStatus(http.StatusNotFound, "user not found"), err
 	}
