@@ -52,8 +52,22 @@ func TestUserControllerGet(t *testing.T) {
 				Name:  "username",
 				Email: "example@example.com",
 			},
-			wantErr:  false,
+			wantErr:false,
 			wantCode: http.StatusOK,
+		},
+		{
+			name:   "ユーザーが存在しない場合にErrUserNotFoundを返す",
+			userid: "3",
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{}, entity.ErrRecordNotFound)
+			},
+			wantMessage: entity.ErrUserNotFound.Error(),
+			wantData: entity.User{},
+			wantErr:true,
+			wantCode: http.StatusNotFound,
 		},
 	}
 
@@ -89,22 +103,21 @@ func TestUserControllerGet(t *testing.T) {
 				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
 			}
 
-			if !tt.wantErr {
-				actualH := struct {
-					Message string
-					Data    entity.User
-				}{}
-				err := json.Unmarshal(w.Body.Bytes(), &actualH)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if actualH.Message != tt.wantMessage {
-					t.Errorf("Get() message = %s, want = %s", actualH.Message, tt.wantMessage)
-				}
-				if !reflect.DeepEqual(actualH.Data, tt.wantData) {
-					t.Errorf("Get() user = %+v, want = %+v", actualH.Data, tt.wantData)
-				}
+			actualH := struct {
+				Message string
+				Data    entity.User
+			}{}
+			err := json.Unmarshal(w.Body.Bytes(), &actualH)
+			if err != nil {
+				t.Fatal(err)
 			}
+			if actualH.Message != tt.wantMessage {
+				t.Errorf("Get() message = %s, want = %s", actualH.Message, tt.wantMessage)
+			}
+			if !reflect.DeepEqual(actualH.Data, tt.wantData) {
+				t.Errorf("Get() user = %+v, want = %+v", actualH.Data, tt.wantData)
+			}
+			
 		})
 	}
 }
