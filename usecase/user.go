@@ -31,19 +31,31 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
 }
 
 func (interactor *UserInteractor) Create(user *entity.User) (resultStatus *ResultStatus) {
-	// 不正なユーザーリクエストの判別
-	fields := []string{user.Name, user.Password, user.Email}
-	for _, field := range fields {
-		if field == "" {
-			return NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
-		}
+	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
+	if (user.Name == "") || (user.Password == "") || (user.Email == "") {
+		return NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
 	}
 
 	db := interactor.DB.Connect()
 	// 新規Userを作成
 	err := interactor.User.Create(db, user)
 	if err != nil {
-		user = &entity.User{}
+		return NewResultStatus(http.StatusInternalServerError, err)
+	}
+	user.HidePassword()
+	return NewResultStatus(http.StatusOK, nil)
+}
+
+func (interactor *UserInteractor) Update(user *entity.User) (resultStatus *ResultStatus) {
+	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
+	if (user.Name == "") && (user.Password == "") && (user.Email == "") {
+		return NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
+	}
+
+	db := interactor.DB.Connect()
+	// Userデータを更新
+	err := interactor.User.Update(db, user)
+	if err != nil {
 		return NewResultStatus(http.StatusInternalServerError, err)
 	}
 	user.HidePassword()

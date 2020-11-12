@@ -29,8 +29,7 @@ func NewUserController(db repository.DBRepository) *UserController {
 
 // Get is the Handler for GET /user
 func (controller *UserController) Get(c Context) {
-	cookie, err := c.Cookie("id")
-	id, err := strconv.Atoi(cookie)
+	id, err := GetUserIDFromCookie(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, NewH(err.Error(), nil))
 		return
@@ -46,8 +45,7 @@ func (controller *UserController) Get(c Context) {
 
 // Create is the Handler for POST /user
 func (controller *UserController) Create(c Context) {
-	user := entity.User{}
-	err := c.ShouldBindJSON(&user)
+	user, err := GetUserFromBody(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, NewH(err.Error(), nil))
 		return
@@ -63,5 +61,34 @@ func (controller *UserController) Create(c Context) {
 
 // Update is the Handler for PUT /user
 func (controller *UserController) Update(c Context) {
+	user, err := GetUserFromBody(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, NewH(err.Error(), nil))
+		return
+	}
 
+	id, err := GetUserIDFromCookie(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, NewH(err.Error(), nil))
+		return
+	}
+	user.ID = id
+
+	res := controller.Interactor.Update(&user)
+	if res.Error != nil {
+		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
+		return
+	}
+	c.JSON(res.StatusCode, NewH("success", user))
+}
+
+func GetUserIDFromCookie(c Context) (id int, err error) {
+	cookie, err := c.Cookie("id")
+	id, err = strconv.Atoi(cookie)
+	return
+}
+
+func GetUserFromBody(c Context) (user entity.User, err error) {
+	err = c.ShouldBindJSON(&user)
+	return
 }

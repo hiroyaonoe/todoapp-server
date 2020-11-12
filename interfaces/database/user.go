@@ -20,6 +20,12 @@ func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
 }
 
 func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
+	beforeuser := entity.User{}
+	err = db.First(&beforeuser, u.ID).Error
+	if err != nil {
+		return err
+	}
+	FillInNullFields(beforeuser, u)
 	err = db.Save(u).Error
 	return
 }
@@ -27,4 +33,17 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {
 	err = db.Delete(&entity.User{}, id).Error
 	return id, err
+}
+
+func FillInNullFields(before entity.User, after *entity.User) {
+	if after.Name == "" {
+		after.Name = before.Name
+	}
+	if after.Password == "" {
+		after.Password = before.Password
+	}
+	if after.Email == "" {
+		after.Email = before.Email
+	}
+	return
 }
