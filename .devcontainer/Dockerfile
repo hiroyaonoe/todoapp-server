@@ -48,10 +48,6 @@ RUN apt-get update \
         github.com/fatih/gomodifytags@latest  \
         github.com/mgechev/revive@latest  \
         github.com/go-delve/delve/cmd/dlv@latest 2>&1 \
-        github.com/golang/mock/gomock
-    #
-    # Install mockgen of gomock
-    && GOPATH=/tmp/gotools GO111MODULE=on go install github.com/golang/mock/mockgen
     #
     # Build Go tools w/o module support
     && GOPATH=/tmp/gotools go get -v github.com/alecthomas/gometalinter 2>&1 \
