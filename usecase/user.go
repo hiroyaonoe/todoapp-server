@@ -55,6 +55,9 @@ func (interactor *UserInteractor) Update(user *entity.User) (resultStatus *Resul
 	db := interactor.DB.Connect()
 	// Userデータを更新
 	err := interactor.User.Update(db, user)
+	if err == entity.ErrRecordNotFound {
+		return NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
+	}
 	if err != nil {
 		return NewResultStatus(http.StatusInternalServerError, err)
 	}

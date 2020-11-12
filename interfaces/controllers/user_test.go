@@ -198,7 +198,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantMessage: "invalid user",
+			wantMessage: entity.ErrInvalidUser.Error(),
 			wantData:    entity.User{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
@@ -319,10 +319,27 @@ func TestUserController_Update(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantMessage: "invalid user",
+			wantMessage: entity.ErrInvalidUser.Error(),
 			wantData:    entity.User{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
+		},
+		{
+			name:   "DBにユーザがいないときはErrUserNotFound",
+			userid: "3",
+			body: `{
+				"name":"newname"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(entity.ErrRecordNotFound)
+			},
+			wantMessage: entity.ErrUserNotFound.Error(),
+			wantData:    entity.User{},
+			wantErr:     true,
+			wantCode:    http.StatusNotFound,
 		},
 	}
 
