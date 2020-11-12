@@ -8,6 +8,8 @@ import (
 var (
 	// ErrUserNotFound user not found error
 	ErrUserNotFound = errors.New("user not found")
+	// ErrInvalidUser invalid user request error
+	ErrInvalidUser = errors.New("invalid user")
 )
 
 //Errors of go

@@ -203,6 +203,18 @@ func TestUserController_Create(t *testing.T) {
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
 		},
+		{
+			name: "RequestBodyがJSONでないならStatusBadRequest",
+			body: `aaaaa`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantMessage: "invalid character 'a' looking for beginning of value",
+			wantData:    entity.User{},
+			wantErr:     true,
+			wantCode:    http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {

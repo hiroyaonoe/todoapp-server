@@ -31,6 +31,14 @@ func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *R
 }
 
 func (interactor *UserInteractor) Create(user *entity.User) (resultStatus *ResultStatus) {
+	// 不正なユーザーリクエストの判別
+	fields := []string{user.Name, user.Password, user.Email}
+	for _, field := range fields {
+		if field == "" {
+			return NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
+		}
+	}
+
 	db := interactor.DB.Connect()
 	// 新規Userを作成
 	err := interactor.User.Create(db, user)
