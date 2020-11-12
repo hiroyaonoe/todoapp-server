@@ -54,7 +54,6 @@ func (db *DB) Connect() *gorm.DB {
 	return db.Connection
 }
 
-
 func (db *DB) Migrate() {
 	connection := db.Connect()
 	connection.AutoMigrate(&entity.User{})
