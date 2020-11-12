@@ -9,6 +9,7 @@ import (
 	"strconv"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 	"github.com/hiroyaonoe/todoapp-server/interfaces/database"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
@@ -17,10 +18,10 @@ type UserController struct {
 	Interactor usecase.UserInteractor
 }
 
-func NewUserController(db database.DBRepository) *UserController {
+func NewUserController(db repository.DBRepository) *UserController {
 	return &UserController{
 		Interactor: usecase.UserInteractor{
-			DB:   &db,
+			DB:   db,
 			User: &database.UserRepository{},
 		},
 	}

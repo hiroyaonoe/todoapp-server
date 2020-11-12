@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
@@ -51,4 +52,10 @@ func (db *DB) Begin() *gorm.DB {
 
 func (db *DB) Connect() *gorm.DB {
 	return db.Connection
+}
+
+
+func (db *DB) Migrate() {
+	connection := db.Connect()
+	connection.AutoMigrate(&entity.User{})
 }

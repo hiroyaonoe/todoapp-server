@@ -6,6 +6,8 @@ import (
 
 func main() {
 	db := infrastructure.NewDB()
+	// db := infrastructure.NewTestDB()
+	db.Migrate()
 	r := infrastructure.NewRouting(db)
 	r.Run()
 }
