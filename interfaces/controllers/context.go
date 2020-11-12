@@ -1,5 +1,6 @@
 package controllers
 
+// Context is a interface for gin.Context
 type Context interface {
 	Param(key string) string
 	JSON(code int, obj interface{})

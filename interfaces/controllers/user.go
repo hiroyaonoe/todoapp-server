@@ -27,6 +27,7 @@ func NewUserController(db repository.DBRepository) *UserController {
 	}
 }
 
+// Get is the Handler for GET /user
 func (controller *UserController) Get(c Context) {
 	cookie, err := c.Cookie("id")
 	id, err := strconv.Atoi(cookie)
@@ -43,6 +44,7 @@ func (controller *UserController) Get(c Context) {
 	c.JSON(res.StatusCode, NewH("success", user))
 }
 
+// Create is the Handler for POST /user
 func (controller *UserController) Create(c Context) {
 	user := entity.User{}
 	err := c.ShouldBindJSON(&user)
@@ -57,4 +59,9 @@ func (controller *UserController) Create(c Context) {
 		return
 	}
 	c.JSON(res.StatusCode, NewH("success", user))
+}
+
+// Update is the Handler for PUT /user
+func (controller *UserController) Update(c Context) {
+
 }
