@@ -1,3 +1,7 @@
+/*
+Package database is Interface Adapters.
+SQLへのクエリはここで行う
+*/
 package database
 
 import (
