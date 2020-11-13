@@ -11,7 +11,6 @@ import (
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
-	"github.com/hiroyaonoe/todoapp-server/database"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
 
@@ -19,11 +18,11 @@ type UserController struct {
 	Interactor usecase.UserInteractor
 }
 
-func NewUserController(db repository.DBRepository) *UserController {
+func NewUserController(db repository.DBRepository, user repository.UserRepository) *UserController {
 	return &UserController{
 		Interactor: usecase.UserInteractor{
 			DB:   db,
-			User: &database.UserRepository{},
+			User: user,
 		},
 	}
 }

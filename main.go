@@ -9,6 +9,7 @@ func main() {
 	db := database.NewDB()
 	// db := database.NewTestDB()
 	db.Migrate()
-	r := web.NewRouting(db)
+	user := new(database.UserRepository)
+	r := web.NewRouting(db, user)
 	r.Run()
 }
