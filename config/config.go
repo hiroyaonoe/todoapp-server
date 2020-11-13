@@ -3,7 +3,7 @@ Package infrastructure is Frameworks & Drivers.
 DBのドライバー,Ginをinterfacesとつなぐ．
 interfacesに依存．
 */
-package infrastructure
+package config
 
 // Config is a config for connecting DB
 type Config struct {

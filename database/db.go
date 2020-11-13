@@ -1,11 +1,13 @@
-package infrastructure
+package database
 
 import (
+	"github.com/hiroyaonoe/todoapp-server/config"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
+// DB はinterface DBRepositoryを満たす
 type DB struct {
 	Host       string
 	Username   string
@@ -16,7 +18,7 @@ type DB struct {
 }
 
 func NewDB() *DB {
-	c := NewConfig()
+	c := config.NewConfig()
 	return newDB(&DB{
 		Host:     c.DB.Production.Host,
 		Username: c.DB.Production.Username,
@@ -27,7 +29,7 @@ func NewDB() *DB {
 }
 
 func NewTestDB() *DB {
-	c := NewConfig()
+	c := config.NewConfig()
 	return newDB(&DB{
 		Host:     c.DB.Test.Host,
 		Username: c.DB.Test.Username,

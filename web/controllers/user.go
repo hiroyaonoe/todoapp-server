@@ -10,7 +10,7 @@ import (
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
-	"github.com/hiroyaonoe/todoapp-server/interfaces/database"
+	"github.com/hiroyaonoe/todoapp-server/database"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
 

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/hiroyaonoe/todoapp-server/infrastructure"
+	"github.com/hiroyaonoe/todoapp-server/web"
+	"github.com/hiroyaonoe/todoapp-server/database"
 )
 
 func main() {
-	db := infrastructure.NewDB()
-	// db := infrastructure.NewTestDB()
+	db := database.NewDB()
+	// db := database.NewTestDB()
 	db.Migrate()
-	r := infrastructure.NewRouting(db)
+	r := web.NewRouting(db)
 	r.Run()
 }

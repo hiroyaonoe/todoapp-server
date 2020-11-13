@@ -1,18 +1,20 @@
-package infrastructure
+package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hiroyaonoe/todoapp-server/interfaces/controllers"
+	"github.com/hiroyaonoe/todoapp-server/web/controllers"
+	"github.com/hiroyaonoe/todoapp-server/database"
+	"github.com/hiroyaonoe/todoapp-server/config"
 )
 
 type Routing struct {
-	DB   *DB
+	DB   *database.DB
 	Gin  *gin.Engine
 	Port string
 }
 
-func NewRouting(db *DB) *Routing {
-	c := NewConfig()
+func NewRouting(db *database.DB) *Routing {
+	c := config.NewConfig()
 	r := &Routing{
 		DB:   db,
 		Gin:  gin.Default(),
