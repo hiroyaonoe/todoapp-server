@@ -1,14 +1,14 @@
 /*
-Package web is Interface Adapters.
+Package web is Frameworks & Drivers.
 ルーティング処理
 */
 package web
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/hiroyaonoe/todoapp-server/web/controllers"
-	"github.com/hiroyaonoe/todoapp-server/database"
 	"github.com/hiroyaonoe/todoapp-server/config"
+	"github.com/hiroyaonoe/todoapp-server/database"
+	"github.com/hiroyaonoe/todoapp-server/web/controllers"
 )
 
 type Routing struct {

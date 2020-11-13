@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hiroyaonoe/todoapp-server/web"
 	"github.com/hiroyaonoe/todoapp-server/database"
+	"github.com/hiroyaonoe/todoapp-server/web"
 )
 
 func main() {
