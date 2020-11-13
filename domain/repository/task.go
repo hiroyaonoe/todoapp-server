@@ -8,6 +8,7 @@ import (
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 )
 
+// TaskRepository is interface of Task
 type TaskRepository interface {
 	FindByUser(db *gorm.DB, uid int) (tasks []entity.Task, err error)
 	FindByID(db *gorm.DB, id int) (task entity.Task, err error)

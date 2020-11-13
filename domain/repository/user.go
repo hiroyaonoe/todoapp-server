@@ -13,6 +13,7 @@ import (
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 )
 
+// UserRepository is interface of User
 type UserRepository interface {
 	FindByID(db *gorm.DB, id int) (user *entity.User, err error)
 	Create(db *gorm.DB, u *entity.User) (err error)

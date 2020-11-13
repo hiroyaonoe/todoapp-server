@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+// DBRepository is interface of DB
 type DBRepository interface {
 	Begin() *gorm.DB
 	Connect() *gorm.DB

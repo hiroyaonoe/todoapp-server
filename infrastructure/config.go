@@ -1,10 +1,11 @@
 /*
-infrastructure is Frameworks & Drivers.
+Package infrastructure is Frameworks & Drivers.
 DBのドライバー,Ginをinterfacesとつなぐ．
 interfacesに依存．
 */
 package infrastructure
 
+// Config is a config for connecting DB
 type Config struct {
 	DB struct {
 		Production struct {
@@ -27,6 +28,7 @@ type Config struct {
 	}
 }
 
+// NewConfig is constructor of Config
 func NewConfig() *Config {
 
 	c := new(Config)

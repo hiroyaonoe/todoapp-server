@@ -1,5 +1,5 @@
 /*
-usecase is Application Business Rules.
+Package usecase is Application Business Rules.
 具体的な処理を行う
 */
 package usecase
