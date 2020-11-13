@@ -1,5 +1,5 @@
 /*
-entity is Enterprise Business Rules.
+Package entity is Enterprise Business Rules.
 エンティティがどうあるべきか記述
 どこにも依存しない．
 */
@@ -26,7 +26,7 @@ type UserForJSON struct {
 	Email string `json:"email"`
 }
 
-// toUserForJSON はUserからUserForJSONを取得する関数である
+// ToUserForJSON はUserからUserForJSONを取得する関数である
 func (u *User) ToUserForJSON() (p UserForJSON) {
 	p.ID = u.ID
 	p.Name = u.Name

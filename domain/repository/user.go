@@ -1,7 +1,7 @@
 //go:generate mockgen -source=$GOFILE -destination=../mock_repository/mock_$GOFILE -package=mock_repository
 
 /*
-repository is Enterprise Business Rules.
+Package repository is Enterprise Business Rules.
 データベースへの処理がどうあるべきかインターフェースの形で記述
 どこにも依存しない．
 */
