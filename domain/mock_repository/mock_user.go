@@ -35,10 +35,10 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // FindByID mocks base method
-func (m *MockUserRepository) FindByID(db *gorm.DB, id int) (entity.User, error) {
+func (m *MockUserRepository) FindByID(db *gorm.DB, id int) (*entity.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByID", db, id)
-	ret0, _ := ret[0].(entity.User)
+	ret0, _ := ret[0].(*entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

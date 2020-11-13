@@ -8,9 +8,9 @@ import (
 // UserRepository の具体的な実装
 type UserRepository struct{}
 
-func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user entity.User, err error) {
-	user = entity.User{}
-	err = db.First(&user, id).Error
+func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user *entity.User, err error) {
+	user = &entity.User{}
+	err = db.First(user, id).Error
 	return
 }
 

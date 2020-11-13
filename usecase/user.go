@@ -16,51 +16,51 @@ type UserInteractor struct {
 	User repository.UserRepository
 }
 
-func (interactor *UserInteractor) Get(id int) (user entity.User, resultStatus *ResultStatus) {
+func (interactor *UserInteractor) Get(id int) (jsonUser entity.UserForJSON, resultStatus *ResultStatus) {
 	db := interactor.DB.Connect()
 	// User の取得
 	user, err := interactor.User.FindByID(db, id)
 	if err == entity.ErrRecordNotFound {
-		return entity.User{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
 	}
 	if err != nil {
-		return entity.User{}, NewResultStatus(http.StatusInternalServerError, err)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusInternalServerError, err)
 	}
-	(&user).HidePassword()
-	return user, NewResultStatus(http.StatusOK, nil)
+	jsonUser = user.ToUserForJSON()
+	return jsonUser, NewResultStatus(http.StatusOK, nil)
 }
 
-func (interactor *UserInteractor) Create(user *entity.User) (resultStatus *ResultStatus) {
+func (interactor *UserInteractor) Create(user *entity.User) (jsonUser entity.UserForJSON, resultStatus *ResultStatus) {
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
 	if (user.Name == "") || (user.Password == "") || (user.Email == "") {
-		return NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
 	}
 
 	db := interactor.DB.Connect()
 	// 新規Userを作成
 	err := interactor.User.Create(db, user)
 	if err != nil {
-		return NewResultStatus(http.StatusInternalServerError, err)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusInternalServerError, err)
 	}
-	user.HidePassword()
-	return NewResultStatus(http.StatusOK, nil)
+	jsonUser = user.ToUserForJSON()
+	return jsonUser, NewResultStatus(http.StatusOK, nil)
 }
 
-func (interactor *UserInteractor) Update(user *entity.User) (resultStatus *ResultStatus) {
+func (interactor *UserInteractor) Update(user *entity.User) (jsonUser entity.UserForJSON, resultStatus *ResultStatus) {
 	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
 	if (user.Name == "") && (user.Password == "") && (user.Email == "") {
-		return NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusBadRequest, entity.ErrInvalidUser)
 	}
 
 	db := interactor.DB.Connect()
 	// Userデータを更新
 	err := interactor.User.Update(db, user)
 	if err == entity.ErrRecordNotFound {
-		return NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusNotFound, entity.ErrUserNotFound)
 	}
 	if err != nil {
-		return NewResultStatus(http.StatusInternalServerError, err)
+		return entity.UserForJSON{}, NewResultStatus(http.StatusInternalServerError, err)
 	}
-	user.HidePassword()
-	return NewResultStatus(http.StatusOK, nil)
+	jsonUser = user.ToUserForJSON()
+	return jsonUser, NewResultStatus(http.StatusOK, nil)
 }

@@ -35,12 +35,12 @@ func (controller *UserController) Get(c Context) {
 		return
 	}
 
-	user, res := controller.Interactor.Get(id)
+	jsonUser, res := controller.Interactor.Get(id)
 	if res.Error != nil {
 		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
 		return
 	}
-	c.JSON(res.StatusCode, NewH("success", user))
+	c.JSON(res.StatusCode, NewH("success", jsonUser))
 }
 
 // Create is the Handler for POST /user
@@ -51,12 +51,12 @@ func (controller *UserController) Create(c Context) {
 		return
 	}
 
-	res := controller.Interactor.Create(&user)
+	jsonUser, res := controller.Interactor.Create(&user)
 	if res.Error != nil {
 		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
 		return
 	}
-	c.JSON(res.StatusCode, NewH("success", user))
+	c.JSON(res.StatusCode, NewH("success", jsonUser))
 }
 
 // Update is the Handler for PUT /user
@@ -74,12 +74,12 @@ func (controller *UserController) Update(c Context) {
 	}
 	user.ID = id
 
-	res := controller.Interactor.Update(&user)
+	jsonUser, res := controller.Interactor.Update(&user)
 	if res.Error != nil {
 		c.JSON(res.StatusCode, NewH(res.Error.Error(), nil))
 		return
 	}
-	c.JSON(res.StatusCode, NewH("success", user))
+	c.JSON(res.StatusCode, NewH("success", jsonUser))
 }
 
 func GetUserIDFromCookie(c Context) (id int, err error) {
