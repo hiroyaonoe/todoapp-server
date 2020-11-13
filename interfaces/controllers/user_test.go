@@ -26,7 +26,7 @@ func TestUserController_Get(t *testing.T) {
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 		wantMessage         string
-		wantData            entity.User
+		wantData            entity.UserForJSON
 		wantErr             bool
 		wantCode            int
 	}{
@@ -37,7 +37,7 @@ func TestUserController_Get(t *testing.T) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{
+				user.EXPECT().FindByID(gomock.Any(), 3).Return(&entity.User{
 					ID:        3,
 					Name:      "username",
 					Password:  "password",
@@ -47,7 +47,7 @@ func TestUserController_Get(t *testing.T) {
 				}, nil)
 			},
 			wantMessage: "success",
-			wantData: entity.User{
+			wantData: entity.UserForJSON{
 				ID:    3,
 				Name:  "username",
 				Email: "example@example.com",
@@ -62,10 +62,10 @@ func TestUserController_Get(t *testing.T) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), 3).Return(entity.User{}, entity.ErrRecordNotFound)
+				user.EXPECT().FindByID(gomock.Any(), 3).Return(&entity.User{}, entity.ErrRecordNotFound)
 			},
 			wantMessage: entity.ErrUserNotFound.Error(),
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusNotFound,
 		},
@@ -77,7 +77,7 @@ func TestUserController_Get(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantMessage: "strconv.Atoi: parsing \"\": invalid syntax",
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
 		},
@@ -89,7 +89,7 @@ func TestUserController_Get(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantMessage: "strconv.Atoi: parsing \"a\": invalid syntax",
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
 		},
@@ -129,7 +129,7 @@ func TestUserController_Get(t *testing.T) {
 
 			actualH := struct {
 				Message string
-				Data    entity.User
+				Data    entity.UserForJSON
 			}{}
 			err := json.Unmarshal(w.Body.Bytes(), &actualH)
 			if err != nil {
@@ -155,7 +155,7 @@ func TestUserController_Create(t *testing.T) {
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 		wantMessage         string
-		wantData            entity.User
+		wantData            entity.UserForJSON
 		wantErr             bool
 		wantCode            int
 	}{
@@ -179,7 +179,7 @@ func TestUserController_Create(t *testing.T) {
 					})
 			},
 			wantMessage: "success",
-			wantData: entity.User{
+			wantData: entity.UserForJSON{
 				ID:    3,
 				Name:  "username",
 				Email: "example@example.com",
@@ -199,7 +199,7 @@ func TestUserController_Create(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantMessage: entity.ErrInvalidUser.Error(),
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
 		},
@@ -211,7 +211,7 @@ func TestUserController_Create(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantMessage: "invalid character 'a' looking for beginning of value",
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
 		},
@@ -247,7 +247,7 @@ func TestUserController_Create(t *testing.T) {
 
 			actualH := struct {
 				Message string
-				Data    entity.User
+				Data    entity.UserForJSON
 			}{}
 			err := json.Unmarshal(w.Body.Bytes(), &actualH)
 			if err != nil {
@@ -274,7 +274,7 @@ func TestUserController_Update(t *testing.T) {
 		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 		wantMessage         string
-		wantData            entity.User
+		wantData            entity.UserForJSON
 		wantErr             bool
 		wantCode            int
 	}{
@@ -299,7 +299,7 @@ func TestUserController_Update(t *testing.T) {
 					})
 			},
 			wantMessage: "success",
-			wantData: entity.User{
+			wantData: entity.UserForJSON{
 				ID:    3,
 				Name:  "newname",
 				Email: "example@example.com",
@@ -320,7 +320,7 @@ func TestUserController_Update(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantMessage: entity.ErrInvalidUser.Error(),
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusBadRequest,
 		},
@@ -337,7 +337,7 @@ func TestUserController_Update(t *testing.T) {
 				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(entity.ErrRecordNotFound)
 			},
 			wantMessage: entity.ErrUserNotFound.Error(),
-			wantData:    entity.User{},
+			wantData:    entity.UserForJSON{},
 			wantErr:     true,
 			wantCode:    http.StatusNotFound,
 		},
@@ -377,7 +377,7 @@ func TestUserController_Update(t *testing.T) {
 
 			actualH := struct {
 				Message string
-				Data    entity.User
+				Data    entity.UserForJSON
 			}{}
 			err := json.Unmarshal(w.Body.Bytes(), &actualH)
 			if err != nil {
