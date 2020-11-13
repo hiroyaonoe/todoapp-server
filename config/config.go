@@ -1,7 +1,6 @@
 /*
-Package infrastructure is Frameworks & Drivers.
-DBのドライバー,Ginをinterfacesとつなぐ．
-interfacesに依存．
+Package config はconfigファイルを集めたパッケージ
+将来的には環境変数から取得するようにする
 */
 package config
 
@@ -28,7 +27,7 @@ type Config struct {
 	}
 }
 
-// NewConfig is constructor of Config
+// NewConfig is a constructor of Config
 func NewConfig() *Config {
 
 	c := new(Config)

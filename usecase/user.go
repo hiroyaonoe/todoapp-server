@@ -1,6 +1,7 @@
 /*
 Package usecase is Application Business Rules.
 具体的な処理を行う
+domainにのみ依存
 */
 package usecase
 

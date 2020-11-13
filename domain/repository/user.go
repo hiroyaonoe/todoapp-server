@@ -3,7 +3,8 @@
 /*
 Package repository is Enterprise Business Rules.
 データベースへの処理がどうあるべきかインターフェースの形で記述
-どこにも依存しない．
+永続化を責務とする
+どこにも依存しない
 */
 package repository
 

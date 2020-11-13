@@ -1,6 +1,7 @@
 /*
 Package controllers is Interface Adapters.
 routerから要求された処理をusecaseにつなぐ
+
 */
 package controllers
 

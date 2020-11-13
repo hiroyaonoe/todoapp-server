@@ -1,3 +1,8 @@
+/*
+Package database is Frameworks & Drivers.
+SQLへの接続，クエリはここで行う
+domainにのみ依存
+*/
 package database
 
 import (

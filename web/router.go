@@ -1,3 +1,7 @@
+/*
+Package web is Interface Adapters.
+ルーティング処理
+*/
 package web
 
 import (
