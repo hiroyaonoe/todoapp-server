@@ -8,6 +8,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"errors"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
@@ -31,17 +32,18 @@ func NewUserController(db repository.DBRepository, user repository.UserRepositor
 func (controller *UserController) Get(c Context) {
 	id, err := GetUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
 	}
 
 	jsonUser, err := controller.Interactor.Get(id)
-	if err == entity.ErrRecordNotFound {
-		errorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
-		return
-	}
+	
 	if err != nil {
-		errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
+			return
+		}
+		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		return
 	}
 	c.JSON(http.StatusOK, jsonUser)
@@ -51,17 +53,18 @@ func (controller *UserController) Get(c Context) {
 func (controller *UserController) Create(c Context) {
 	user, err := GetUserFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
 	}
 
 	jsonUser, err := controller.Interactor.Create(&user)
-	if err == entity.ErrInvalidUser {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrInvalidUser)
-		return
-	}
+	
 	if err != nil {
-		errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		if errors.Is(err, entity.ErrInvalidUser) {
+			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+			return
+		}
+		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		return
 	}
 	c.JSON(http.StatusOK, jsonUser)
@@ -72,22 +75,23 @@ func (controller *UserController) Update(c Context) {
 	user, err := GetUserFromBody(c)
 	id, err := GetUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
 	}
 	user.ID = id
 
 	jsonUser, err := controller.Interactor.Update(&user)
-	if err == entity.ErrInvalidUser {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrInvalidUser)
-		return
-	}
-	if err == entity.ErrUserNotFound {
-		errorToJSON(c, http.StatusNotFound, err)
-		return
-	}
+
 	if err != nil {
-		errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		if errors.Is(err, entity.ErrInvalidUser) {
+			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+			return
+		}
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
+			return
+		}
+		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		return
 	}
 	c.JSON(http.StatusOK, jsonUser)

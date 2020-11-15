@@ -19,9 +19,6 @@ func (interactor *UserInteractor) Get(id int) (jsonUser *entity.UserForJSON, err
 	db := interactor.DB.Connect()
 	// User の取得
 	user, err := interactor.User.FindByID(db, id)
-	if err == entity.ErrRecordNotFound {
-		return nil, entity.ErrUserNotFound
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -54,9 +51,6 @@ func (interactor *UserInteractor) Update(user *entity.User) (jsonUser *entity.Us
 	db := interactor.DB.Connect()
 	// Userデータを更新
 	err = interactor.User.Update(db, user)
-	if err == entity.ErrRecordNotFound {
-		return nil, entity.ErrUserNotFound
-	}
 	if err != nil {
 		return nil, err
 	}

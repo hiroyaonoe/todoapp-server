@@ -5,9 +5,9 @@ import (
 )
 //Errors of http
 var (
-	// ErrUserNotFound user not found error
+	// ErrBadRequest is http.StatusBadRequest
 	ErrBadRequest = errors.New("bad request")
-	// ErrInvalidUser invalid user request error
+	// ErrInternalServerError is http.StatusInternalServerError
 	ErrInternalServerError = errors.New("internal server error")
 )
 
@@ -15,7 +15,7 @@ var (
 var (
 	// ErrUserNotFound user not found error
 	ErrUserNotFound = errors.New("user not found")
-	// ErrInvalidUser invalid user request error
+	// ErrInvalidUser invalid user request error(private)
 	ErrInvalidUser = errors.New("invalid user")
 )
 
