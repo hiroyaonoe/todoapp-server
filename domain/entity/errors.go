@@ -3,6 +3,13 @@ package entity
 import (
 	"errors"
 )
+//Errors of http
+var (
+	// ErrUserNotFound user not found error
+	ErrBadRequest = errors.New("bad request")
+	// ErrInvalidUser invalid user request error
+	ErrInternalServerError = errors.New("internal server error")
+)
 
 //Errors of user
 var (
