@@ -17,6 +17,10 @@
 		"go.alternateTools": {
 			"go-langserver":"gopls",
 		},
+		"gopls": {
+			"completeUnimported": true,
+			"linkTarget": "godoc.org",
+		},
 	},
 	
 	// Add the IDs of extensions you want installed when the container is created.
