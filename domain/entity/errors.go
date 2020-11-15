@@ -12,7 +12,7 @@ var (
 	ErrInvalidUser = errors.New("invalid user")
 )
 
-//Errors of go
+//Errors of gorm
 var (
 	// ErrRecordNotFound record not found error
 	ErrRecordNotFound = errors.New("record not found")
