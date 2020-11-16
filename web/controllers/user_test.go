@@ -101,6 +101,7 @@ func TestUserController_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
@@ -139,7 +140,7 @@ func TestUserController_Get(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %+v, want = %+v", actualData, expectData)
+					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -149,7 +150,7 @@ func TestUserController_Get(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %+v, want = %+v", actualData, expectData)
+					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -231,6 +232,7 @@ func TestUserController_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
@@ -265,7 +267,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %+v, want = %+v", actualData, expectData)
+					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -275,7 +277,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %+v, want = %+v", actualData, expectData)
+					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -365,6 +367,7 @@ func TestUserController_Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
@@ -403,7 +406,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %+v, want = %+v", actualData, expectData)
+					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -413,7 +416,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %+v, want = %+v", actualData, expectData)
+					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
