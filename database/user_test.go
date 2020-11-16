@@ -52,6 +52,17 @@ func TestUserRepository_FindByID(t *testing.T) {
 				userC,
 			},
 		},
+		{
+			name:"存在しないユーザーの場合はErrRecordNotFound",
+			userid:4,
+			wantUser: nil,
+			wantErr:entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+				userC,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -59,6 +70,9 @@ func TestUserRepository_FindByID(t *testing.T) {
 			dbRepo.Migrate()
 			user := new(UserRepository)
 			db := dbRepo.Connect()
+
+			// databaseを初期化する
+			db.Exec("TRUNCATE TABLE users")
 
 			// 事前データの準備
 			// tx := db.Begin()
@@ -77,9 +91,6 @@ func TestUserRepository_FindByID(t *testing.T) {
 			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
 				t.Errorf("FindByID() = %#v, want %#v", gotUser, tt.wantUser)
 			}
-			
-			// databaseを初期化する
-			db.Exec("TRUNCATE TABLE users")
 		})
 	}
 }
