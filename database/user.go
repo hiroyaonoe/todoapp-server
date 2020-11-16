@@ -19,23 +19,42 @@ func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user *entity.User, er
 }
 
 func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
-	err = db.Create(u).Error
+	tx := db.Begin()
+	err = tx.Create(u).Error
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
 	return
 }
 
 func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
+	tx := db.Begin()
 	beforeuser := entity.User{}
 	err = db.First(&beforeuser, u.ID).Error
 	if err != nil {
-		return err
+		tx.Rollback()
+		return
 	}
 	FillInNullFields(beforeuser, u)
 	err = db.Save(u).Error
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
 	return
 }
 
 func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {
-	err = db.Delete(&entity.User{}, id).Error
+	tx := db.Begin()
+	err = tx.Delete(&entity.User{}, id).Error
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+	tx.Commit()
 	return id, err
 }
 
