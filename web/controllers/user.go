@@ -8,7 +8,6 @@ package controllers
 import (
 	"net/http"
 	"strconv"
-	"errors"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
@@ -39,7 +38,7 @@ func (controller *UserController) Get(c Context) {
 	jsonUser, err := controller.Interactor.Get(id)
 	
 	if err != nil {
-		if errors.Is(err, entity.ErrRecordNotFound) {
+		if err == entity.ErrRecordNotFound {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
@@ -60,7 +59,7 @@ func (controller *UserController) Create(c Context) {
 	jsonUser, err := controller.Interactor.Create(&user)
 	
 	if err != nil {
-		if errors.Is(err, entity.ErrInvalidUser) {
+		if err == entity.ErrInvalidUser {
 			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
@@ -83,11 +82,11 @@ func (controller *UserController) Update(c Context) {
 	jsonUser, err := controller.Interactor.Update(&user)
 
 	if err != nil {
-		if errors.Is(err, entity.ErrInvalidUser) {
+		if err == entity.ErrInvalidUser {
 			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
-		if errors.Is(err, entity.ErrRecordNotFound) {
+		if err == entity.ErrRecordNotFound {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}

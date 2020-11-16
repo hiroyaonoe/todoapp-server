@@ -22,5 +22,5 @@ todoapp-server
 # gomod
 go.sum
 
-#memo
-curl.txt
+# private
+mygitignore/

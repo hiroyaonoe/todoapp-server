@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"github.com/jinzhu/gorm"
 )
 //Errors of http
 var (
@@ -19,32 +20,46 @@ var (
 	ErrInvalidUser = errors.New("invalid user")
 )
 
-//Errors of gorm
+//Errors of jinzhu/gorm
 var (
-	// ErrRecordNotFound record not found error
-	ErrRecordNotFound = errors.New("record not found")
-	// ErrInvalidTransaction invalid transaction when you are trying to `Commit` or `Rollback`
-	ErrInvalidTransaction = errors.New("no valid transaction")
-	// ErrNotImplemented not implemented
-	ErrNotImplemented = errors.New("not implemented")
-	// ErrMissingWhereClause missing where clause
-	ErrMissingWhereClause = errors.New("WHERE conditions required")
-	// ErrUnsupportedRelation unsupported relations
-	ErrUnsupportedRelation = errors.New("unsupported relations")
-	// ErrPrimaryKeyRequired primary keys required
-	ErrPrimaryKeyRequired = errors.New("primary key required")
-	// ErrModelValueRequired model value required
-	ErrModelValueRequired = errors.New("model value required")
-	// ErrInvalidData unsupported data
-	ErrInvalidData = errors.New("unsupported data")
-	// ErrUnsupportedDriver unsupported driver
-	ErrUnsupportedDriver = errors.New("unsupported driver")
-	// ErrRegistered registered
-	ErrRegistered = errors.New("registered")
-	// ErrInvalidField invalid field
-	ErrInvalidField = errors.New("invalid field")
-	// ErrEmptySlice empty slice found
-	ErrEmptySlice = errors.New("empty slice found")
-	// ErrDryRunModeUnsupported dry run mode unsupported
-	ErrDryRunModeUnsupported = errors.New("dry run mode unsupported")
+	// ErrRecordNotFound returns a "record not found error". Occurs only when attempting to query the database with a struct; querying with a slice won't return this error
+	ErrRecordNotFound = gorm.ErrRecordNotFound
+	// ErrInvalidSQL occurs when you attempt a query with invalid SQL
+	ErrInvalidSQL = gorm.ErrInvalidSQL
+	// ErrInvalidTransaction occurs when you are trying to `Commit` or `Rollback`
+	ErrInvalidTransaction = gorm.ErrInvalidTransaction
+	// ErrCantStartTransaction can't start transaction when you are trying to start one with `Begin`
+	ErrCantStartTransaction = gorm.ErrCantStartTransaction
+	// ErrUnaddressable unaddressable value
+	ErrUnaddressable = gorm.ErrUnaddressable
 )
+
+// //Errors of go-gorm/gorm
+// var (
+// 	// ErrRecordNotFound record not found error
+// 	ErrRecordNotFound = gorm.ErrRecordNotFound
+// 	// ErrInvalidTransaction invalid transaction when you are trying to `Commit` or `Rollback`
+// 	ErrInvalidTransaction = gorm.ErrInvalidTransaction
+// 	// ErrNotImplemented not implemented
+// 	ErrNotImplemented = gorm.ErrNotImplemented
+// 	// ErrMissingWhereClause missing where clause
+// 	ErrMissingWhereClause = gorm.ErrMissingWhereClause
+// 	// ErrUnsupportedRelation unsupported relations
+// 	ErrUnsupportedRelation = gorm.ErrUnsupportedRelation
+// 	// ErrPrimaryKeyRequired primary keys required
+// 	ErrPrimaryKeyRequired = gorm.ErrPrimaryKeyRequired
+// 	// ErrModelValueRequired model value required
+// 	ErrModelValueRequired = gorm.ErrModelValueRequired
+// 	// ErrInvalidData unsupported data
+// 	ErrInvalidData = gorm.ErrInvalidData
+// 	// ErrUnsupportedDriver unsupported driver
+// 	ErrUnsupportedDriver = gorm.ErrUnsupportedDriver
+// 	// ErrRegistered registered
+// 	ErrRegistered = gorm.ErrRegistered
+// 	// ErrInvalidField invalid field
+// 	ErrInvalidField = gorm.ErrInvalidField
+// 	// ErrEmptySlice empty slice found
+// 	ErrEmptySlice = gorm.ErrEmptySlice
+// 	// ErrDryRunModeUnsupported dry run mode unsupported
+// 	ErrDryRunModeUnsupported = gorm.ErrDryRunModeUnsupported
+// )
