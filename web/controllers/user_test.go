@@ -256,7 +256,7 @@ func TestUserController_Create(t *testing.T) {
 			userController.Create(context)
 
 			if w.Code != tt.wantCode {
-				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
+				t.Errorf("Create() code = %d, want = %d", w.Code, tt.wantCode)
 			}
 
 			if tt.wantErr {
@@ -267,7 +267,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() errData = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -277,7 +277,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() okData = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -395,7 +395,7 @@ func TestUserController_Update(t *testing.T) {
 			userController.Update(context)
 
 			if w.Code != tt.wantCode {
-				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
+				t.Errorf("Update() code = %d, want = %d", w.Code, tt.wantCode)
 			}
 
 			if tt.wantErr {
@@ -406,7 +406,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Update() errData = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -416,7 +416,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Update() okData = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
