@@ -32,13 +32,13 @@ func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
 func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 	tx := db.Begin()
 	beforeuser := entity.User{}
-	err = db.First(&beforeuser, u.ID).Error
+	err = tx.First(&beforeuser, u.ID).Error
 	if err != nil {
 		tx.Rollback()
 		return
 	}
-	FillInNullFields(beforeuser, u)
-	err = db.Save(u).Error
+	FillInNullFields(beforeuser, u)	
+	err = tx.Save(u).Error
 	if err != nil {
 		tx.Rollback()
 		return
