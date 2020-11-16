@@ -61,25 +61,25 @@ func TestUserRepository_FindByID(t *testing.T) {
 			db := dbRepo.Connect()
 
 			// 事前データの準備
-			tx := db.Begin()
-			defer tx.Rollback()
-			err := addData(t, tx, tt.prepareUsers)
+			// tx := db.Begin()
+			// defer tx.Rollback()
+			err := addData(t, db, tt.prepareUsers)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			gotUser, err := user.FindByID(tx, tt.userid)
+			gotUser, err := user.FindByID(db, tt.userid)
 
 			if err != tt.wantErr {
 				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
 				return
 			}
-			if !userEqual(t, gotUser, tt.wantUser) {
+			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
 				t.Errorf("FindByID() = %#v, want %#v", gotUser, tt.wantUser)
 			}
-			// if !reflect.DeepEqual(gotUser, tt.wantUser) {
-			// 	t.Errorf("FindByID() = %#v, want %#v", gotUser, tt.wantUser)
-			// }
+			
+			// databaseを初期化する
+			db.Exec("TRUNCATE TABLE users")
 		})
 	}
 }
