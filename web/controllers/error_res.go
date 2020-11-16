@@ -11,7 +11,7 @@ type ErrorForJSON struct {
 
 // ErrorToJSON はエラーが発生したときにステータスコードとメッセージをJSONにしてレスポンスを返す
 func ErrorToJSON(c Context, statusCode int, err error) {
-	fmt.Printf(err.Error())
+	fmt.Printf("[Error] %s ",err.Error())
 	c.JSON(statusCode, &ErrorForJSON{
 		Code:statusCode,
 		Err:err.Error(),
