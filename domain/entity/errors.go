@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/jinzhu/gorm"
 )
+
 //Errors of http
 var (
 	// ErrBadRequest is http.StatusBadRequest

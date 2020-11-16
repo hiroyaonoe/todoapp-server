@@ -5,16 +5,16 @@ import (
 )
 
 type ErrorForJSON struct {
-	Code int `json:"code"`
-	Err string `json:"error"`
+	Code int    `json:"code"`
+	Err  string `json:"error"`
 }
 
 // ErrorToJSON はエラーが発生したときにステータスコードとメッセージをJSONにしてレスポンスを返す
 func ErrorToJSON(c Context, statusCode int, err error) {
-	fmt.Printf("[Error] %s ",err.Error())
+	fmt.Printf("[Error] %s ", err.Error())
 	c.JSON(statusCode, &ErrorForJSON{
-		Code:statusCode,
-		Err:err.Error(),
+		Code: statusCode,
+		Err:  err.Error(),
 	})
 	return
 }

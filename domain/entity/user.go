@@ -29,9 +29,9 @@ type UserForJSON struct {
 // ToUserForJSON はUserからUserForJSONを取得する関数である
 func (u *User) ToUserForJSON() (p *UserForJSON) {
 	p = &UserForJSON{
-		ID:u.ID,
-		Name:u.Name,
-		Email:u.Email,
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
 	}
 	return
 }

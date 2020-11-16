@@ -36,7 +36,7 @@ func (controller *UserController) Get(c Context) {
 	}
 
 	jsonUser, err := controller.Interactor.Get(id)
-	
+
 	if err != nil {
 		if err == entity.ErrRecordNotFound {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
@@ -57,7 +57,7 @@ func (controller *UserController) Create(c Context) {
 	}
 
 	jsonUser, err := controller.Interactor.Create(&user)
-	
+
 	if err != nil {
 		if err == entity.ErrInvalidUser {
 			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)

@@ -62,12 +62,12 @@ func TestUserController_Get(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().FindByID(gomock.Any(), 3).Return(&entity.User{}, entity.ErrRecordNotFound)
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusNotFound,
-				Err :entity.ErrUserNotFound.Error(),
+				Err:  entity.ErrUserNotFound.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusNotFound,
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
 		},
 		{
 			name:   "Cookieが空ならStatusBadRequest",
@@ -76,12 +76,12 @@ func TestUserController_Get(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusBadRequest,
-				Err :entity.ErrBadRequest.Error(),
+				Err:  entity.ErrBadRequest.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusBadRequest,
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name:   "CookieがintでないならStatusBadRequest",
@@ -90,12 +90,12 @@ func TestUserController_Get(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusBadRequest,
-				Err :entity.ErrBadRequest.Error(),
+				Err:  entity.ErrBadRequest.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusBadRequest,
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
 		},
 	}
 
@@ -141,7 +141,7 @@ func TestUserController_Get(t *testing.T) {
 				if !reflect.DeepEqual(actualData, expectData) {
 					t.Errorf("Get() errData = %+v, want = %+v", actualData, expectData)
 				}
-			} else{
+			} else {
 				actualData := entity.UserForJSON{}
 				expectData := tt.wantData.(entity.UserForJSON)
 				err := json.Unmarshal(w.Body.Bytes(), &actualData)
@@ -206,12 +206,12 @@ func TestUserController_Create(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusBadRequest,
-				Err :entity.ErrBadRequest.Error(),
+				Err:  entity.ErrBadRequest.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusBadRequest,
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name: "RequestBodyがJSONでないならStatusBadRequest",
@@ -220,12 +220,12 @@ func TestUserController_Create(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusBadRequest,
-				Err :entity.ErrBadRequest.Error(),
+				Err:  entity.ErrBadRequest.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusBadRequest,
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
 		},
 	}
 
@@ -267,7 +267,7 @@ func TestUserController_Create(t *testing.T) {
 				if !reflect.DeepEqual(actualData, expectData) {
 					t.Errorf("Get() errData = %+v, want = %+v", actualData, expectData)
 				}
-			} else{
+			} else {
 				actualData := entity.UserForJSON{}
 				expectData := tt.wantData.(entity.UserForJSON)
 				err := json.Unmarshal(w.Body.Bytes(), &actualData)
@@ -335,12 +335,12 @@ func TestUserController_Update(t *testing.T) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusBadRequest,
-				Err :entity.ErrBadRequest.Error(),
+				Err:  entity.ErrBadRequest.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusBadRequest,
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
@@ -354,12 +354,12 @@ func TestUserController_Update(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(entity.ErrRecordNotFound)
 			},
-			wantData:    ErrorForJSON{
+			wantData: ErrorForJSON{
 				Code: http.StatusNotFound,
-				Err :entity.ErrUserNotFound.Error(),
+				Err:  entity.ErrUserNotFound.Error(),
 			},
-			wantErr:     true,
-			wantCode:    http.StatusNotFound,
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
 		},
 	}
 
@@ -405,7 +405,7 @@ func TestUserController_Update(t *testing.T) {
 				if !reflect.DeepEqual(actualData, expectData) {
 					t.Errorf("Get() errData = %+v, want = %+v", actualData, expectData)
 				}
-			} else{
+			} else {
 				actualData := entity.UserForJSON{}
 				expectData := tt.wantData.(entity.UserForJSON)
 				err := json.Unmarshal(w.Body.Bytes(), &actualData)
