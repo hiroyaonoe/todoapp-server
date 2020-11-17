@@ -38,9 +38,9 @@ func TestUserController_Get(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().FindByID(gomock.Any(), 3).Return(&entity.User{
 					ID:        3,
-					Name:      "username",
-					Password:  "password",
-					Email:     "example@example.com",
+					Name:      entity.NewNullString("username"),
+					Password:  entity.NewNullString("password"),
+					Email:     entity.NewNullString("example@example.com"),
 					CreatedAt: time.Unix(100, 0),
 					UpdatedAt: time.Unix(100, 0),
 				}, nil)
@@ -310,8 +310,8 @@ func TestUserController_Update(t *testing.T) {
 				user.EXPECT().Update(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
 						user.ID = 3
-						user.Password = "password"
-						user.Email = "example@example.com"
+						user.Password = entity.NewNullString("password")
+						user.Email = entity.NewNullString("example@example.com")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
 						return nil

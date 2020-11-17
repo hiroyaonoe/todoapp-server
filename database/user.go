@@ -59,13 +59,13 @@ func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {
 }
 
 func FillInNilFields(before entity.User, after *entity.User) {
-	if after.Name == "" {
+	if after.Name.IsNull() {
 		after.Name = before.Name
 	}
-	if after.Password == "" {
+	if after.Password.IsNull() {
 		after.Password = before.Password
 	}
-	if after.Email == "" {
+	if after.Email.IsNull() {
 		after.Email = before.Email
 	}
 	return

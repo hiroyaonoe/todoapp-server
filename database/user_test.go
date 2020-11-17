@@ -1,6 +1,7 @@
 package database
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
@@ -8,21 +9,9 @@ import (
 )
 
 var (
-	userA = &entity.User{
-		Name:     "userA",
-		Password: "passwordA",
-		Email:    "exampleA@example.com",
-	}
-	userB = &entity.User{
-		Name:     "userB",
-		Password: "passwordB",
-		Email:    "exampleB@example.com",
-	}
-	userC = &entity.User{
-		Name:     "userC",
-		Password: "passwordC",
-		Email:    "exampleC@example.com",
-	}
+	userA = entity.NewUser("userA", "passwordA", "exampleA@example.com")
+	userB = entity.NewUser("userB", "passwordB", "exampleB@example.com")
+	userC = entity.NewUser("userC", "passwordC", "exampleC@example.com")
 )
 
 func TestUserRepository_FindByID(t *testing.T) {
@@ -31,7 +20,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 	dbRepo.Migrate()
 	user := new(UserRepository)
 	db := dbRepo.Connect()
-	db.LogMode(true)
+	// db.LogMode(true)
 
 	tests := []struct {
 		name         string
@@ -41,15 +30,10 @@ func TestUserRepository_FindByID(t *testing.T) {
 		prepareUsers []*entity.User
 	}{
 		{
-			name:   "正しくユーザが取得できる",
-			userid: 2,
-			wantUser: &entity.User{
-				ID:       2,
-				Name:     "userB",
-				Password: "passwordB",
-				Email:    "exampleB@example.com",
-			},
-			wantErr: nil,
+			name:     "正しくユーザが取得できる",
+			userid:   2,
+			wantUser: entity.NewUser("userB", "passwordB", "exampleB@example.com").AddID(2),
+			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
 				userB,
@@ -80,15 +64,17 @@ func TestUserRepository_FindByID(t *testing.T) {
 
 			gotUser, err := user.FindByID(db, tt.userid)
 
-			if err != tt.wantErr {
+			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("FindByID() got = %s", gotUser.ToString())
 				return
 			}
 			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
-				t.Errorf("FindByID() = %#v, want %#v", gotUser, tt.wantUser)
+				t.Errorf("FindByID() got = %s, want %s", gotUser.ToString(), tt.wantUser.ToString())
 			}
 		})
 	}
+	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Create(t *testing.T) {
@@ -97,7 +83,7 @@ func TestUserRepository_Create(t *testing.T) {
 	dbRepo.Migrate()
 	user := new(UserRepository)
 	db := dbRepo.Connect()
-	db.LogMode(true)
+	// db.LogMode(true)
 
 	tests := []struct {
 		name         string
@@ -107,89 +93,60 @@ func TestUserRepository_Create(t *testing.T) {
 		prepareUsers []*entity.User
 	}{
 		{
-			name: "正しくユーザを作成できる",
-			user: &entity.User{
-				Name:     "userB",
-				Password: "passwordB",
-				Email:    "exampleB@example.com",
-			},
-			wantUser: &entity.User{
-				ID:       2,
-				Name:     "userB",
-				Password: "passwordB",
-				Email:    "exampleB@example.com",
-			},
-			wantErr: nil,
+			name:     "正しくユーザを作成できる",
+			user:     entity.NewUser("userB", "passwordB", "exampleB@example.com"),
+			wantUser: entity.NewUser("userB", "passwordB", "exampleB@example.com").AddID(2),
+			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
 			},
 		},
 		{
-			name: "Nameがnilの場合はErr",
-			user: &entity.User{
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
-			},
+			name:         "Nameがnilの場合はErrMySQL",
+			user:         entity.NewUser("", "passwordB", "exampleB@example.com"),
 			wantUser:     nil,
-			wantErr:      entity.ErrRecordNotFound,
+			wantErr:      entity.ErrMySQL(0x418, "Column 'name' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
-			name: "Passwordがnilの場合はErr",
-			user: &entity.User{
-				Name:  "userD",
-				Email: "exampleD@example.com",
-			},
+			name:         "Passwordがnilの場合はErrMySQL",
+			user:         entity.NewUser("userB", "", "exampleB@example.com"),
 			wantUser:     nil,
-			wantErr:      entity.ErrRecordNotFound,
+			wantErr:      entity.ErrMySQL(0x418, "Column 'password' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
-			name: "Emailがnilの場合はErr",
-			user: &entity.User{
-				Name:     "userD",
-				Password: "passwordD",
-			},
+			name:         "Emailがnilの場合はErrMySQL",
+			user:         entity.NewUser("userB", "passwordB", ""),
 			wantUser:     nil,
-			wantErr:      entity.ErrRecordNotFound,
+			wantErr:      entity.ErrMySQL(0x418, "Column 'email' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
-			name: "IDが指定されている(0でない)場合はそのIDで作成",
-			user: &entity.User{
-				ID:       100,
-				Name:     "userD",
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
-			},
-			wantUser: &entity.User{
-				ID:       100,
-				Name:     "userD",
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
-			},
-			wantErr: nil,
+			name:     "IDが指定されている(0でない)場合はそのIDで作成",
+			user:     entity.NewUser("userB", "passwordB", "exampleB@example.com").AddID(100),
+			wantUser: entity.NewUser("userB", "passwordB", "exampleB@example.com").AddID(100),
+			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
 			},
 		},
 		{
-			name: "指定したIDのユーザーが既に存在している場合はErr",
-			user: &entity.User{
-				ID:       100,
-				Name:     "userD",
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
-			},
-			wantUser: &entity.User{
-				ID:       100,
-				Name:     "userD",
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
-			},
-			wantErr: entity.ErrRecordNotFound,
+			name:     "指定したIDのユーザーが既に存在している場合はErrMySQL",
+			user:     entity.NewUser("userB", "passwordB", "exampleB@example.com").AddID(1),
+			wantUser: nil,
+			wantErr:  entity.ErrMySQL(0x426, "Duplicate entry '1' for key 'users.PRIMARY'"),
 			prepareUsers: []*entity.User{
 				userA,
+			},
+		},
+		{
+			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
+			user:     entity.NewUser("userB", "passwordB", "exampleB@example.com"),
+			wantUser: nil,
+			wantErr:  entity.ErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
+			prepareUsers: []*entity.User{
+				userB,
 			},
 		},
 	}
@@ -207,15 +164,17 @@ func TestUserRepository_Create(t *testing.T) {
 			err = user.Create(db, tt.user)
 			gotUser := tt.user
 
-			if err != tt.wantErr {
+			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("Create() got = %s", gotUser.ToString())
 				return
 			}
 			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
-				t.Errorf("Create() = %#v, want %#v", gotUser, tt.wantUser)
+				t.Errorf("Create() = %s, want %s", gotUser.ToString(), tt.wantUser.ToString())
 			}
 		})
 	}
+	db.Exec("TRUNCATE TABLE users")
 }
 
 // addData はテスト用のデータをデータベースに追加する
@@ -231,10 +190,10 @@ func addData(t *testing.T, db *gorm.DB, users []*entity.User) (err error) {
 }
 
 // userEqual はCreatedAt, UpdatedAt以外のUserのフィールドが同じかどうか判定する
-func userEqual(t *testing.T, a *entity.User, b *entity.User) bool {
+func userEqual(t *testing.T, got *entity.User, want *entity.User) bool {
 	t.Helper()
-	return (a.ID == b.ID) &&
-		(a.Name == b.Name) &&
-		(a.Password == b.Password) &&
-		(a.Email == b.Email)
+	return (got.ID == want.ID) &&
+		(got.Name.Equals(want.Name)) &&
+		(got.Password.Equals(want.Password)) &&
+		(got.Email.Equals(want.Email))
 }

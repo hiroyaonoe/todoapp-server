@@ -28,7 +28,7 @@ func (interactor *UserInteractor) Get(id int) (jsonUser *entity.UserForJSON, err
 
 func (interactor *UserInteractor) Create(user *entity.User) (jsonUser *entity.UserForJSON, err error) {
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
-	if (user.Name == "") || (user.Password == "") || (user.Email == "") {
+	if user.Name.IsNull() || user.Password.IsNull() || user.Email.IsNull() {
 		return nil, entity.ErrInvalidUser
 	}
 
@@ -44,7 +44,7 @@ func (interactor *UserInteractor) Create(user *entity.User) (jsonUser *entity.Us
 
 func (interactor *UserInteractor) Update(user *entity.User) (jsonUser *entity.UserForJSON, err error) {
 	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
-	if (user.Name == "") && (user.Password == "") && (user.Email == "") {
+	if user.Name.IsNull() && user.Password.IsNull() && user.Email.IsNull() {
 		return nil, entity.ErrInvalidUser
 	}
 
