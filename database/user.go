@@ -37,7 +37,7 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 		tx.Rollback()
 		return
 	}
-	FillInNullFields(beforeuser, u)
+	FillInNilFields(beforeuser, u)
 	err = tx.Save(u).Error
 	if err != nil {
 		tx.Rollback()
@@ -58,7 +58,7 @@ func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {
 	return id, err
 }
 
-func FillInNullFields(before entity.User, after *entity.User) {
+func FillInNilFields(before entity.User, after *entity.User) {
 	if after.Name == "" {
 		after.Name = before.Name
 	}

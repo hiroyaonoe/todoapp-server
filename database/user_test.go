@@ -26,6 +26,13 @@ var (
 )
 
 func TestUserRepository_FindByID(t *testing.T) {
+	// dbに接続
+	dbRepo := NewTestDB()
+	dbRepo.Migrate()
+	user := new(UserRepository)
+	db := dbRepo.Connect()
+	db.LogMode(true)
+
 	tests := []struct {
 		name         string
 		userid       int
@@ -35,39 +42,31 @@ func TestUserRepository_FindByID(t *testing.T) {
 	}{
 		{
 			name:   "正しくユーザが取得できる",
-			userid: 3,
+			userid: 2,
 			wantUser: &entity.User{
-				ID:       3,
-				Name:     "userC",
-				Password: "passwordC",
-				Email:    "exampleC@example.com",
+				ID:       2,
+				Name:     "userB",
+				Password: "passwordB",
+				Email:    "exampleB@example.com",
 			},
 			wantErr: nil,
 			prepareUsers: []*entity.User{
 				userA,
 				userB,
-				userC,
 			},
 		},
 		{
 			name:     "存在しないユーザーの場合はErrRecordNotFound",
-			userid:   4,
+			userid:   2,
 			wantUser: nil,
 			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
-				userB,
-				userC,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dbRepo := NewTestDB()
-			dbRepo.Migrate()
-			user := new(UserRepository)
-			db := dbRepo.Connect()
-
 			// databaseを初期化する
 			db.Exec("TRUNCATE TABLE users")
 
@@ -93,6 +92,13 @@ func TestUserRepository_FindByID(t *testing.T) {
 }
 
 func TestUserRepository_Create(t *testing.T) {
+	// dbに接続
+	dbRepo := NewTestDB()
+	dbRepo.Migrate()
+	user := new(UserRepository)
+	db := dbRepo.Connect()
+	db.LogMode(true)
+
 	tests := []struct {
 		name         string
 		user         *entity.User
@@ -103,21 +109,19 @@ func TestUserRepository_Create(t *testing.T) {
 		{
 			name: "正しくユーザを作成できる",
 			user: &entity.User{
-				Name:     "userD",
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
+				Name:     "userB",
+				Password: "passwordB",
+				Email:    "exampleB@example.com",
 			},
 			wantUser: &entity.User{
-				ID:       4,
-				Name:     "userD",
-				Password: "passwordD",
-				Email:    "exampleD@example.com",
+				ID:       2,
+				Name:     "userB",
+				Password: "passwordB",
+				Email:    "exampleB@example.com",
 			},
 			wantErr: nil,
 			prepareUsers: []*entity.User{
 				userA,
-				userB,
-				userC,
 			},
 		},
 		{
@@ -126,13 +130,9 @@ func TestUserRepository_Create(t *testing.T) {
 				Password: "passwordD",
 				Email:    "exampleD@example.com",
 			},
-			wantUser: nil,
-			wantErr:  entity.ErrRecordNotFound,
-			prepareUsers: []*entity.User{
-				userA,
-				userB,
-				userC,
-			},
+			wantUser:     nil,
+			wantErr:      entity.ErrRecordNotFound,
+			prepareUsers: nil,
 		},
 		{
 			name: "Passwordがnilの場合はErr",
@@ -140,13 +140,9 @@ func TestUserRepository_Create(t *testing.T) {
 				Name:  "userD",
 				Email: "exampleD@example.com",
 			},
-			wantUser: nil,
-			wantErr:  entity.ErrRecordNotFound,
-			prepareUsers: []*entity.User{
-				userA,
-				userB,
-				userC,
-			},
+			wantUser:     nil,
+			wantErr:      entity.ErrRecordNotFound,
+			prepareUsers: nil,
 		},
 		{
 			name: "Emailがnilの場合はErr",
@@ -154,16 +150,12 @@ func TestUserRepository_Create(t *testing.T) {
 				Name:     "userD",
 				Password: "passwordD",
 			},
-			wantUser: nil,
-			wantErr:  entity.ErrRecordNotFound,
-			prepareUsers: []*entity.User{
-				userA,
-				userB,
-				userC,
-			},
+			wantUser:     nil,
+			wantErr:      entity.ErrRecordNotFound,
+			prepareUsers: nil,
 		},
 		{
-			name: "IDが指定されている(0でない)場合は場合はそのIDで作成",
+			name: "IDが指定されている(0でない)場合はそのIDで作成",
 			user: &entity.User{
 				ID:       100,
 				Name:     "userD",
@@ -179,18 +171,30 @@ func TestUserRepository_Create(t *testing.T) {
 			wantErr: nil,
 			prepareUsers: []*entity.User{
 				userA,
-				userB,
-				userC,
+			},
+		},
+		{
+			name: "指定したIDのユーザーが既に存在している場合はErr",
+			user: &entity.User{
+				ID:       100,
+				Name:     "userD",
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantUser: &entity.User{
+				ID:       100,
+				Name:     "userD",
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantErr: entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			dbRepo := NewTestDB()
-			dbRepo.Migrate()
-			user := new(UserRepository)
-			db := dbRepo.Connect()
-
 			// databaseを初期化する
 			db.Exec("TRUNCATE TABLE users")
 
