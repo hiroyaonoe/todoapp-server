@@ -10,42 +10,42 @@ import (
 
 var (
 	userA = &entity.User{
-				Name:"userA",
-				Password:"passwordA",
-				Email:"exampleA@example.com",
-			}
+		Name:     "userA",
+		Password: "passwordA",
+		Email:    "exampleA@example.com",
+	}
 	userB = &entity.User{
-				Name:"userB",
-				Password:"passwordB",
-				Email:"exampleB@example.com",
-			}
+		Name:     "userB",
+		Password: "passwordB",
+		Email:    "exampleB@example.com",
+	}
 	userC = &entity.User{
-				Name:"userC",
-				Password:"passwordC",
-				Email:"exampleC@example.com",
-			}
+		Name:     "userC",
+		Password: "passwordC",
+		Email:    "exampleC@example.com",
+	}
 )
 
 func TestUserRepository_FindByID(t *testing.T) {
 	tests := []struct {
-		name     string
-		userid   int
-		wantUser *entity.User
-		wantErr  error
+		name         string
+		userid       int
+		wantUser     *entity.User
+		wantErr      error
 		prepareUsers []*entity.User
 	}{
 		{
-			name:"正しくユーザが取得できる",
-			userid:3,
+			name:   "正しくユーザが取得できる",
+			userid: 3,
 			wantUser: &entity.User{
-				ID:3,
-				Name:"userC",
-				Password:"passwordC",
-				Email:"exampleC@example.com",
+				ID:        3,
+				Name:      "userC",
+				Password:  "passwordC",
+				Email:     "exampleC@example.com",
 				CreatedAt: time.Unix(100, 0),
 				UpdatedAt: time.Unix(100, 0),
 			},
-			wantErr:nil,
+			wantErr: nil,
 			prepareUsers: []*entity.User{
 				userA,
 				userB,
@@ -53,10 +53,10 @@ func TestUserRepository_FindByID(t *testing.T) {
 			},
 		},
 		{
-			name:"存在しないユーザーの場合はErrRecordNotFound",
-			userid:4,
+			name:     "存在しないユーザーの場合はErrRecordNotFound",
+			userid:   4,
 			wantUser: nil,
-			wantErr:entity.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 				userB,
@@ -95,9 +95,8 @@ func TestUserRepository_FindByID(t *testing.T) {
 	}
 }
 
-
 // addData はテスト用のデータをデータベースに追加する
-func addData(t *testing.T, db *gorm.DB, users []*entity.User) (err error){
+func addData(t *testing.T, db *gorm.DB, users []*entity.User) (err error) {
 	t.Helper()
 	for _, user := range users {
 		err = db.Create(user).Error
