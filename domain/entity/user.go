@@ -11,8 +11,8 @@ import (
 
 // User は内部で処理する際のUser情報である
 type User struct {
-	ID        int `gorm:"primary_key"`
-	Name      string
+	ID        int    `gorm:"primary_key"`
+	Name      string `sql:"not null"`
 	Password  string `sql:"not null"`
 	Email     string `sql:"not null;unique"`
 	CreatedAt time.Time

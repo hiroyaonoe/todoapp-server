@@ -2,7 +2,6 @@ package database
 
 import (
 	"testing"
-	"time"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/jinzhu/gorm"
@@ -38,12 +37,10 @@ func TestUserRepository_FindByID(t *testing.T) {
 			name:   "正しくユーザが取得できる",
 			userid: 3,
 			wantUser: &entity.User{
-				ID:        3,
-				Name:      "userC",
-				Password:  "passwordC",
-				Email:     "exampleC@example.com",
-				CreatedAt: time.Unix(100, 0),
-				UpdatedAt: time.Unix(100, 0),
+				ID:       3,
+				Name:     "userC",
+				Password: "passwordC",
+				Email:    "exampleC@example.com",
 			},
 			wantErr: nil,
 			prepareUsers: []*entity.User{
@@ -90,6 +87,128 @@ func TestUserRepository_FindByID(t *testing.T) {
 			}
 			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
 				t.Errorf("FindByID() = %#v, want %#v", gotUser, tt.wantUser)
+			}
+		})
+	}
+}
+
+func TestUserRepository_Create(t *testing.T) {
+	tests := []struct {
+		name         string
+		user         *entity.User
+		wantUser     *entity.User
+		wantErr      error
+		prepareUsers []*entity.User
+	}{
+		{
+			name: "正しくユーザを作成できる",
+			user: &entity.User{
+				Name:     "userD",
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantUser: &entity.User{
+				ID:       4,
+				Name:     "userD",
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantErr: nil,
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+				userC,
+			},
+		},
+		{
+			name: "Nameがnilの場合はErr",
+			user: &entity.User{
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantUser: nil,
+			wantErr:  entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+				userC,
+			},
+		},
+		{
+			name: "Passwordがnilの場合はErr",
+			user: &entity.User{
+				Name:  "userD",
+				Email: "exampleD@example.com",
+			},
+			wantUser: nil,
+			wantErr:  entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+				userC,
+			},
+		},
+		{
+			name: "Emailがnilの場合はErr",
+			user: &entity.User{
+				Name:     "userD",
+				Password: "passwordD",
+			},
+			wantUser: nil,
+			wantErr:  entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+				userC,
+			},
+		},
+		{
+			name: "IDが指定されている(0でない)場合は場合はそのIDで作成",
+			user: &entity.User{
+				ID:       100,
+				Name:     "userD",
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantUser: &entity.User{
+				ID:       100,
+				Name:     "userD",
+				Password: "passwordD",
+				Email:    "exampleD@example.com",
+			},
+			wantErr: nil,
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+				userC,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			dbRepo := NewTestDB()
+			dbRepo.Migrate()
+			user := new(UserRepository)
+			db := dbRepo.Connect()
+
+			// databaseを初期化する
+			db.Exec("TRUNCATE TABLE users")
+
+			// 事前データの準備
+			err := addData(t, db, tt.prepareUsers)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = user.Create(db, tt.user)
+			gotUser := tt.user
+
+			if err != tt.wantErr {
+				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
+				return
+			}
+			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
+				t.Errorf("Create() = %#v, want %#v", gotUser, tt.wantUser)
 			}
 		})
 	}
