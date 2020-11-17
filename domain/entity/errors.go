@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
 
@@ -34,6 +35,37 @@ var (
 	// ErrUnaddressable unaddressable value
 	ErrUnaddressable = gorm.ErrUnaddressable
 )
+
+// Errors of go-sql-driver/mysql. Various errors the driver might return. Can change between driver versions.
+var (
+	ErrInvalidConn       = mysql.ErrInvalidConn
+	ErrMalformPkt        = mysql.ErrMalformPkt
+	ErrNoTLS             = mysql.ErrNoTLS
+	ErrCleartextPassword = mysql.ErrCleartextPassword
+	ErrNativePassword    = mysql.ErrNativePassword
+	ErrOldPassword       = mysql.ErrOldPassword
+	ErrUnknownPlugin     = mysql.ErrUnknownPlugin
+	ErrOldProtocol       = mysql.ErrOldProtocol
+	ErrPktSync           = mysql.ErrPktSync
+	ErrPktSyncMul        = mysql.ErrPktSyncMul
+	ErrPktTooLarge       = mysql.ErrPktTooLarge
+	ErrBusyBuffer        = mysql.ErrBusyBuffer
+
+	// errBadConnNoWrite is used for connection errors where nothing was sent to the database yet.
+	// If this happens first in a function starting a database interaction, it should be replaced by driver.ErrBadConn
+	// to trigger a resend.
+	// See https://github.com/go-sql-driver/mysql/pull/302
+	errBadConnNoWrite = errors.New("bad connection")
+)
+
+// MySQLError is an error type which represents a single MySQL error
+func ErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
+	err = &mysql.MySQLError{
+		Number:  num,
+		Message: str,
+	}
+	return
+}
 
 // //Errors of go-gorm/gorm
 // var (

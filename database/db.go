@@ -6,10 +6,10 @@ domainにのみ依存
 package database
 
 import (
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/hiroyaonoe/todoapp-server/config"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 // DB はinterface DBRepositoryを満たす
