@@ -197,6 +197,79 @@ func TestUserController_Create(t *testing.T) {
 			wantCode: http.StatusOK,
 		},
 		{
+			name: "RequestにuserIDが含まれているならStatusBadRequest",
+			body: `{
+				"id":10,
+				"name":"username",
+				"password":"password",
+				"email":"example@example.com"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name: "Requestにnameが含まれていないならStatusBadRequest",
+			body: `{
+				"id":10,
+				"password":"password",
+				"email":"example@example.com"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name: "Requestにpasswordが含まれていないならStatusBadRequest",
+			body: `{
+				"id":10,
+				"name":"username",
+				"email":"example@example.com"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name: "Requestにemailが含まれていないならStatusBadRequest",
+			body: `{
+				"id":10,
+				"name":"username",
+				"password":"password",
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
 			name: "RequestBodyが不正ならStatusBadRequest",
 			body: `{
 				"id":10,
