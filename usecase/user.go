@@ -31,6 +31,10 @@ func (interactor *UserInteractor) Create(user *entity.User) (jsonUser *entity.Us
 	if user.Name.IsNull() || user.Password.IsNull() || user.Email.IsNull() {
 		return nil, entity.ErrInvalidUser
 	}
+	// 不正なユーザーリクエストの判別(UserIDがnil出ない場合)
+	if user.ID != 0 {
+		return nil, entity.ErrInvalidUser
+	}
 
 	db := interactor.DB.Connect()
 	// 新規Userを作成
