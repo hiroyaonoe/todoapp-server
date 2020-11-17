@@ -41,7 +41,7 @@ func (s *NullString) ToString() string {
 }
 
 func (s *NullString) IsNull() bool {
-	return s.Valid
+	return !s.Valid
 }
 
 func (s NullString) Equals(t NullString) bool {

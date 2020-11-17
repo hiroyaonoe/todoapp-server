@@ -27,11 +27,12 @@ func (interactor *UserInteractor) Get(id int) (jsonUser *entity.UserForJSON, err
 }
 
 func (interactor *UserInteractor) Create(user *entity.User) (jsonUser *entity.UserForJSON, err error) {
-	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
-	if user.Name.IsNull() || user.Password.IsNull() || user.Email.IsNull() {
-		return nil, entity.ErrInvalidUser
-	}
-	// 不正なユーザーリクエストの判別(UserIDがnil出ない場合)
+	// databaseのnot null制約があるので不要？
+	// // 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
+	// if user.Name.IsNull() || user.Password.IsNull() || user.Email.IsNull() {
+	// 	return nil, entity.ErrInvalidUser
+	// }
+	// 不正なユーザーリクエストの判別(UserIDがnilでない場合)
 	if user.ID != 0 {
 		return nil, entity.ErrInvalidUser
 	}
