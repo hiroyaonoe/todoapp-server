@@ -177,6 +177,131 @@ func TestUserRepository_Create(t *testing.T) {
 	db.Exec("TRUNCATE TABLE users")
 }
 
+func TestUserRepository_Update(t *testing.T) {
+	// dbに接続
+	dbRepo := NewTestDB()
+	dbRepo.Migrate()
+	user := new(UserRepository)
+	db := dbRepo.Connect()
+	// db.LogMode(true)
+
+	tests := []struct {
+		name         string
+		user         *entity.User
+		wantUser     *entity.User
+		wantErr      error
+		prepareUsers []*entity.User
+	}{
+		{
+			name:     "全フィールドを変更できる",
+			user:     entity.NewUser("userAA", "passwordAA", "exampleAA@example.com").AddID(1),
+			wantUser: entity.NewUser("userAA", "passwordAA", "exampleAA@example.com").AddID(1),
+			wantErr:  nil,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "Nameのみを変更できる",
+			user:     entity.NewUser("userAA", "", "").AddID(1),
+			wantUser: entity.NewUser("userAA", "passwordA", "exampleA@example.com").AddID(1),
+			wantErr:  nil,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "Passwordのみを変更できる",
+			user:     entity.NewUser("", "passwordAA", "").AddID(1),
+			wantUser: entity.NewUser("userA", "passwordAA", "exampleA@example.com").AddID(1),
+			wantErr:  nil,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "Emailのみを変更できる",
+			user:     entity.NewUser("", "", "exampleAA@example.com").AddID(1),
+			wantUser: entity.NewUser("userA", "passwordA", "exampleAA@example.com").AddID(1),
+			wantErr:  nil,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "全フィールドがもとと同じでも実行できる",
+			user:     entity.NewUser("userA", "passwordA", "exampleA@example.com").AddID(1),
+			wantUser: entity.NewUser("userA", "passwordA", "exampleA@example.com").AddID(1),
+			wantErr:  nil,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "全フィールドが空でも実行できる",
+			user:     entity.NewUser("", "", "").AddID(1),
+			wantUser: entity.NewUser("userA", "passwordA", "exampleA@example.com").AddID(1),
+			wantErr:  nil,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "IDが指定されていない場合はErrRecordNotFound",
+			user:     entity.NewUser("userB", "passwordB", "exampleB@example.com"),
+			wantUser: nil,
+			wantErr:  entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "指定したIDのユーザーが存在しない場合はErrRecordNotFound",
+			user:     entity.NewUser("userB", "passwordB", "exampleB@example.com").AddID(100),
+			wantUser: nil,
+			wantErr:  entity.ErrRecordNotFound,
+			prepareUsers: []*entity.User{
+				userA,
+			},
+		},
+		{
+			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
+			user:     entity.NewUser("", "", "exampleB@example.com").AddID(1),
+			wantUser: nil,
+			wantErr:  entity.ErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
+			prepareUsers: []*entity.User{
+				userA,
+				userB,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// databaseを初期化する
+			db.Exec("TRUNCATE TABLE users")
+
+			// 事前データの準備
+			err := addData(t, db, tt.prepareUsers)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			err = user.Update(db, tt.user)
+			gotUser := tt.user
+
+			if !reflect.DeepEqual(err, tt.wantErr) {
+				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("Create() got = %s", gotUser.ToString())
+				return
+			}
+			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser)) {
+				t.Errorf("Create() = %s, want %s", gotUser.ToString(), tt.wantUser.ToString())
+			}
+		})
+	}
+	db.Exec("TRUNCATE TABLE users")
+}
+
 // addData はテスト用のデータをデータベースに追加する
 func addData(t *testing.T, db *gorm.DB, users []*entity.User) (err error) {
 	t.Helper()
