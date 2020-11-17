@@ -218,7 +218,6 @@ func TestUserController_Create(t *testing.T) {
 		{
 			name: "Requestにnameが含まれていないならStatusBadRequest",
 			body: `{
-				"id":10,
 				"password":"password",
 				"email":"example@example.com"
 			}`,
@@ -236,7 +235,6 @@ func TestUserController_Create(t *testing.T) {
 		{
 			name: "Requestにpasswordが含まれていないならStatusBadRequest",
 			body: `{
-				"id":10,
 				"name":"username",
 				"email":"example@example.com"
 			}`,
@@ -254,7 +252,6 @@ func TestUserController_Create(t *testing.T) {
 		{
 			name: "Requestにemailが含まれていないならStatusBadRequest",
 			body: `{
-				"id":10,
 				"name":"username",
 				"password":"password",
 			}`,
@@ -274,7 +271,7 @@ func TestUserController_Create(t *testing.T) {
 			body: `{
 				"id":10,
 				"title":"title",
-				"userid":3
+				"userid":3,
 			}`,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
