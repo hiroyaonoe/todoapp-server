@@ -49,7 +49,17 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 
 func (repo *UserRepository) Delete(db *gorm.DB, id int) (err error) {
 	tx := db.Begin()
-	err = tx.Delete(&entity.User{}, id).Error
+
+	// idに該当するユーザーがいない場合を弾く
+	user := &entity.User{}
+	err = tx.First(user, id).Error
+	if err != nil {
+		tx.Rollback()
+		return
+	}
+
+	// err = tx.Delete(&entity.User{}, id).Error
+	err = tx.Where("id = ?", id).Delete(&entity.User{}).Error
 	if err != nil {
 		tx.Rollback()
 		return
