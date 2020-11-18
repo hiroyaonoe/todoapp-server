@@ -96,6 +96,30 @@ func (controller *UserController) Update(c Context) {
 	c.JSON(http.StatusOK, jsonUser)
 }
 
+func (controller *UserController) Delete(c Context) {
+	id, err := GetUserIDFromCookie(c)
+	if err != nil {
+		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		return
+	}
+
+	err = controller.Interactor.Delete(id)
+
+	if err != nil {
+		if err == entity.ErrInvalidUser {
+			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+			return
+		}
+		if err == entity.ErrRecordNotFound {
+			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
+			return
+		}
+		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
+}
+
 func GetUserIDFromCookie(c Context) (id int, err error) {
 	cookie, err := c.Cookie("id")
 	id, err = strconv.Atoi(cookie)

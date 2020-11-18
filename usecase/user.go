@@ -66,3 +66,13 @@ func (interactor *UserInteractor) Update(user *entity.User) (jsonUser *entity.Us
 	jsonUser = user.ToUserForJSON()
 	return jsonUser, nil
 }
+
+func (interactor *UserInteractor) Delete(id int) (err error) {
+	db := interactor.DB.Connect()
+	// Userデータを削除
+	err = interactor.User.Delete(db, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}

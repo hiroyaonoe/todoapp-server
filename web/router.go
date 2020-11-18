@@ -55,7 +55,7 @@ func (r *Routing) setRouting() {
 	user.GET("", func(c *gin.Context) { userController.Get(c) })
 	user.POST("", func(c *gin.Context) { userController.Create(c) })
 	user.PUT("", func(c *gin.Context) { userController.Update(c) })
-	// user.DELETE("", func(c *gin.Context) { userController.Delete(c) })
+	user.DELETE("", func(c *gin.Context) { userController.Delete(c) })
 
 }
 

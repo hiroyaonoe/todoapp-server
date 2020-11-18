@@ -47,7 +47,7 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 	return
 }
 
-func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {
+func (repo *UserRepository) Delete(db *gorm.DB, id int) (err error) {
 	tx := db.Begin()
 	err = tx.Delete(&entity.User{}, id).Error
 	if err != nil {
@@ -55,7 +55,7 @@ func (repo *UserRepository) Delete(db *gorm.DB, id int) (uid int, err error) {
 		return
 	}
 	tx.Commit()
-	return id, err
+	return
 }
 
 func FillInNilFields(before entity.User, after *entity.User) {

@@ -78,12 +78,11 @@ func (mr *MockUserRepositoryMockRecorder) Update(db, u interface{}) *gomock.Call
 }
 
 // Delete mocks base method
-func (m *MockUserRepository) Delete(db *gorm.DB, id int) (int, error) {
+func (m *MockUserRepository) Delete(db *gorm.DB, id int) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", db, id)
-	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
+	ret0, _ := ret[0].(error)
+	return ret0
 }
 
 // Delete indicates an expected call of Delete
