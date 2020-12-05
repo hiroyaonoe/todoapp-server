@@ -39,9 +39,10 @@ func (t *Task) NewID() *Task {
 	return t
 }
 
-func (old *Task) SetComp(comp bool) *Task {
-	old.IsCompleted = comp
-	return old
+// SetComp はTaskのIsCompletedを設定する
+func (t *Task) SetComp(comp bool) *Task {
+	t.IsCompleted = comp
+	return t
 }
 
 // TaskForJSON はJSONにして外部に公開するTask情報である
@@ -50,7 +51,7 @@ type TaskForJSON struct {
 	Title       string `json:"title"`
 	Content     string `json:"content"`
 	IsCompleted bool   `json:"iscomp"`
-	Date        string `json:date`
+	Date        string `json:"date"`
 }
 
 // ToTaskForJSON はTaskからTaskForJSONを取得する関数である
@@ -65,8 +66,8 @@ func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
 	return
 }
 
-func (u *Task) String() (str string) {
-	str = fmt.Sprintf("&entity.Task{ID:%s, Title:%s, Content:%s, UserID:%s, IsCompleted:%b, Date:%s, CreatedAt:%s, UpdatedAt: %s",
-		u.ID.String, u.Title.String, u.Content.String, u.UserID.String, u.IsCompleted, u.Date, u.CreatedAt, u.UpdatedAt)
+func (t *Task) String() (str string) {
+	str = fmt.Sprintf("&entity.Task{ID:%s, Title:%s, Content:%s, UserID:%s, IsCompleted:%t, Date:%s, CreatedAt:%s, UpdatedAt: %s",
+		t.ID.String, t.Title.String, t.Content.String, t.UserID.String, t.IsCompleted, t.Date, t.CreatedAt, t.UpdatedAt)
 	return
 }
