@@ -7,7 +7,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
@@ -77,7 +76,7 @@ func (controller *UserController) Update(c Context) {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
 	}
-	user.ID = id
+	user.SetID(id)
 
 	jsonUser, err := controller.Interactor.Update(&user)
 
@@ -120,9 +119,8 @@ func (controller *UserController) Delete(c Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func GetUserIDFromCookie(c Context) (id int, err error) {
-	cookie, err := c.Cookie("id")
-	id, err = strconv.Atoi(cookie)
+func GetUserIDFromCookie(c Context) (id string, err error) {
+	id, err = c.Cookie("id")
 	return
 }
 
