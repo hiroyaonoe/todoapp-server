@@ -16,8 +16,8 @@ import (
 
 // UserRepository is interface of User
 type UserRepository interface {
-	FindByID(db *gorm.DB, uuid int) (user *entity.User, err error)
+	FindByID(db *gorm.DB, id string) (user *entity.User, err error)
 	Create(db *gorm.DB, u *entity.User) (err error)
 	Update(db *gorm.DB, u *entity.User) (err error)
-	Delete(db *gorm.DB, uuid int) (err error)
+	Delete(db *gorm.DB, id string) (err error)
 }

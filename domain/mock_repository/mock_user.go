@@ -35,18 +35,18 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // FindByID mocks base method
-func (m *MockUserRepository) FindByID(db *gorm.DB, uuid int) (*entity.User, error) {
+func (m *MockUserRepository) FindByID(db *gorm.DB, id string) (*entity.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByID", db, uuid)
+	ret := m.ctrl.Call(m, "FindByID", db, id)
 	ret0, _ := ret[0].(*entity.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindByID indicates an expected call of FindByID
-func (mr *MockUserRepositoryMockRecorder) FindByID(db, uuid interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) FindByID(db, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockUserRepository)(nil).FindByID), db, uuid)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockUserRepository)(nil).FindByID), db, id)
 }
 
 // Create mocks base method
@@ -78,15 +78,15 @@ func (mr *MockUserRepositoryMockRecorder) Update(db, u interface{}) *gomock.Call
 }
 
 // Delete mocks base method
-func (m *MockUserRepository) Delete(db *gorm.DB, uuid int) error {
+func (m *MockUserRepository) Delete(db *gorm.DB, id string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", db, uuid)
+	ret := m.ctrl.Call(m, "Delete", db, id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete
-func (mr *MockUserRepositoryMockRecorder) Delete(db, uuid interface{}) *gomock.Call {
+func (mr *MockUserRepositoryMockRecorder) Delete(db, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUserRepository)(nil).Delete), db, uuid)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockUserRepository)(nil).Delete), db, id)
 }

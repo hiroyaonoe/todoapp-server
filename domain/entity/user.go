@@ -8,14 +8,12 @@ package entity
 import (
 	"fmt"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 // User は内部で処理する際のUser情報である
 type User struct {
-	ID        int        `gorm:"primary_key"`
-	UUID      uuid.UUID  `gorm:"not null;unique;index"`
+	// ID        int        `gorm:"primary_key"`
+	ID        NullString `gorm:"primary_key"`
 	Name      NullString `gorm:"not null"`
 	Password  NullString `gorm:"not null"`
 	Email     NullString `gorm:"not null;unique"`
@@ -33,29 +31,29 @@ func NewUser(name string, pass string, email string) (u *User) {
 	return
 }
 
-// AddID はUserのIDを設定
-func (u *User) AddID(id int) *User {
-	u.ID = id
-	return u
-}
+// // AddID はUserのIDを設定
+// func (u *User) AddID(id int) *User {
+// 	u.ID = id
+// 	return u
+// }
 
-// AddUUID はUserのUUIDを設定
-func (u *User) AddUUID(uuid uuid.UUID) *User {
-	u.UUID = uuid
+// AddID はUserのIDを設定
+func (u *User) AddID(id string) *User {
+	u.ID = NewNullString(id)
 	return u
 }
 
 // UserForJSON はJSONにして外部に公開するUser情報である
 type UserForJSON struct {
-	UUID  uuid.UUID `json:"uuid"`
-	Name  string    `json:"name"`
-	Email string    `json:"email"`
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
 }
 
 // ToUserForJSON はUserからUserForJSONを取得する関数である
 func (u *User) ToUserForJSON() (p *UserForJSON) {
 	p = &UserForJSON{
-		UUID:  u.UUID,
+		ID:    u.ID.String,
 		Name:  u.Name.String,
 		Email: u.Email.String,
 	}
@@ -63,7 +61,7 @@ func (u *User) ToUserForJSON() (p *UserForJSON) {
 }
 
 func (u *User) String() (str string) {
-	str = fmt.Sprintf("&entity.User{ID:%d, UUID:%s, Name:%s, Password:%s, Email:%s, CreatedAt:%s, UpdatedAt: %s",
-		u.ID, u.UUID.String(), u.Name.String, u.Password.String, u.Email.String, u.CreatedAt, u.UpdatedAt)
+	str = fmt.Sprintf("&entity.User{ID:%s, Name:%s, Password:%s, Email:%s, CreatedAt:%s, UpdatedAt: %s",
+		u.ID.String, u.Name.String, u.Password.String, u.Email.String, u.CreatedAt, u.UpdatedAt)
 	return
 }
