@@ -12,9 +12,9 @@ import (
 // UserRepository の具体的な実装
 type UserRepository struct{}
 
-func (repo *UserRepository) FindByID(db *gorm.DB, id int) (user *entity.User, err error) {
+func (repo *UserRepository) FindByID(db *gorm.DB, id string) (user *entity.User, err error) {
 	user = &entity.User{}
-	err = db.First(user, id).Error
+	err = db.Where("id = ?", id).First(user).Error
 	return
 }
 
@@ -32,7 +32,7 @@ func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
 func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 	tx := db.Begin()
 	beforeuser := entity.User{}
-	err = tx.First(&beforeuser, u.ID).Error
+	err = tx.Where("id = ?", u.ID).First(&beforeuser).Error
 	if err != nil {
 		tx.Rollback()
 		return
@@ -47,12 +47,12 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 	return
 }
 
-func (repo *UserRepository) Delete(db *gorm.DB, id int) (err error) {
+func (repo *UserRepository) Delete(db *gorm.DB, id string) (err error) {
 	tx := db.Begin()
 
 	// idに該当するユーザーがいない場合を弾く
 	user := &entity.User{}
-	err = tx.First(user, id).Error
+	err = tx.Where("id = ?", id).First(user).Error
 	if err != nil {
 		tx.Rollback()
 		return

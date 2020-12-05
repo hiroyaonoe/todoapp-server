@@ -35,7 +35,7 @@ func (m *MockUserRepository) EXPECT() *MockUserRepositoryMockRecorder {
 }
 
 // FindByID mocks base method
-func (m *MockUserRepository) FindByID(db *gorm.DB, id int) (*entity.User, error) {
+func (m *MockUserRepository) FindByID(db *gorm.DB, id string) (*entity.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByID", db, id)
 	ret0, _ := ret[0].(*entity.User)
@@ -78,7 +78,7 @@ func (mr *MockUserRepositoryMockRecorder) Update(db, u interface{}) *gomock.Call
 }
 
 // Delete mocks base method
-func (m *MockUserRepository) Delete(db *gorm.DB, id int) error {
+func (m *MockUserRepository) Delete(db *gorm.DB, id string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Delete", db, id)
 	ret0, _ := ret[0].(error)

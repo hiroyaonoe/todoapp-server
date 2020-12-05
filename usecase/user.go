@@ -15,7 +15,7 @@ type UserInteractor struct {
 	User repository.UserRepository
 }
 
-func (interactor *UserInteractor) Get(id int) (jsonUser *entity.UserForJSON, err error) {
+func (interactor *UserInteractor) Get(id string) (jsonUser *entity.UserForJSON, err error) {
 	db := interactor.DB.Connect()
 	// User の取得
 	user, err := interactor.User.FindByID(db, id)
@@ -33,9 +33,12 @@ func (interactor *UserInteractor) Create(user *entity.User) (jsonUser *entity.Us
 		return nil, entity.ErrInvalidUser
 	}
 	// 不正なユーザーリクエストの判別(UserIDがnilでない場合)
-	if user.ID != 0 {
+	if !user.ID.IsNull() {
 		return nil, entity.ErrInvalidUser
 	}
+
+	// UUIDを付与
+	user.NewID()
 
 	db := interactor.DB.Connect()
 	// 新規Userを作成
@@ -53,7 +56,7 @@ func (interactor *UserInteractor) Update(user *entity.User) (jsonUser *entity.Us
 		return nil, entity.ErrInvalidUser
 	}
 	// 不正なユーザーリクエストの判別(UserIDがnilの場合)
-	if user.ID == 0 {
+	if user.ID.IsNull() {
 		return nil, entity.ErrInvalidUser
 	}
 
@@ -67,7 +70,7 @@ func (interactor *UserInteractor) Update(user *entity.User) (jsonUser *entity.Us
 	return jsonUser, nil
 }
 
-func (interactor *UserInteractor) Delete(id int) (err error) {
+func (interactor *UserInteractor) Delete(id string) (err error) {
 	db := interactor.DB.Connect()
 	// Userデータを削除
 	err = interactor.User.Delete(db, id)

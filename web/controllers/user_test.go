@@ -17,8 +17,11 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+const (
+	uuid = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
+)
+
 func TestUserController_Get(t *testing.T) {
-	t.Parallel()
 
 	tests := []struct {
 		name                string
@@ -31,13 +34,13 @@ func TestUserController_Get(t *testing.T) {
 	}{
 		{
 			name:   "正しくユーザが取得できる",
-			userid: "3",
+			userid: uuid,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), 3).Return(&entity.User{
-					ID:        3,
+				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{
+					ID:        entity.NewNullString(uuid),
 					Name:      entity.NewNullString("username"),
 					Password:  entity.NewNullString("password"),
 					Email:     entity.NewNullString("example@example.com"),
@@ -46,7 +49,7 @@ func TestUserController_Get(t *testing.T) {
 				}, nil)
 			},
 			wantData: entity.UserForJSON{
-				ID:    3,
+				ID:    uuid,
 				Name:  "username",
 				Email: "example@example.com",
 			},
@@ -55,12 +58,12 @@ func TestUserController_Get(t *testing.T) {
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
-			userid: "3",
+			userid: uuid,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), 3).Return(&entity.User{}, entity.ErrRecordNotFound)
+				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{}, entity.ErrRecordNotFound)
 			},
 			wantData: ErrorForJSON{
 				Code: http.StatusNotFound,
@@ -70,22 +73,7 @@ func TestUserController_Get(t *testing.T) {
 			wantCode: http.StatusNotFound,
 		},
 		{
-			name:   "Cookieが空ならStatusBadRequest",
-			userid: "",
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
-			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-			},
-			wantData: ErrorForJSON{
-				Code: http.StatusBadRequest,
-				Err:  entity.ErrBadRequest.Error(),
-			},
-			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-		},
-		{
-			name:   "CookieがintでないならStatusBadRequest",
-			userid: "a",
+			name: "Cookieが空ならStatusBadRequest",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
@@ -101,15 +89,17 @@ func TestUserController_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+			//t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
 			context.Request, _ = http.NewRequest("GET", "/user", nil)
-			context.Request.AddCookie(&http.Cookie{
-				Name:  "id",
-				Value: tt.userid,
-			})
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
 
 			// モックの準備
 			ctrl := gomock.NewController(t)
@@ -158,7 +148,6 @@ func TestUserController_Get(t *testing.T) {
 }
 
 func TestUserController_Create(t *testing.T) {
-	t.Parallel()
 
 	tests := []struct {
 		name                string
@@ -182,14 +171,14 @@ func TestUserController_Create(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Create(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
-						user.ID = 3
+						user.SetID("any id")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
 						return nil
 					})
 			},
 			wantData: entity.UserForJSON{
-				ID:    3,
+				ID:    "any id",
 				Name:  "username",
 				Email: "example@example.com",
 			},
@@ -199,7 +188,7 @@ func TestUserController_Create(t *testing.T) {
 		{
 			name: "RequestにuserIDが含まれているならStatusBadRequest",
 			body: `{
-				"id":10,
+				"id":98457fea-708f-bb8e-3e5e-fe1b43f1acad,
 				"name":"username",
 				"password":"password",
 				"email":"example@example.com"
@@ -302,7 +291,7 @@ func TestUserController_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+			// t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
@@ -369,7 +358,7 @@ func TestUserController_Update(t *testing.T) {
 	}{
 		{
 			name:   "正しくnameを更新出来る",
-			userid: "3",
+			userid: uuid,
 			body: `{
 				"name":"newname"
 			}`,
@@ -379,7 +368,7 @@ func TestUserController_Update(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Update(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
-						user.ID = 3
+						user.SetID(uuid)
 						user.Password = entity.NewNullString("password")
 						user.Email = entity.NewNullString("example@example.com")
 						user.CreatedAt = time.Unix(100, 0)
@@ -388,7 +377,7 @@ func TestUserController_Update(t *testing.T) {
 					})
 			},
 			wantData: entity.UserForJSON{
-				ID:    3,
+				ID:    uuid,
 				Name:  "newname",
 				Email: "example@example.com",
 			},
@@ -397,7 +386,7 @@ func TestUserController_Update(t *testing.T) {
 		},
 		{
 			name:   "RequestBodyが不正ならStatusBadRequest",
-			userid: "3",
+			userid: uuid,
 			body: `{
 				"id":10,
 				"title":"title",
@@ -416,7 +405,7 @@ func TestUserController_Update(t *testing.T) {
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
-			userid: "3",
+			userid: uuid,
 			body: `{
 				"name":"newname"
 			}`,
@@ -437,7 +426,7 @@ func TestUserController_Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
+			// t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
