@@ -8,6 +8,8 @@ package entity
 import (
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 // User は内部で処理する際のUser情報である
@@ -22,8 +24,9 @@ type User struct {
 }
 
 // NewUser is the constructor of User.(値が""の場合はsql.NullStringのnullとして扱う)
-func NewUser(name string, pass string, email string) (u *User) {
+func NewUser(id string, name string, pass string, email string) (u *User) {
 	u = &User{
+		ID:       NewNullString(id),
 		Name:     NewNullString(name),
 		Password: NewNullString(pass),
 		Email:    NewNullString(email),
@@ -37,8 +40,15 @@ func NewUser(name string, pass string, email string) (u *User) {
 // 	return u
 // }
 
-// AddID はUserのIDを設定
-func (u *User) AddID(id string) *User {
+// NewID はUserのUUIDを生成
+func (u *User) NewID() *User {
+	id := uuid.New().String()
+	u.ID = NewNullString(id)
+	return u
+}
+
+// SetID はUserのIDを設定
+func (u *User) SetID(id string) *User {
 	u.ID = NewNullString(id)
 	return u
 }
