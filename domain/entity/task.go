@@ -45,26 +45,26 @@ func (t *Task) SetComp(comp bool) *Task {
 	return t
 }
 
-// // TaskForJSON はJSONにして外部に公開するTask情報である
-// type TaskForJSON struct {
-// 	ID          string `json:"id"`
-// 	Title       string `json:"title"`
-// 	Content     string `json:"content"`
-// 	IsCompleted bool   `json:"iscomp"`
-// 	Date        Date   `json:"date"`
-// }
+// TaskForJSON はJSONにして外部に公開するTask情報である
+type TaskForJSON struct {
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Content     string   `json:"content"`
+	IsCompleted bool     `json:"iscomp"`
+	Date        NullDate `json:"date"`
+}
 
-// // ToTaskForJSON はTaskからTaskForJSONを取得する関数である
-// func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
-// 	p = &TaskForJSON{
-// 		ID:          t.ID.ToString(),
-// 		Title:       t.Title.ToString(),
-// 		Content:     t.Content.ToString(),
-// 		IsCompleted: t.IsCompleted,
-// 		Date:        t.Date,
-// 	}
-// 	return
-// }
+// ToTaskForJSON はTaskからTaskForJSONを取得する関数である
+func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
+	p = &TaskForJSON{
+		ID:          t.ID.ToString(),
+		Title:       t.Title.ToString(),
+		Content:     t.Content.ToString(),
+		IsCompleted: t.IsCompleted,
+		Date:        t.Date,
+	}
+	return
+}
 
 func (t *Task) String() (str string) {
 	str = fmt.Sprintf("&entity.Task{ID:%s, Title:%s, Content:%s, UserID:%s, IsCompleted:%t, Date:%s, CreatedAt:%s, UpdatedAt: %s",
