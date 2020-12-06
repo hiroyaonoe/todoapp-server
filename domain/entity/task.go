@@ -14,7 +14,7 @@ type Task struct {
 	Content     NullString
 	UserID      NullString `gorm:"not null;index"`
 	IsCompleted bool
-	Date        Date
+	Date        Date `gorm:"not null"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
