@@ -25,6 +25,15 @@ func NewNullDate(s string) NullDate {
 	return *date
 }
 
+func (d *NullDate) Set(str string) error {
+	new, err := innerNewNullDate(str)
+	if err != nil {
+		return err
+	}
+	d = new
+	return nil
+}
+
 func innerNewNullDate(s string) (*NullDate, error) {
 	array := strings.Split(s, "-")
 

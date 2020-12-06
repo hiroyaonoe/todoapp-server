@@ -17,6 +17,11 @@ func NewNullString(s string) NullString {
 	return NullString{sql.NullString{String: s, Valid: s != ""}}
 }
 
+func (s *NullString) Set(str string) {
+	new := NewNullString(str)
+	s = &new
+}
+
 func (s *NullString) MarshalJSON() ([]byte, error) {
 	if s.Valid {
 		return json.Marshal(s.String)
