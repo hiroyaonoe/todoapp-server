@@ -119,12 +119,7 @@ func (controller *UserController) Delete(c Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func GetUserIDFromCookie(c Context) (id string, err error) {
-	id, err = c.Cookie("id")
-	return
-}
-
-func GetUserFromBody(c Context) (user entity.User, err error) {
+func getUserFromBody(c Context) (user entity.User, err error) {
 	err = c.ShouldBindJSON(&user)
 	return
 }
