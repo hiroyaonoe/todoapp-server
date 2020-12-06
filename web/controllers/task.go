@@ -29,7 +29,10 @@ func (controller *TaskController) Create(c Context) {
 		return
 	}
 
-	jsonTask, err := controller.Interactor.Create(&task)
+	userid, err := getUserIDFromCookie(c)
+	task.UserID.Set(userid)
+
+	err = controller.Interactor.Create(&task)
 
 	if err != nil {
 		if err == entity.ErrInvalidTask {
@@ -39,7 +42,7 @@ func (controller *TaskController) Create(c Context) {
 		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		return
 	}
-	c.JSON(http.StatusOK, jsonTask)
+	c.JSON(http.StatusOK, task)
 }
 
 func getTaskFromBody(c Context) (task entity.Task, err error) {
