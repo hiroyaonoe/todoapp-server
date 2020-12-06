@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -15,11 +16,11 @@ type Date struct {
 	date time.Time
 }
 
-func NewDate(s string) (Date, error) {
+func NewDate(s string) (*Date, error) {
 	array := strings.Split(s, "-")
 
 	if len(array) != 3 {
-		return Date{}, fmt.Errorf("%s is invalid format", s)
+		return nil, fmt.Errorf("%s is invalid format", s)
 	}
 
 	var ymd []int
@@ -27,7 +28,7 @@ func NewDate(s string) (Date, error) {
 	for i, v := range array {
 		ymd[i], err = strconv.Atoi(v)
 		if err != nil {
-			return Date{}, err
+			return nil, err
 		}
 	}
 
@@ -35,7 +36,18 @@ func NewDate(s string) (Date, error) {
 
 	date, err := isExist(y, m, d)
 
-	return Date{date: date}, nil
+	return &Date{date: date}, nil
+}
+
+func (d *Date) MarshalJSON() ([]byte, error) {
+	return json.Marshal(d.String())
+}
+
+func (d *Date) UnmarshalJSON(data []byte) error {
+	var str string
+	json.Unmarshal(data, &str)
+	d, err := NewDate(str)
+	return err
 }
 
 func (d Date) String() string {
