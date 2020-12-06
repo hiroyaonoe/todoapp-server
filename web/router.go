@@ -42,8 +42,8 @@ func (r *Routing) setRouting() {
 	// engine.POST("/login", func(c *gin.Context) { authController.Login(c) })
 
 	v1 := engine.Group("/api/v1")
-	// tasks := v1.Group("/tasks")
-	// tasks.POST("", func(c *gin.Context) { taskController.Create(c) })
+	tasks := v1.Group("/tasks")
+	tasks.POST("", func(c *gin.Context) { taskController.Create(c) })
 	// tasks.GET("/:id", func(c *gin.Context) { taskController.GetbyID(c) })
 	// tasks.PUT("/:id", func(c *gin.Context) { taskController.Update(c) })
 	// tasks.Delete("/:id", func(c *gin.Context) { taskController.Delete(c) })
