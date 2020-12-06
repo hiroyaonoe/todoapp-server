@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -12,11 +13,19 @@ const (
 	layout = "2006-01-02"
 )
 
-type Date struct {
-	date time.Time
+type NullDate struct {
+	sql.NullTime
 }
 
-func NewDate(s string) (*Date, error) {
+func NewNullDate(s string) NullDate {
+	date, err := innerNewNullDate(s)
+	if err != nil {
+		panic(err.Error())
+	}
+	return *date
+}
+
+func innerNewNullDate(s string) (*NullDate, error) {
 	array := strings.Split(s, "-")
 
 	if len(array) != 3 {
@@ -35,23 +44,37 @@ func NewDate(s string) (*Date, error) {
 	y, m, d := ymd[0], ymd[1], ymd[2]
 
 	date, err := isExist(y, m, d)
+	if err != nil {
+		return nil, err
+	}
 
-	return &Date{date: date}, nil
+	return &NullDate{sql.NullTime{Time: date, Valid: !date.IsZero()}}, nil
 }
 
-func (d *Date) MarshalJSON() ([]byte, error) {
+func (d *NullDate) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.String())
 }
 
-func (d *Date) UnmarshalJSON(data []byte) error {
+func (d *NullDate) UnmarshalJSON(data []byte) error {
 	var str string
 	json.Unmarshal(data, &str)
-	d, err := NewDate(str)
+	d, err := innerNewNullDate(str)
 	return err
 }
 
-func (d Date) String() string {
-	return d.date.Format(layout)
+func (d NullDate) Value() time.Time {
+	if d.IsNull() {
+		return time.Unix(0, 0)
+	}
+	return d.Time
+}
+
+func (d NullDate) String() string {
+	return d.Value().Format(layout)
+}
+
+func (d *NullDate) IsNull() bool {
+	return !d.Valid
 }
 
 func isExist(year, month, day int) (time.Time, error) {

@@ -14,13 +14,13 @@ type Task struct {
 	Content     NullString `json:"content"`
 	UserID      NullString `gorm:"not null;index"`
 	IsCompleted bool       `gorm:"not null" json:"iscomp"`
-	Date        Date       `gorm:"not null" json:"date"`
+	Date        NullDate   `gorm:"not null" json:"date"`
 	CreatedAt   time.Time  `json:"-"`
 	UpdatedAt   time.Time  `json:"-"`
 }
 
 // NewTask is the constructor of Task.(値が""の場合はsql.NullStringのnullとして扱う)
-func NewTask(id string, title string, content string, userid string, date Date) (u *Task) {
+func NewTask(id string, title string, content string, userid string, date NullDate) (u *Task) {
 	u = &Task{
 		ID:          NewNullString(id),
 		Title:       NewNullString(title),
