@@ -39,6 +39,12 @@ func (t *Task) NewID() *Task {
 	return t
 }
 
+// SetID はTaskのIDを設定
+func (t *Task) SetID(id string) *Task {
+	t.ID = NewNullString(id)
+	return t
+}
+
 // SetComp はTaskのIsCompletedを設定する
 func (t *Task) SetComp(comp bool) *Task {
 	t.IsCompleted = comp
