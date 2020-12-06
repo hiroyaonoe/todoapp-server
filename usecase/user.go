@@ -40,6 +40,9 @@ func (interactor *UserInteractor) Create(user *entity.User) (jsonUser *entity.Us
 	// UUIDを付与
 	user.NewID()
 
+	// Passwordをhash化
+	EncryptPassword(user)
+
 	db := interactor.DB.Connect()
 	// 新規Userを作成
 	err = interactor.User.Create(db, user)
@@ -59,6 +62,9 @@ func (interactor *UserInteractor) Update(user *entity.User) (jsonUser *entity.Us
 	if user.ID.IsNull() {
 		return nil, entity.ErrInvalidUser
 	}
+
+	// Passwordをhash化
+	EncryptPassword(user)
 
 	db := interactor.DB.Connect()
 	// Userデータを更新

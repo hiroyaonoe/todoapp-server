@@ -34,12 +34,6 @@ func NewUser(id string, name string, pass string, email string) (u *User) {
 	return
 }
 
-// // AddID はUserのIDを設定
-// func (u *User) AddID(id int) *User {
-// 	u.ID = id
-// 	return u
-// }
-
 // NewID はUserのUUIDを生成
 func (u *User) NewID() *User {
 	id := uuid.New().String()

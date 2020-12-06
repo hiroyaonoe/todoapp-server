@@ -42,7 +42,7 @@ func TestUserController_Get(t *testing.T) {
 				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{
 					ID:        entity.NewNullString(uuid),
 					Name:      entity.NewNullString("username"),
-					Password:  entity.NewNullString("password"),
+					Password:  entity.NewNullString("encrypted_password"),
 					Email:     entity.NewNullString("example@example.com"),
 					CreatedAt: time.Unix(100, 0),
 					UpdatedAt: time.Unix(100, 0),
@@ -89,7 +89,7 @@ func TestUserController_Get(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			//t.Parallel()
+			t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
@@ -291,7 +291,7 @@ func TestUserController_Create(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
@@ -369,7 +369,7 @@ func TestUserController_Update(t *testing.T) {
 				user.EXPECT().Update(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
 						user.SetID(uuid)
-						user.Password = entity.NewNullString("password")
+						user.Password = entity.NewNullString("encrypted_password")
 						user.Email = entity.NewNullString("example@example.com")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
@@ -426,7 +426,7 @@ func TestUserController_Update(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// t.Parallel()
+			t.Parallel()
 			gin.SetMode("test")
 			w := httptest.NewRecorder()
 			context, _ := gin.CreateTestContext(w)
