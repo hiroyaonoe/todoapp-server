@@ -63,15 +63,15 @@ type UserForJSON struct {
 // ToUserForJSON はUserからUserForJSONを取得する関数である
 func (u *User) ToUserForJSON() (p *UserForJSON) {
 	p = &UserForJSON{
-		ID:    u.ID.String,
-		Name:  u.Name.String,
-		Email: u.Email.String,
+		ID:    u.ID.ToString(),
+		Name:  u.Name.ToString(),
+		Email: u.Email.ToString(),
 	}
 	return
 }
 
 func (u *User) String() (str string) {
 	str = fmt.Sprintf("&entity.User{ID:%s, Name:%s, Password:%s, Email:%s, CreatedAt:%s, UpdatedAt: %s",
-		u.ID.String, u.Name.String, u.Password.String, u.Email.String, u.CreatedAt, u.UpdatedAt)
+		u.ID.ToString(), u.Name.ToString(), u.Password.ToString(), u.Email.ToString(), u.CreatedAt, u.UpdatedAt)
 	return
 }
