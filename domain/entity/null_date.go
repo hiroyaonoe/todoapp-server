@@ -30,7 +30,8 @@ func (d *NullDate) Set(str string) error {
 	if err != nil {
 		return err
 	}
-	d = new
+	d.Time = new.Time
+	d.Valid = new.Valid
 	return nil
 }
 
@@ -41,7 +42,7 @@ func innerNewNullDate(s string) (*NullDate, error) {
 		return nil, fmt.Errorf("%s is invalid format", s)
 	}
 
-	var ymd []int
+	ymd := []int{-1, -1, -1}
 	var err error
 	for i, v := range array {
 		ymd[i], err = strconv.Atoi(v)
@@ -57,7 +58,11 @@ func innerNewNullDate(s string) (*NullDate, error) {
 		return nil, err
 	}
 
-	return &NullDate{sql.NullTime{Time: date, Valid: !date.IsZero()}}, nil
+	res := new(NullDate)
+	res.Time = date
+	res.Valid = !date.IsZero()
+
+	return res, nil
 }
 
 func (d *NullDate) MarshalJSON() ([]byte, error) {
@@ -67,7 +72,7 @@ func (d *NullDate) MarshalJSON() ([]byte, error) {
 func (d *NullDate) UnmarshalJSON(data []byte) error {
 	var str string
 	json.Unmarshal(data, &str)
-	d, err := innerNewNullDate(str)
+	err := d.Set(str)
 	return err
 }
 

@@ -18,8 +18,10 @@ func NewNullString(s string) NullString {
 }
 
 func (s *NullString) Set(str string) {
-	new := NewNullString(str)
-	s = &new
+	s.String = str
+	s.Valid = str != ""
+	// new := NewNullString(str)
+	// s = &new
 }
 
 func (s *NullString) MarshalJSON() ([]byte, error) {
