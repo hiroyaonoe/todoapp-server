@@ -14,11 +14,11 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (jsonTask *entity.Ta
 	// databaseのnot null制約があるので不要？
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
 	if task.Title.IsNull() || task.UserID.IsNull() || task.Date.IsNull() {
-		return nil, entity.ErrInvalidUser
+		return nil, entity.ErrInvalidTask
 	}
 	// 不正なユーザーリクエストの判別(TaskIDがnilでない場合)
 	if !task.ID.IsNull() {
-		return nil, entity.ErrInvalidUser
+		return nil, entity.ErrInvalidTask
 	}
 
 	// UUIDを付与

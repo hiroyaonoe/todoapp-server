@@ -65,6 +65,142 @@ func TestTaskController_Create(t *testing.T) {
 			wantErr:  false,
 			wantCode: http.StatusOK,
 		},
+		{
+			name:   "RequestにtaskIDが含まれているならStatusBadRequest",
+			userid: uuid,
+			body: `{
+				"id":taskid,
+				"title":"taskname",
+				"content":"I am content.",
+				"iscomp":false,
+				"date":"2020-12-06"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:   "Requestにtitleが含まれていないならStatusBadRequest",
+			userid: uuid,
+			body: `{
+				"content":"I am content.",
+				"iscomp":false,
+				"date":"2020-12-06"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:   "Requestにdateが含まれていないならStatusBadRequest",
+			userid: uuid,
+			body: `{
+				"title":"taskname",
+				"content":"I am content.",
+				"iscomp":false
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:   "contentが含まれていなくてもok",
+			userid: uuid,
+			body: `{
+				"title":"taskname",
+				"iscomp":false,
+				"date":"2020-12-06"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Create(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(db *gorm.DB, task *entity.Task) error {
+						task.SetID("any id")
+						task.CreatedAt = time.Unix(100, 0)
+						task.UpdatedAt = time.Unix(100, 0)
+						return nil
+					})
+			},
+			wantData: entity.TaskForJSON{
+				ID:          "any id",
+				Title:       "taskname",
+				IsCompleted: false,
+				Date:        entity.NewNullDate("2020-12-06"),
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
+		},
+		{
+			name:   "iscompが含まれていなければfalseに設定",
+			userid: uuid,
+			body: `{
+				"title":"taskname",
+				"content":"I am content.",
+				"date":"2020-12-06"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Create(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(db *gorm.DB, task *entity.Task) error {
+						task.SetID("any id")
+						task.CreatedAt = time.Unix(100, 0)
+						task.UpdatedAt = time.Unix(100, 0)
+						return nil
+					})
+			},
+			wantData: entity.TaskForJSON{
+				ID:          "any id",
+				Title:       "taskname",
+				IsCompleted: false,
+				Date:        entity.NewNullDate("2020-12-06"),
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
+		},
+		{
+			name: "Cookieが空ならStatusBadRequest",
+			body: `{
+				"title":"taskname",
+				"content":"I am content.",
+				"iscomp":false,
+				"date":"2020-12-06"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
