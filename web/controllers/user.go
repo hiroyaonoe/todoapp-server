@@ -28,7 +28,7 @@ func NewUserController(db repository.DBRepository, user repository.UserRepositor
 
 // Get is the Handler for GET /user
 func (controller *UserController) Get(c Context) {
-	id, err := GetUserIDFromCookie(c)
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -49,7 +49,7 @@ func (controller *UserController) Get(c Context) {
 
 // Create is the Handler for POST /user
 func (controller *UserController) Create(c Context) {
-	user, err := GetUserFromBody(c)
+	user, err := getUserFromBody(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -70,8 +70,8 @@ func (controller *UserController) Create(c Context) {
 
 // Update is the Handler for PUT /user
 func (controller *UserController) Update(c Context) {
-	user, err := GetUserFromBody(c)
-	id, err := GetUserIDFromCookie(c)
+	user, err := getUserFromBody(c)
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -96,7 +96,7 @@ func (controller *UserController) Update(c Context) {
 }
 
 func (controller *UserController) Delete(c Context) {
-	id, err := GetUserIDFromCookie(c)
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
