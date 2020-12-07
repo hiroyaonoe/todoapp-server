@@ -21,6 +21,11 @@ const (
 	uuid = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
 )
 
+func TestMain(m *testing.M) {
+	gin.SetMode("test")
+	m.Run()
+}
+
 func TestUserController_Get(t *testing.T) {
 
 	tests := []struct {
@@ -88,11 +93,10 @@ func TestUserController_Get(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareUserTT(t)
+
 			context.Request, _ = http.NewRequest("GET", "/user", nil)
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
@@ -290,11 +294,10 @@ func TestUserController_Create(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareUserTT(t)
+
 			context.Request, _ = http.NewRequest("POST", "/user", bytes.NewBufferString(tt.body))
 
 			// モックの準備
@@ -425,11 +428,10 @@ func TestUserController_Update(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareUserTT(t)
+
 			context.Request, _ = http.NewRequest("PUT", "/user", bytes.NewBufferString(tt.body))
 			context.Request.AddCookie(&http.Cookie{
 				Name:  "id",
@@ -480,4 +482,13 @@ func TestUserController_Update(t *testing.T) {
 			}
 		})
 	}
+}
+
+func prepareUserTT(t *testing.T) (context *gin.Context, w *httptest.ResponseRecorder) {
+	t.Helper()
+	t.Parallel()
+	w = httptest.NewRecorder()
+	context, _ = gin.CreateTestContext(w)
+
+	return
 }
