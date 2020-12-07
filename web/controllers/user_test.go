@@ -13,13 +13,17 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
-	"github.com/hiroyaonoe/todoapp-server/usecase"
 	"github.com/jinzhu/gorm"
 )
 
 const (
 	uuid = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
 )
+
+func TestMain(m *testing.M) {
+	gin.SetMode("test")
+	m.Run()
+}
 
 func TestUserController_Get(t *testing.T) {
 
@@ -88,11 +92,10 @@ func TestUserController_Get(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareUserTT(t)
+
 			context.Request, _ = http.NewRequest("GET", "/user", nil)
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
@@ -109,12 +112,7 @@ func TestUserController_Get(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Get(context)
 
@@ -130,7 +128,7 @@ func TestUserController_Get(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Get() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -140,7 +138,7 @@ func TestUserController_Get(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Get() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -290,11 +288,10 @@ func TestUserController_Create(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareUserTT(t)
+
 			context.Request, _ = http.NewRequest("POST", "/user", bytes.NewBufferString(tt.body))
 
 			// モックの準備
@@ -305,12 +302,7 @@ func TestUserController_Create(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Create(context)
 
@@ -326,7 +318,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -336,7 +328,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -404,6 +396,21 @@ func TestUserController_Update(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 		},
 		{
+			name:   "RequestBodyがJSONでないならStatusBadRequest",
+			userid: uuid,
+			body:   `aaaaa`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
 			userid: uuid,
 			body: `{
@@ -422,19 +429,36 @@ func TestUserController_Update(t *testing.T) {
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
 		},
+		{
+			name: "Cookieが空ならStatusBadRequest",
+			body: `{
+				"name":"newname"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareUserTT(t)
+
 			context.Request, _ = http.NewRequest("PUT", "/user", bytes.NewBufferString(tt.body))
-			context.Request.AddCookie(&http.Cookie{
-				Name:  "id",
-				Value: tt.userid,
-			})
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
 
 			// モックの準備
 			ctrl := gomock.NewController(t)
@@ -444,12 +468,7 @@ func TestUserController_Update(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Update(context)
 
@@ -465,7 +484,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Update() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Update() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -475,9 +494,127 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Update() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Update() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
 	}
+}
+
+func TestUserController_Delete(t *testing.T) {
+
+	tests := []struct {
+		name                string
+		userid              string
+		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
+		prepareMockUserRepo func(user *mock_repository.MockUserRepository)
+		wantData            interface{}
+		wantErr             bool
+		wantCode            int
+	}{
+		{
+			name:   "正しくユーザーを削除できる",
+			userid: uuid,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().Delete(gomock.Any(), uuid).Return(nil)
+			},
+			wantData: nil,
+			wantErr:  false,
+			wantCode: http.StatusOK,
+		},
+		{
+			name:   "DBにユーザがいないときはErrUserNotFound",
+			userid: uuid,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().Delete(gomock.Any(), uuid).Return(entity.ErrRecordNotFound)
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusNotFound,
+				Err:  entity.ErrUserNotFound.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
+		},
+		{
+			name: "Cookieが空ならStatusBadRequest",
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			context, w := prepareUserTT(t)
+
+			context.Request, _ = http.NewRequest("DELETE", "/user", nil)
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
+
+			// モックの準備
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			dbRepo := mock_repository.NewMockDBRepository(ctrl)
+			tt.prepareMockDBRepo(dbRepo)
+			userRepo := mock_repository.NewMockUserRepository(ctrl)
+			tt.prepareMockUserRepo(userRepo)
+
+			userController := NewUserController(dbRepo, userRepo)
+
+			userController.Delete(context)
+
+			if w.Code != tt.wantCode {
+				t.Errorf("Get() code = %d, want = %d", w.Code, tt.wantCode)
+			}
+
+			if tt.wantErr {
+				actualData := ErrorForJSON{}
+				expectData := tt.wantData.(ErrorForJSON)
+				err := json.Unmarshal(w.Body.Bytes(), &actualData)
+				if err != nil {
+					t.Fatal(err)
+				}
+				if !reflect.DeepEqual(actualData, expectData) {
+					t.Errorf("Get() err = %#v, want = %#v", actualData, expectData)
+				}
+			} else {
+				// actualData := entity.UserForJSON{}
+				// expectData := tt.wantData.(entity.UserForJSON)
+				// err := json.Unmarshal(w.Body.Bytes(), &actualData)
+				// if err != nil {
+				// 	t.Fatal(err)
+				// }
+				// if !reflect.DeepEqual(actualData, expectData) {
+				// 	t.Errorf("Get() actual = %#v, want = %#v", actualData, expectData)
+				// }
+			}
+		})
+	}
+}
+
+func prepareUserTT(t *testing.T) (context *gin.Context, w *httptest.ResponseRecorder) {
+	t.Helper()
+	t.Parallel()
+	w = httptest.NewRecorder()
+	context, _ = gin.CreateTestContext(w)
+
+	return
 }

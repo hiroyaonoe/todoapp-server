@@ -17,6 +17,13 @@ func NewNullString(s string) NullString {
 	return NullString{sql.NullString{String: s, Valid: s != ""}}
 }
 
+func (s *NullString) Set(str string) {
+	s.String = str
+	s.Valid = str != ""
+	// new := NewNullString(str)
+	// s = &new
+}
+
 func (s *NullString) MarshalJSON() ([]byte, error) {
 	if s.Valid {
 		return json.Marshal(s.String)
@@ -33,7 +40,7 @@ func (s *NullString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s *NullString) ToString() string {
+func (s *NullString) GetString() string {
 	if s.IsNull() {
 		return ""
 	}

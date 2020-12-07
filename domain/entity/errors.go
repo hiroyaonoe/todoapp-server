@@ -22,6 +22,14 @@ var (
 	ErrInvalidUser = errors.New("invalid user")
 )
 
+//Errors of task
+var (
+	// ErrTaskNotFound task not found error
+	ErrTaskNotFound = errors.New("task not found")
+	// ErrInvalidTask invalid task request error(private)
+	ErrInvalidTask = errors.New("invalid task")
+)
+
 //Errors of jinzhu/gorm
 var (
 	// ErrRecordNotFound returns a "record not found error". Occurs only when attempting to query the database with a struct; querying with a slice won't return this error

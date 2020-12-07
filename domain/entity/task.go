@@ -9,25 +9,25 @@ import (
 
 // Task は内部で処理する際のTask情報である
 type Task struct {
-	ID          NullString `gorm:"primary_key"`
-	Title       NullString `gorm:"not null"`
-	Content     NullString
+	ID          NullString `gorm:"primary_key" json:"id"`
+	Title       NullString `gorm:"not null" json:"title"`
+	Content     NullString `json:"content"`
 	UserID      NullString `gorm:"not null;index"`
-	IsCompleted bool
-	Date        Date `gorm:"not null"`
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	IsCompleted bool       `gorm:"not null" json:"iscomp"`
+	Date        NullDate   `gorm:"not null" json:"date"`
+	CreatedAt   time.Time  `json:"-"`
+	UpdatedAt   time.Time  `json:"-"`
 }
 
 // NewTask is the constructor of Task.(値が""の場合はsql.NullStringのnullとして扱う)
-func NewTask(id string, title string, content string, userid string, date Date) (u *Task) {
+func NewTask(id string, title string, content string, userid string, date string) (u *Task) {
 	u = &Task{
 		ID:          NewNullString(id),
 		Title:       NewNullString(title),
 		Content:     NewNullString(content),
 		UserID:      NewNullString(userid),
 		IsCompleted: false,
-		Date:        date,
+		Date:        NewNullDate(date),
 	}
 	return
 }
@@ -35,6 +35,12 @@ func NewTask(id string, title string, content string, userid string, date Date) 
 // NewID はTaskのUUIDを生成
 func (t *Task) NewID() *Task {
 	id := uuid.New().String()
+	t.ID = NewNullString(id)
+	return t
+}
+
+// SetID はTaskのIDを設定
+func (t *Task) SetID(id string) *Task {
 	t.ID = NewNullString(id)
 	return t
 }
@@ -47,19 +53,19 @@ func (t *Task) SetComp(comp bool) *Task {
 
 // TaskForJSON はJSONにして外部に公開するTask情報である
 type TaskForJSON struct {
-	ID          string `json:"id"`
-	Title       string `json:"title"`
-	Content     string `json:"content"`
-	IsCompleted bool   `json:"iscomp"`
-	Date        Date   `json:"date"`
+	ID          string   `json:"id"`
+	Title       string   `json:"title"`
+	Content     string   `json:"content"`
+	IsCompleted bool     `json:"iscomp"`
+	Date        NullDate `json:"date"`
 }
 
 // ToTaskForJSON はTaskからTaskForJSONを取得する関数である
 func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
 	p = &TaskForJSON{
-		ID:          t.ID.ToString(),
-		Title:       t.Title.ToString(),
-		Content:     t.Content.ToString(),
+		ID:          t.ID.GetString(),
+		Title:       t.Title.GetString(),
+		Content:     t.Content.GetString(),
 		IsCompleted: t.IsCompleted,
 		Date:        t.Date,
 	}
@@ -68,6 +74,6 @@ func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
 
 func (t *Task) String() (str string) {
 	str = fmt.Sprintf("&entity.Task{ID:%s, Title:%s, Content:%s, UserID:%s, IsCompleted:%t, Date:%s, CreatedAt:%s, UpdatedAt: %s",
-		t.ID.ToString(), t.Title.ToString(), t.Content.ToString(), t.UserID.ToString(), t.IsCompleted, t.Date, t.CreatedAt, t.UpdatedAt)
+		t.ID.GetString(), t.Title.GetString(), t.Content.GetString(), t.UserID.GetString(), t.IsCompleted, t.Date, t.CreatedAt, t.UpdatedAt)
 	return
 }

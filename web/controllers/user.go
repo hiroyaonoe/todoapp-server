@@ -28,7 +28,7 @@ func NewUserController(db repository.DBRepository, user repository.UserRepositor
 
 // Get is the Handler for GET /user
 func (controller *UserController) Get(c Context) {
-	id, err := GetUserIDFromCookie(c)
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -41,15 +41,16 @@ func (controller *UserController) Get(c Context) {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonUser)
 }
 
 // Create is the Handler for POST /user
 func (controller *UserController) Create(c Context) {
-	user, err := GetUserFromBody(c)
+	user, err := getUserFromBody(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -62,16 +63,21 @@ func (controller *UserController) Create(c Context) {
 			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonUser)
 }
 
 // Update is the Handler for PUT /user
 func (controller *UserController) Update(c Context) {
-	user, err := GetUserFromBody(c)
-	id, err := GetUserIDFromCookie(c)
+	user, err := getUserFromBody(c)
+	if err != nil {
+		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		return
+	}
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -89,14 +95,15 @@ func (controller *UserController) Update(c Context) {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonUser)
 }
 
 func (controller *UserController) Delete(c Context) {
-	id, err := GetUserIDFromCookie(c)
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
@@ -105,26 +112,22 @@ func (controller *UserController) Delete(c Context) {
 	err = controller.Interactor.Delete(id)
 
 	if err != nil {
-		if err == entity.ErrInvalidUser {
-			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
-			return
-		}
+		// if err == entity.ErrInvalidUser {
+		// 	ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		// 	return
+		// }
 		if err == entity.ErrRecordNotFound {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, nil)
 }
 
-func GetUserIDFromCookie(c Context) (id string, err error) {
-	id, err = c.Cookie("id")
-	return
-}
-
-func GetUserFromBody(c Context) (user entity.User, err error) {
+func getUserFromBody(c Context) (user entity.User, err error) {
 	err = c.ShouldBindJSON(&user)
 	return
 }

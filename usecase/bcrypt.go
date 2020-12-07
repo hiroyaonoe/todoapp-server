@@ -6,7 +6,7 @@ import (
 )
 
 func EncryptPassword(u *entity.User) error {
-	password := []byte(u.Password.ToString())
+	password := []byte(u.Password.GetString())
 	hashed, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -18,8 +18,8 @@ func EncryptPassword(u *entity.User) error {
 }
 
 func ComparePassword(hashed *entity.User, plain *entity.User) error {
-	p1 := []byte(hashed.Password.ToString())
-	p2 := []byte(plain.Password.ToString())
+	p1 := []byte(hashed.Password.GetString())
+	p2 := []byte(plain.Password.GetString())
 
 	return bcrypt.CompareHashAndPassword(p1, p2)
 }

@@ -11,6 +11,7 @@ func main() {
 	db.Migrate()
 	db.Connect().LogMode(true)
 	user := new(database.UserRepository)
-	r := web.NewRouting(db, user)
+	task := new(database.TaskRepository)
+	r := web.NewRouting(db, user, task)
 	r.Run()
 }
