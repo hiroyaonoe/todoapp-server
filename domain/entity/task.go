@@ -20,14 +20,14 @@ type Task struct {
 }
 
 // NewTask is the constructor of Task.(値が""の場合はsql.NullStringのnullとして扱う)
-func NewTask(id string, title string, content string, userid string, date NullDate) (u *Task) {
+func NewTask(id string, title string, content string, userid string, date string) (u *Task) {
 	u = &Task{
 		ID:          NewNullString(id),
 		Title:       NewNullString(title),
 		Content:     NewNullString(content),
 		UserID:      NewNullString(userid),
 		IsCompleted: false,
-		Date:        date,
+		Date:        NewNullDate(date),
 	}
 	return
 }
