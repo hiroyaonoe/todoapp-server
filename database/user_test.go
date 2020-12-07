@@ -51,6 +51,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
@@ -140,6 +141,7 @@ func TestUserRepository_Create(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
@@ -254,6 +256,7 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
@@ -303,6 +306,7 @@ func TestUserRepository_Delete(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
