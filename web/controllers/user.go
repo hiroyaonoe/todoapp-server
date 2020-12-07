@@ -71,6 +71,10 @@ func (controller *UserController) Create(c Context) {
 // Update is the Handler for PUT /user
 func (controller *UserController) Update(c Context) {
 	user, err := getUserFromBody(c)
+	if err != nil {
+		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		return
+	}
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
 		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)

@@ -407,6 +407,21 @@ func TestUserController_Update(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 		},
 		{
+			name:   "RequestBodyがJSONでないならStatusBadRequest",
+			userid: uuid,
+			body:   `aaaaa`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
 			userid: uuid,
 			body: `{
@@ -425,6 +440,22 @@ func TestUserController_Update(t *testing.T) {
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
 		},
+		{
+			name: "Cookieが空ならStatusBadRequest",
+			body: `{
+				"name":"newname"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
 	}
 
 	for _, tt := range tests {
@@ -433,10 +464,12 @@ func TestUserController_Update(t *testing.T) {
 			context, w := prepareUserTT(t)
 
 			context.Request, _ = http.NewRequest("PUT", "/user", bytes.NewBufferString(tt.body))
-			context.Request.AddCookie(&http.Cookie{
-				Name:  "id",
-				Value: tt.userid,
-			})
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
 
 			// モックの準備
 			ctrl := gomock.NewController(t)
