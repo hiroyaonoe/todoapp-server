@@ -134,7 +134,7 @@ func TestUserController_Get(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Get() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -144,7 +144,7 @@ func TestUserController_Get(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Get() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Get() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -329,7 +329,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -339,7 +339,7 @@ func TestUserController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
@@ -467,7 +467,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Update() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Update() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.UserForJSON{}
@@ -477,7 +477,7 @@ func TestUserController_Update(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Update() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Update() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
