@@ -13,7 +13,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
-	"github.com/hiroyaonoe/todoapp-server/usecase"
 	"github.com/jinzhu/gorm"
 )
 
@@ -229,12 +228,7 @@ func TestTaskController_Create(t *testing.T) {
 			taskRepo := mock_repository.NewMockTaskRepository(ctrl)
 			tt.prepareMockTaskRepo(taskRepo)
 
-			taskController := &TaskController{
-				Interactor: usecase.TaskInteractor{
-					DB:   dbRepo,
-					Task: taskRepo,
-				},
-			}
+			taskController := NewTaskController(dbRepo, taskRepo)
 
 			taskController.Create(context)
 

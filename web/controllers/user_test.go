@@ -13,7 +13,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
-	"github.com/hiroyaonoe/todoapp-server/usecase"
 	"github.com/jinzhu/gorm"
 )
 
@@ -113,12 +112,7 @@ func TestUserController_Get(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Get(context)
 
@@ -308,12 +302,7 @@ func TestUserController_Create(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Create(context)
 
@@ -479,12 +468,7 @@ func TestUserController_Update(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Update(context)
 
@@ -593,12 +577,7 @@ func TestUserController_Delete(t *testing.T) {
 			userRepo := mock_repository.NewMockUserRepository(ctrl)
 			tt.prepareMockUserRepo(userRepo)
 
-			userController := &UserController{
-				Interactor: usecase.UserInteractor{
-					DB:   dbRepo,
-					User: userRepo,
-				},
-			}
+			userController := NewUserController(dbRepo, userRepo)
 
 			userController.Delete(context)
 
