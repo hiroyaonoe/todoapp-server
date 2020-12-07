@@ -21,6 +21,10 @@ import (
 // const (
 // 	uuid = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
 // )
+// func TestMain(m *testing.M) {
+// 	gin.SetMode("test")
+// 	m.Run()
+// }
 
 func TestTaskController_Create(t *testing.T) {
 
@@ -176,6 +180,7 @@ func TestTaskController_Create(t *testing.T) {
 			wantData: entity.TaskForJSON{
 				ID:          "any id",
 				Title:       "taskname",
+				Content:     "I am content.",
 				IsCompleted: false,
 				Date:        entity.NewNullDate("2020-12-06"),
 			},
@@ -204,11 +209,10 @@ func TestTaskController_Create(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			gin.SetMode("test")
-			w := httptest.NewRecorder()
-			context, _ := gin.CreateTestContext(w)
+			context, w := prepareTaskTT(t)
+
 			context.Request, _ = http.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
@@ -246,7 +250,7 @@ func TestTaskController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() errData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() err = %#v, want = %#v", actualData, expectData)
 				}
 			} else {
 				actualData := entity.TaskForJSON{}
@@ -256,9 +260,18 @@ func TestTaskController_Create(t *testing.T) {
 					t.Fatal(err)
 				}
 				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() okData = %#v, want = %#v", actualData, expectData)
+					t.Errorf("Create() actual = %#v, want = %#v", actualData, expectData)
 				}
 			}
 		})
 	}
+}
+
+func prepareTaskTT(t *testing.T) (context *gin.Context, w *httptest.ResponseRecorder) {
+	t.Helper()
+	t.Parallel()
+	w = httptest.NewRecorder()
+	context, _ = gin.CreateTestContext(w)
+
+	return
 }
