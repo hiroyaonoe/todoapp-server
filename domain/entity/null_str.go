@@ -40,7 +40,7 @@ func (s *NullString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (s *NullString) ToString() string {
+func (s *NullString) GetString() string {
 	if s.IsNull() {
 		return ""
 	}

@@ -63,9 +63,9 @@ type TaskForJSON struct {
 // ToTaskForJSON はTaskからTaskForJSONを取得する関数である
 func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
 	p = &TaskForJSON{
-		ID:          t.ID.ToString(),
-		Title:       t.Title.ToString(),
-		Content:     t.Content.ToString(),
+		ID:          t.ID.GetString(),
+		Title:       t.Title.GetString(),
+		Content:     t.Content.GetString(),
 		IsCompleted: t.IsCompleted,
 		Date:        t.Date,
 	}
@@ -74,6 +74,6 @@ func (t *Task) ToTaskForJSON() (p *TaskForJSON) {
 
 func (t *Task) String() (str string) {
 	str = fmt.Sprintf("&entity.Task{ID:%s, Title:%s, Content:%s, UserID:%s, IsCompleted:%t, Date:%s, CreatedAt:%s, UpdatedAt: %s",
-		t.ID.ToString(), t.Title.ToString(), t.Content.ToString(), t.UserID.ToString(), t.IsCompleted, t.Date, t.CreatedAt, t.UpdatedAt)
+		t.ID.GetString(), t.Title.GetString(), t.Content.GetString(), t.UserID.GetString(), t.IsCompleted, t.Date, t.CreatedAt, t.UpdatedAt)
 	return
 }

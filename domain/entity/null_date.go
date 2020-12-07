@@ -76,7 +76,7 @@ func (d *NullDate) UnmarshalJSON(data []byte) error {
 	return err
 }
 
-func (d NullDate) Value() time.Time {
+func (d NullDate) GetTime() time.Time {
 	if d.IsNull() {
 		return time.Unix(0, 0)
 	}
@@ -84,7 +84,7 @@ func (d NullDate) Value() time.Time {
 }
 
 func (d NullDate) String() string {
-	return d.Value().Format(layout)
+	return d.GetTime().Format(layout)
 }
 
 func (d *NullDate) IsNull() bool {
@@ -97,5 +97,13 @@ func isExist(year, month, day int) (time.Time, error) {
 		return date, nil
 	} else {
 		return time.Time{}, fmt.Errorf("%d-%d-%d is not exist", year, month, day)
+	}
+}
+
+func (s NullDate) Equals(t NullDate) bool {
+	if s.Valid {
+		return t.Valid
+	} else {
+		return s.String() == t.String()
 	}
 }
