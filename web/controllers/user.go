@@ -41,8 +41,9 @@ func (controller *UserController) Get(c Context) {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonUser)
 }
@@ -62,8 +63,9 @@ func (controller *UserController) Create(c Context) {
 			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonUser)
 }
@@ -93,8 +95,9 @@ func (controller *UserController) Update(c Context) {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonUser)
 }
@@ -117,8 +120,9 @@ func (controller *UserController) Delete(c Context) {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, nil)
 }

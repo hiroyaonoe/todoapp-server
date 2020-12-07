@@ -39,8 +39,9 @@ func (controller *TaskController) Create(c Context) {
 			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
-		ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
-		return
+		panic(err.Error())
+		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// return
 	}
 	c.JSON(http.StatusOK, jsonTask)
 }
