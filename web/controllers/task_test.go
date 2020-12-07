@@ -128,6 +128,26 @@ func TestTaskController_Create(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 		},
 		{
+			name:   "dateのformatが不正ならStatusBadRequest",
+			userid: uuid,
+			body: `{
+				"title":"taskname",
+				"content":"I am content.",
+				"iscomp":false,
+				"date":"invalid date"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
+			},
+			wantData: ErrorForJSON{
+				Code: http.StatusBadRequest,
+				Err:  entity.ErrBadRequest.Error(),
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+		},
+		{
 			name:   "contentが含まれていなくてもok",
 			userid: uuid,
 			body: `{
