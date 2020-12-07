@@ -109,10 +109,10 @@ func (controller *UserController) Delete(c Context) {
 	err = controller.Interactor.Delete(id)
 
 	if err != nil {
-		if err == entity.ErrInvalidUser {
-			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
-			return
-		}
+		// if err == entity.ErrInvalidUser {
+		// 	ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		// 	return
+		// }
 		if err == entity.ErrRecordNotFound {
 			ErrorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
 			return
