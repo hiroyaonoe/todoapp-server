@@ -20,12 +20,8 @@ var (
 )
 
 func TestUserRepository_FindByID(t *testing.T) {
-	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	user := new(UserRepository)
-	db := dbRepo.Connect()
-	// db.LogMode(true)
+
+	db, user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -56,16 +52,8 @@ func TestUserRepository_FindByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// databaseを初期化する
-			db.Exec("TRUNCATE TABLE users")
 
-			// 事前データの準備
-			// tx := db.Begin()
-			// defer tx.Rollback()
-			err := addData(t, db, tt.prepareUsers)
-			if err != nil {
-				t.Fatal(err)
-			}
+			prepareUserTT(t, db, tt.prepareUsers)
 
 			gotUser, err := user.FindByID(db, tt.userid)
 
@@ -83,12 +71,8 @@ func TestUserRepository_FindByID(t *testing.T) {
 }
 
 func TestUserRepository_Create(t *testing.T) {
-	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	user := new(UserRepository)
-	db := dbRepo.Connect()
-	// db.LogMode(true)
+
+	db, user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -157,16 +141,10 @@ func TestUserRepository_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// databaseを初期化する
-			db.Exec("TRUNCATE TABLE users")
 
-			// 事前データの準備
-			err := addData(t, db, tt.prepareUsers)
-			if err != nil {
-				t.Fatal(err)
-			}
+			prepareUserTT(t, db, tt.prepareUsers)
 
-			err = user.Create(db, tt.user)
+			err := user.Create(db, tt.user)
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -183,12 +161,8 @@ func TestUserRepository_Create(t *testing.T) {
 }
 
 func TestUserRepository_Update(t *testing.T) {
-	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	user := new(UserRepository)
-	db := dbRepo.Connect()
-	// db.LogMode(true)
+
+	db, user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -281,16 +255,10 @@ func TestUserRepository_Update(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// databaseを初期化する
-			db.Exec("TRUNCATE TABLE users")
 
-			// 事前データの準備
-			err := addData(t, db, tt.prepareUsers)
-			if err != nil {
-				t.Fatal(err)
-			}
+			prepareUserTT(t, db, tt.prepareUsers)
 
-			err = user.Update(db, tt.user)
+			err := user.Update(db, tt.user)
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -307,12 +275,8 @@ func TestUserRepository_Update(t *testing.T) {
 }
 
 func TestUserRepository_Delete(t *testing.T) {
-	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	user := new(UserRepository)
-	db := dbRepo.Connect()
-	// db.LogMode(true)
+
+	db, user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -340,16 +304,10 @@ func TestUserRepository_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// databaseを初期化する
-			db.Exec("TRUNCATE TABLE users")
 
-			// 事前データの準備
-			err := addData(t, db, tt.prepareUsers)
-			if err != nil {
-				t.Fatal(err)
-			}
+			prepareUserTT(t, db, tt.prepareUsers)
 
-			err = user.Delete(db, tt.userid)
+			err := user.Delete(db, tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -379,4 +337,30 @@ func userEqual(t *testing.T, got *entity.User, want *entity.User) bool {
 		(got.Name.Equals(want.Name)) &&
 		(got.Password.Equals(want.Password)) &&
 		(got.Email.Equals(want.Email))
+}
+
+func prepareUserT(t *testing.T) (db *gorm.DB, user *UserRepository) {
+	t.Helper()
+
+	// dbに接続
+	dbRepo := NewTestDB()
+	dbRepo.Migrate()
+	user = new(UserRepository)
+	db = dbRepo.Connect()
+	// db.LogMode(true)
+
+	return
+}
+
+func prepareUserTT(t *testing.T, db *gorm.DB, users []*entity.User) {
+	t.Helper()
+
+	// databaseを初期化する
+	db.Exec("TRUNCATE TABLE users")
+
+	// 事前データの準備
+	err := addData(t, db, users)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
