@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	uuidA = "df1ecfbf-e5f8-5eab-d49c-3a3f2e201fa3"
-	uuidB = "38d94bb3-d13d-76c8-b4aa-54985158d899"
-	uuidZ = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
+	uuidUA = "df1ecfbf-e5f8-5eab-d49c-3a3f2e201fa3"
+	uuidUB = "38d94bb3-d13d-76c8-b4aa-54985158d899"
+	uuidUZ = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
 )
 
 var (
-	userA = entity.NewUser(uuidA, "userA", "encrypted_passwordA", "exampleA@example.com")
-	userB = entity.NewUser(uuidB, "userB", "encrypted_passwordB", "exampleB@example.com")
+	userA = entity.NewUser(uuidUA, "userA", "encrypted_passwordA", "exampleA@example.com")
+	userB = entity.NewUser(uuidUB, "userB", "encrypted_passwordB", "exampleB@example.com")
 )
 
 func TestUserRepository_FindByID(t *testing.T) {
@@ -32,8 +32,8 @@ func TestUserRepository_FindByID(t *testing.T) {
 	}{
 		{
 			name:     "正しくユーザが取得できる",
-			userid:   uuidB,
-			wantUser: entity.NewUser(uuidB, "userB", "encrypted_passwordB", "exampleB@example.com"),
+			userid:   uuidUB,
+			wantUser: entity.NewUser(uuidUB, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -42,7 +42,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 		},
 		{
 			name:     "存在しないユーザーの場合はErrRecordNotFound",
-			userid:   uuidZ,
+			userid:   uuidUZ,
 			wantUser: nil,
 			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
@@ -83,8 +83,8 @@ func TestUserRepository_Create(t *testing.T) {
 	}{
 		{
 			name:     "正しくユーザを作成できる",
-			user:     entity.NewUser(uuidB, "userB", "encrypted_passwordB", "exampleB@example.com"),
-			wantUser: entity.NewUser(uuidB, "userB", "encrypted_passwordB", "exampleB@example.com"),
+			user:     entity.NewUser(uuidUB, "userB", "encrypted_passwordB", "exampleB@example.com"),
+			wantUser: entity.NewUser(uuidUB, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -92,21 +92,21 @@ func TestUserRepository_Create(t *testing.T) {
 		},
 		{
 			name:         "Nameがnilの場合はErrMySQL",
-			user:         entity.NewUser(uuidB, "", "encrypted_passwordB", "exampleB@example.com"),
+			user:         entity.NewUser(uuidUB, "", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser:     nil,
 			wantErr:      entity.ErrMySQL(0x418, "Column 'name' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
 			name:         "Passwordがnilの場合はErrMySQL",
-			user:         entity.NewUser(uuidB, "userB", "", "exampleB@example.com"),
+			user:         entity.NewUser(uuidUB, "userB", "", "exampleB@example.com"),
 			wantUser:     nil,
 			wantErr:      entity.ErrMySQL(0x418, "Column 'password' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
 			name:         "Emailがnilの場合はErrMySQL",
-			user:         entity.NewUser(uuidB, "userB", "encrypted_passwordB", ""),
+			user:         entity.NewUser(uuidUB, "userB", "encrypted_passwordB", ""),
 			wantUser:     nil,
 			wantErr:      entity.ErrMySQL(0x418, "Column 'email' cannot be null"),
 			prepareUsers: nil,
@@ -122,7 +122,7 @@ func TestUserRepository_Create(t *testing.T) {
 		},
 		{
 			name:     "指定したIDのユーザーが既に存在している場合はErrMySQL",
-			user:     entity.NewUser(uuidA, "userB", "encrypted_passwordB", "exampleB@example.com"),
+			user:     entity.NewUser(uuidUA, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
 			wantErr:  entity.ErrMySQL(0x426, "Duplicate entry 'df1ecfbf-e5f8-5eab-d49c-3a3f2e201fa3' for key 'users.PRIMARY'"),
 			prepareUsers: []*entity.User{
@@ -131,7 +131,7 @@ func TestUserRepository_Create(t *testing.T) {
 		},
 		{
 			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
-			user:     entity.NewUser(uuidA, "userB", "encrypted_passwordB", "exampleB@example.com"),
+			user:     entity.NewUser(uuidUA, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
 			wantErr:  entity.ErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
 			prepareUsers: []*entity.User{
@@ -173,8 +173,8 @@ func TestUserRepository_Update(t *testing.T) {
 	}{
 		{
 			name:     "全フィールドを変更できる",
-			user:     entity.NewUser(uuidA, "userAA", "encrypted_passwordAA", "exampleAA@example.com"),
-			wantUser: entity.NewUser(uuidA, "userAA", "encrypted_passwordAA", "exampleAA@example.com"),
+			user:     entity.NewUser(uuidUA, "userAA", "encrypted_passwordAA", "exampleAA@example.com"),
+			wantUser: entity.NewUser(uuidUA, "userAA", "encrypted_passwordAA", "exampleAA@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -182,8 +182,8 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "Nameのみを変更できる",
-			user:     entity.NewUser(uuidA, "userAA", "", ""),
-			wantUser: entity.NewUser(uuidA, "userAA", "encrypted_passwordA", "exampleA@example.com"),
+			user:     entity.NewUser(uuidUA, "userAA", "", ""),
+			wantUser: entity.NewUser(uuidUA, "userAA", "encrypted_passwordA", "exampleA@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -191,8 +191,8 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "Passwordのみを変更できる",
-			user:     entity.NewUser(uuidA, "", "encrypted_passwordAA", ""),
-			wantUser: entity.NewUser(uuidA, "userA", "encrypted_passwordAA", "exampleA@example.com"),
+			user:     entity.NewUser(uuidUA, "", "encrypted_passwordAA", ""),
+			wantUser: entity.NewUser(uuidUA, "userA", "encrypted_passwordAA", "exampleA@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -200,16 +200,16 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "Emailのみを変更できる",
-			user:     entity.NewUser(uuidA, "", "", "exampleAA@example.com"),
-			wantUser: entity.NewUser(uuidA, "userA", "encrypted_passwordA", "exampleAA@example.com"),
+			user:     entity.NewUser(uuidUA, "", "", "exampleAA@example.com"),
+			wantUser: entity.NewUser(uuidUA, "userA", "encrypted_passwordA", "exampleAA@example.com"),
 			prepareUsers: []*entity.User{
 				userA,
 			},
 		},
 		{
 			name:     "全フィールドがもとと同じでも実行できる",
-			user:     entity.NewUser(uuidA, "userA", "encrypted_passwordA", "exampleA@example.com"),
-			wantUser: entity.NewUser(uuidA, "userA", "encrypted_passwordA", "exampleA@example.com"),
+			user:     entity.NewUser(uuidUA, "userA", "encrypted_passwordA", "exampleA@example.com"),
+			wantUser: entity.NewUser(uuidUA, "userA", "encrypted_passwordA", "exampleA@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -217,8 +217,8 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "全フィールドが空でも実行できる",
-			user:     entity.NewUser(uuidA, "", "", ""),
-			wantUser: entity.NewUser(uuidA, "userA", "encrypted_passwordA", "exampleA@example.com"),
+			user:     entity.NewUser(uuidUA, "", "", ""),
+			wantUser: entity.NewUser(uuidUA, "userA", "encrypted_passwordA", "exampleA@example.com"),
 			wantErr:  nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -235,7 +235,7 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "指定したIDのユーザーが存在しない場合はErrRecordNotFound",
-			user:     entity.NewUser(uuidZ, "userB", "encrypted_passwordB", "exampleB@example.com"),
+			user:     entity.NewUser(uuidUZ, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
 			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
@@ -244,7 +244,7 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
-			user:     entity.NewUser(uuidA, "", "", "exampleB@example.com"),
+			user:     entity.NewUser(uuidUA, "", "", "exampleB@example.com"),
 			wantUser: nil,
 			wantErr:  entity.ErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
 			prepareUsers: []*entity.User{
@@ -286,7 +286,7 @@ func TestUserRepository_Delete(t *testing.T) {
 	}{
 		{
 			name:    "正しくユーザを削除できる",
-			userid:  uuidB,
+			userid:  uuidUB,
 			wantErr: nil,
 			prepareUsers: []*entity.User{
 				userA,
@@ -295,7 +295,7 @@ func TestUserRepository_Delete(t *testing.T) {
 		},
 		{
 			name:    "存在しないユーザーの場合はErrRecordNotFound",
-			userid:  uuidZ,
+			userid:  uuidUZ,
 			wantErr: entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
@@ -318,8 +318,8 @@ func TestUserRepository_Delete(t *testing.T) {
 	db.Exec("TRUNCATE TABLE users")
 }
 
-// addData はテスト用のデータをデータベースに追加する
-func addData(t *testing.T, db *gorm.DB, users []*entity.User) (err error) {
+// addUserData はテスト用のデータをデータベースに追加する
+func addUserData(t *testing.T, db *gorm.DB, users []*entity.User) (err error) {
 	t.Helper()
 	for _, user := range users {
 		err = db.Create(user).Error
@@ -359,7 +359,7 @@ func prepareUserTT(t *testing.T, db *gorm.DB, users []*entity.User) {
 	db.Exec("TRUNCATE TABLE users")
 
 	// 事前データの準備
-	err := addData(t, db, users)
+	err := addUserData(t, db, users)
 	if err != nil {
 		t.Fatal(err)
 	}
