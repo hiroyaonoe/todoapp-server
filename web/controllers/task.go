@@ -47,6 +47,6 @@ func (controller *TaskController) Create(c Context) {
 }
 
 func getTaskFromBody(c Context) (task *entity.Task, err error) {
-	err = c.ShouldBindJSON(task)
+	err = c.ShouldBindJSON(&task)
 	return
 }

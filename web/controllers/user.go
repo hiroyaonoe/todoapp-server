@@ -128,6 +128,6 @@ func (controller *UserController) Delete(c Context) {
 }
 
 func getUserFromBody(c Context) (user *entity.User, err error) {
-	err = c.ShouldBindJSON(user)
+	err = c.ShouldBindJSON(&user)
 	return
 }
