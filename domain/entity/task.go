@@ -22,14 +22,18 @@ type Task struct {
 
 // MarshalJSON はjsonにエンコードするときにUserIDフィールドを隠す
 func (t *Task) MarshalJSON() ([]byte, error) {
-	type alias Task
-	aliasTask := alias(*t)
-	aliasTask.UserID.Set("")
-
 	return json.Marshal(&struct {
-		alias
+		ID          NullString `json:"id"`
+		Title       NullString `json:"title"`
+		Content     NullString `json:"content"`
+		IsCompleted bool       `json:"iscomp"`
+		Date        NullDate   `json:"date"`
 	}{
-		aliasTask,
+		ID:          t.ID,
+		Title:       t.Title,
+		Content:     t.Content,
+		IsCompleted: t.IsCompleted,
+		Date:        t.Date,
 	})
 }
 

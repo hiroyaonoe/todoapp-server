@@ -26,14 +26,14 @@ type User struct {
 
 // MarshalJSON はjsonにエンコードするときにパスワードフィールドを隠す
 func (u *User) MarshalJSON() ([]byte, error) {
-	type alias User
-	aliasUser := alias(*u)
-	aliasUser.Password.Set("")
-
 	return json.Marshal(&struct {
-		alias
+		ID    NullString `json:"id"`
+		Name  NullString `json:"name"`
+		Email NullString `json:"email"`
 	}{
-		aliasUser,
+		ID:    u.ID,
+		Name:  u.Name,
+		Email: u.Email,
 	})
 }
 
