@@ -56,7 +56,7 @@ func (controller *UserController) Create(c Context) {
 		return
 	}
 
-	err = controller.Interactor.Create(&user)
+	err = controller.Interactor.Create(user)
 
 	if err != nil {
 		if err == entity.ErrInvalidUser {
@@ -67,7 +67,7 @@ func (controller *UserController) Create(c Context) {
 		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		// return
 	}
-	c.JSON(http.StatusOK, &user)
+	c.JSON(http.StatusOK, user)
 }
 
 // Update is the Handler for PUT /user
@@ -84,7 +84,7 @@ func (controller *UserController) Update(c Context) {
 	}
 	user.SetID(id)
 
-	err = controller.Interactor.Update(&user)
+	err = controller.Interactor.Update(user)
 
 	if err != nil {
 		if err == entity.ErrInvalidUser {
@@ -99,7 +99,7 @@ func (controller *UserController) Update(c Context) {
 		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		// return
 	}
-	c.JSON(http.StatusOK, &user)
+	c.JSON(http.StatusOK, user)
 }
 
 func (controller *UserController) Delete(c Context) {
@@ -127,7 +127,7 @@ func (controller *UserController) Delete(c Context) {
 	c.JSON(http.StatusOK, nil)
 }
 
-func getUserFromBody(c Context) (user entity.User, err error) {
-	err = c.ShouldBindJSON(&user)
+func getUserFromBody(c Context) (user *entity.User, err error) {
+	err = c.ShouldBindJSON(user)
 	return
 }
