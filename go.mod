@@ -9,5 +9,5 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/ichiban/thelper v0.0.0-20191122102105-8394b99e2dc4 // indirect
 	github.com/jinzhu/gorm v1.9.16
-	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
+	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
 )

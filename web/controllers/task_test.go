@@ -2,10 +2,8 @@ package controllers
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 
@@ -27,16 +25,7 @@ import (
 
 func TestTaskController_Create(t *testing.T) {
 
-	tests := []struct {
-		name                string
-		userid              string
-		body                string
-		prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
-		prepareMockTaskRepo func(task *mock_repository.MockTaskRepository)
-		wantData            interface{}
-		wantErr             bool
-		wantCode            int
-	}{
+	tests := []testInfo{
 		{
 			name:   "正しくタスクを作成できる",
 			userid: uuid,
@@ -58,15 +47,9 @@ func TestTaskController_Create(t *testing.T) {
 						return nil
 					})
 			},
-			wantData: entity.TaskForJSON{
-				ID:          "any id",
-				Title:       "taskname",
-				Content:     "I am content.",
-				IsCompleted: false,
-				Date:        entity.NewNullDate("2020-12-06"),
-			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
+			wantData: entity.NewTask("any id", "taskname", "I am content.", "", "2020-12-06"),
 		},
 		{
 			name:   "RequestにtaskIDが含まれているならStatusBadRequest",
@@ -82,12 +65,9 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
-				Code: http.StatusBadRequest,
-				Err:  entity.ErrBadRequest.Error(),
-			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
+			wantData: entity.ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにtitleが含まれていないならStatusBadRequest",
@@ -101,12 +81,9 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
-				Code: http.StatusBadRequest,
-				Err:  entity.ErrBadRequest.Error(),
-			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
+			wantData: entity.ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにdateが含まれていないならStatusBadRequest",
@@ -120,12 +97,9 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
-				Code: http.StatusBadRequest,
-				Err:  entity.ErrBadRequest.Error(),
-			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
+			wantData: entity.ErrBadRequest.Error(),
 		},
 		{
 			name:   "dateのformatが不正ならStatusBadRequest",
@@ -140,12 +114,9 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
-				Code: http.StatusBadRequest,
-				Err:  entity.ErrBadRequest.Error(),
-			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
+			wantData: entity.ErrBadRequest.Error(),
 		},
 		{
 			name:   "contentが含まれていなくてもok",
@@ -167,12 +138,7 @@ func TestTaskController_Create(t *testing.T) {
 						return nil
 					})
 			},
-			wantData: entity.TaskForJSON{
-				ID:          "any id",
-				Title:       "taskname",
-				IsCompleted: false,
-				Date:        entity.NewNullDate("2020-12-06"),
-			},
+			wantData: entity.NewTask("any id", "taskname", "", "", "2020-12-06"),
 			wantErr:  false,
 			wantCode: http.StatusOK,
 		},
@@ -196,13 +162,7 @@ func TestTaskController_Create(t *testing.T) {
 						return nil
 					})
 			},
-			wantData: entity.TaskForJSON{
-				ID:          "any id",
-				Title:       "taskname",
-				Content:     "I am content.",
-				IsCompleted: false,
-				Date:        entity.NewNullDate("2020-12-06"),
-			},
+			wantData: entity.NewTask("any id", "taskname", "I am content.", "", "2020-12-06"),
 			wantErr:  false,
 			wantCode: http.StatusOK,
 		},
@@ -218,12 +178,9 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
-				Code: http.StatusBadRequest,
-				Err:  entity.ErrBadRequest.Error(),
-			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
+			wantData: entity.ErrBadRequest.Error(),
 		},
 	}
 
@@ -232,6 +189,7 @@ func TestTaskController_Create(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			context, w := prepareTaskTT(t)
 
+			// httpRequest
 			context.Request, _ = http.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
@@ -240,43 +198,13 @@ func TestTaskController_Create(t *testing.T) {
 				})
 			}
 
-			// モックの準備
-			ctrl := gomock.NewController(t)
+			// モック,コントローラーの準備
+			ctrl, taskController := prepareMockTaskCtrl(t, tt)
 			defer ctrl.Finish()
-			dbRepo := mock_repository.NewMockDBRepository(ctrl)
-			tt.prepareMockDBRepo(dbRepo)
-			taskRepo := mock_repository.NewMockTaskRepository(ctrl)
-			tt.prepareMockTaskRepo(taskRepo)
-
-			taskController := NewTaskController(dbRepo, taskRepo)
 
 			taskController.Create(context)
 
-			if w.Code != tt.wantCode {
-				t.Errorf("Create() code = %d, want = %d", w.Code, tt.wantCode)
-			}
-
-			if tt.wantErr {
-				actualData := ErrorForJSON{}
-				expectData := tt.wantData.(ErrorForJSON)
-				err := json.Unmarshal(w.Body.Bytes(), &actualData)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() err = %#v, want = %#v", actualData, expectData)
-				}
-			} else {
-				actualData := entity.TaskForJSON{}
-				expectData := tt.wantData.(entity.TaskForJSON)
-				err := json.Unmarshal(w.Body.Bytes(), &actualData)
-				if err != nil {
-					t.Fatal(err)
-				}
-				if !reflect.DeepEqual(actualData, expectData) {
-					t.Errorf("Create() actual = %#v, want = %#v", actualData, expectData)
-				}
-			}
+			compareResult(t, w, tt)
 		})
 	}
 }
@@ -287,5 +215,19 @@ func prepareTaskTT(t *testing.T) (context *gin.Context, w *httptest.ResponseReco
 	w = httptest.NewRecorder()
 	context, _ = gin.CreateTestContext(w)
 
+	return
+}
+
+func prepareMockTaskCtrl(t *testing.T, tt testInfo) (ctrl *gomock.Controller, taskController *TaskController) {
+	t.Helper()
+
+	// モックの準備
+	ctrl = gomock.NewController(t)
+	dbRepo := mock_repository.NewMockDBRepository(ctrl)
+	tt.prepareMockDBRepo(dbRepo)
+	taskRepo := mock_repository.NewMockTaskRepository(ctrl)
+	tt.prepareMockTaskRepo(taskRepo)
+
+	taskController = NewTaskController(dbRepo, taskRepo)
 	return
 }

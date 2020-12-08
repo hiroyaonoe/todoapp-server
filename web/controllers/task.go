@@ -25,28 +25,28 @@ func NewTaskController(db repository.DBRepository, task repository.TaskRepositor
 func (controller *TaskController) Create(c Context) {
 	task, err := getTaskFromBody(c)
 	if err != nil {
-		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
 	}
 
 	userid, err := getUserIDFromCookie(c)
 	task.UserID.Set(userid)
 
-	jsonTask, err := controller.Interactor.Create(&task)
+	err = controller.Interactor.Create(task)
 
 	if err != nil {
 		if err == entity.ErrInvalidTask {
-			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+			errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
 		panic(err.Error())
-		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		// return
 	}
-	c.JSON(http.StatusOK, jsonTask)
+	c.JSON(http.StatusOK, task)
 }
 
-func getTaskFromBody(c Context) (task entity.Task, err error) {
+func getTaskFromBody(c Context) (task *entity.Task, err error) {
 	err = c.ShouldBindJSON(&task)
 	return
 }
