@@ -82,7 +82,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
+			wantData: errorRes{
 				Code: http.StatusBadRequest,
 				Err:  entity.ErrBadRequest.Error(),
 			},
@@ -101,7 +101,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
+			wantData: errorRes{
 				Code: http.StatusBadRequest,
 				Err:  entity.ErrBadRequest.Error(),
 			},
@@ -120,7 +120,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
+			wantData: errorRes{
 				Code: http.StatusBadRequest,
 				Err:  entity.ErrBadRequest.Error(),
 			},
@@ -140,7 +140,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
+			wantData: errorRes{
 				Code: http.StatusBadRequest,
 				Err:  entity.ErrBadRequest.Error(),
 			},
@@ -218,7 +218,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
-			wantData: ErrorForJSON{
+			wantData: errorRes{
 				Code: http.StatusBadRequest,
 				Err:  entity.ErrBadRequest.Error(),
 			},
@@ -257,8 +257,8 @@ func TestTaskController_Create(t *testing.T) {
 			}
 
 			if tt.wantErr {
-				actualData := ErrorForJSON{}
-				expectData := tt.wantData.(ErrorForJSON)
+				actualData := errorRes{}
+				expectData := tt.wantData.(errorRes)
 				err := json.Unmarshal(w.Body.Bytes(), &actualData)
 				if err != nil {
 					t.Fatal(err)

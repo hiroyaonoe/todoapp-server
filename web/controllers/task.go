@@ -25,7 +25,7 @@ func NewTaskController(db repository.DBRepository, task repository.TaskRepositor
 func (controller *TaskController) Create(c Context) {
 	task, err := getTaskFromBody(c)
 	if err != nil {
-		ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 		return
 	}
 
@@ -36,11 +36,11 @@ func (controller *TaskController) Create(c Context) {
 
 	if err != nil {
 		if err == entity.ErrInvalidTask {
-			ErrorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+			errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
 			return
 		}
 		panic(err.Error())
-		// ErrorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		// return
 	}
 	c.JSON(http.StatusOK, jsonTask)
