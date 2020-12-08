@@ -1,6 +1,7 @@
 package entity
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -18,6 +19,23 @@ type Task struct {
 	CreatedAt   time.Time  `json:"-"`
 	UpdatedAt   time.Time  `json:"-"`
 }
+
+// MarshalJSON はjsonにエンコードするときにUserIDフィールドを隠す
+func (t *Task) MarshalJSON() ([]byte, error) {
+	type alias Task
+	aliasTask := alias(*t)
+	aliasTask.UserID.Set("")
+
+	return json.Marshal(&struct {
+		alias
+	}{
+		aliasTask,
+	})
+}
+
+// UnmarshalJSON はjsonからデコードするときにUserIDフィールドを隠さない
+// func (t *Task) UnmarshalJSON(data []byte) error {
+// }
 
 // NewTask is the constructor of Task.(値が""の場合はsql.NullStringのnullとして扱う)
 func NewTask(id string, title string, content string, userid string, date string) (u *Task) {
