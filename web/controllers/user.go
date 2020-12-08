@@ -67,7 +67,7 @@ func (controller *UserController) Create(c Context) {
 		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		// return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, &user)
 }
 
 // Update is the Handler for PUT /user
@@ -99,7 +99,7 @@ func (controller *UserController) Update(c Context) {
 		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
 		// return
 	}
-	c.JSON(http.StatusOK, user)
+	c.JSON(http.StatusOK, &user)
 }
 
 func (controller *UserController) Delete(c Context) {

@@ -498,7 +498,6 @@ func compareResult(t *testing.T, w *httptest.ResponseRecorder, tt testInfo) {
 	}
 
 	var want, actual map[string]interface{}
-	t.Logf("%s", w.Body.Bytes())
 	err := json.Unmarshal(w.Body.Bytes(), &actual)
 
 	var jsonByte []byte
@@ -512,9 +511,6 @@ func compareResult(t *testing.T, w *httptest.ResponseRecorder, tt testInfo) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	acstr, err := json.Marshal(&actual)
-	wastr, err := json.Marshal(&actual)
-	t.Errorf("json actual = %s, want = %s", acstr, wastr)
 	if !reflect.DeepEqual(actual, want) {
 		t.Errorf("actual = %#v, want = %#v", actual, want)
 	}
