@@ -2,6 +2,7 @@ package entity
 
 import (
 	"errors"
+
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
@@ -18,6 +19,8 @@ var (
 var (
 	// ErrUserNotFound user not found error
 	ErrUserNotFound = errors.New("user not found")
+	// ErrDuplicatedEmail email already exists error
+	ErrDuplicatedEmail = errors.New("email already exists")
 	// ErrInvalidUser invalid user request error(private)
 	ErrInvalidUser = errors.New("invalid user")
 )
@@ -66,14 +69,28 @@ var (
 	errBadConnNoWrite = errors.New("bad connection")
 )
 
+// func NewError(err error) error {
+// 	if nerr,ok := err.(*mysql.MySQLError); ok{
+// 		return ErrMySQL(*nerr)
+// 	} else {
+// 		return err
+// 	}
+// }
+
+// type ErrMySQL mysql.MySQLError
+
 // MySQLError is an error type which represents a single MySQL error
-func ErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
+func NewErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
 	err = &mysql.MySQLError{
 		Number:  num,
 		Message: str,
 	}
 	return
 }
+
+// func (me ErrMySQL) Error() string {
+// 	return fmt.Sprintf("ErrMySQL %d: %s", me.Number, me.Message)
+// }
 
 // //Errors of go-gorm/gorm
 // var (
