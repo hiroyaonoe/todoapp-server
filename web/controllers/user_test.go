@@ -220,6 +220,24 @@ func TestUserController_Create(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 			wantData: entity.ErrBadRequest.Error(),
 		},
+		// {
+		// 	name: "同じemailのユーザーが既に存在するならば",
+		// 	body: `{
+		// 		"name":"username",
+		// 		"password":"password",
+		// 		"email":"example@example.com"
+		// 	}`,
+		// 	prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+		// 		db.EXPECT().Connect()
+		// 	},
+		// 	prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+		// 		user.EXPECT().Create(gomock.Any(), gomock.Any()).Return(
+		// 			entity.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
+		// 	},
+		// 	wantErr:  false,
+		// 	wantCode: http.StatusOK,
+		// 	wantData: entity.NewUser("any id", "username", "", "example@example.com"),
+		// },
 	}
 
 	for _, tt := range tests {
