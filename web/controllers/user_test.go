@@ -67,11 +67,11 @@ func TestUserController_Get(t *testing.T) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{}, entity.ErrRecordNotFound)
+				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{}, errs.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: entity.ErrUserNotFound.Error(),
+			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusBadRequest",
@@ -81,7 +81,7 @@ func TestUserController_Get(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 	}
 
@@ -150,7 +150,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name: "Requestにnameが含まれていないならStatusBadRequest",
@@ -164,7 +164,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name: "Requestにpasswordが含まれていないならStatusBadRequest",
@@ -178,7 +178,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name: "Requestにemailが含まれていないならStatusBadRequest",
@@ -192,7 +192,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name: "RequestBodyが不正ならStatusBadRequest",
@@ -207,7 +207,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name: "RequestBodyがJSONでないならStatusBadRequest",
@@ -218,7 +218,7 @@ func TestUserController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		// {
 		// 	name: "同じemailのユーザーが既に存在するならば",
@@ -302,7 +302,7 @@ func TestUserController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "RequestBodyがJSONでないならStatusBadRequest",
@@ -314,7 +314,7 @@ func TestUserController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
@@ -326,11 +326,11 @@ func TestUserController_Update(t *testing.T) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(entity.ErrRecordNotFound)
+				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(errs.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: entity.ErrUserNotFound.Error(),
+			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusBadRequest",
@@ -343,7 +343,7 @@ func TestUserController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 	}
 
@@ -395,11 +395,11 @@ func TestUserController_Delete(t *testing.T) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Delete(gomock.Any(), uuid).Return(entity.ErrRecordNotFound)
+				user.EXPECT().Delete(gomock.Any(), uuid).Return(errs.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: entity.ErrUserNotFound.Error(),
+			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusBadRequest",
@@ -409,7 +409,7 @@ func TestUserController_Delete(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 	}
 

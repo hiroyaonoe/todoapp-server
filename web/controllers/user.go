@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
@@ -30,19 +31,19 @@ func NewUserController(db repository.DBRepository, user repository.UserRepositor
 func (controller *UserController) Get(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 
 	user, err := controller.Interactor.Get(id)
 
 	if err != nil {
-		if err == entity.ErrRecordNotFound {
-			errorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
+		if err == errs.ErrRecordNotFound {
+			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
 		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
 	}
 	c.JSON(http.StatusOK, user)
@@ -52,19 +53,19 @@ func (controller *UserController) Get(c Context) {
 func (controller *UserController) Create(c Context) {
 	user, err := getUserFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 
 	err = controller.Interactor.Create(user)
 
 	if err != nil {
-		if err == entity.ErrInvalidUser {
-			errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		if err == errs.ErrInvalidUser {
+			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
 		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
 	}
 	c.JSON(http.StatusOK, user)
@@ -74,12 +75,12 @@ func (controller *UserController) Create(c Context) {
 func (controller *UserController) Update(c Context) {
 	user, err := getUserFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 	user.SetID(id)
@@ -87,16 +88,16 @@ func (controller *UserController) Update(c Context) {
 	err = controller.Interactor.Update(user)
 
 	if err != nil {
-		if err == entity.ErrInvalidUser {
-			errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		if err == errs.ErrInvalidUser {
+			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
-		if err == entity.ErrRecordNotFound {
-			errorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
+		if err == errs.ErrRecordNotFound {
+			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
 		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
 	}
 	c.JSON(http.StatusOK, user)
@@ -105,23 +106,23 @@ func (controller *UserController) Update(c Context) {
 func (controller *UserController) Delete(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 
 	err = controller.Interactor.Delete(id)
 
 	if err != nil {
-		// if err == entity.ErrInvalidUser {
-		// 	errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		// if err == errs.ErrInvalidUser {
+		// 	errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		// 	return
 		// }
-		if err == entity.ErrRecordNotFound {
-			errorToJSON(c, http.StatusNotFound, entity.ErrUserNotFound)
+		if err == errs.ErrRecordNotFound {
+			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
 		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
 	}
 	c.JSON(http.StatusOK, nil)

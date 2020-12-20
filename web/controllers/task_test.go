@@ -67,7 +67,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにtitleが含まれていないならStatusBadRequest",
@@ -83,7 +83,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにdateが含まれていないならStatusBadRequest",
@@ -99,7 +99,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "dateのformatが不正ならStatusBadRequest",
@@ -116,7 +116,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "contentが含まれていなくてもok",
@@ -180,7 +180,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 	}
 
