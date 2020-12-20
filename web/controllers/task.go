@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
