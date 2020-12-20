@@ -2,7 +2,9 @@ package entity
 
 import (
 	"errors"
+	"fmt"
 
+	// "github.com/VividCortex/mysqlerr"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
@@ -43,15 +45,7 @@ var (
 	errBadConnNoWrite = errors.New("bad connection")
 )
 
-// func NewError(err error) error {
-// 	if nerr,ok := err.(*mysql.MySQLError); ok{
-// 		return ErrMySQL(*nerr)
-// 	} else {
-// 		return err
-// 	}
-// }
-
-// type ErrMySQL mysql.MySQLError
+type ErrMySQL mysql.MySQLError
 
 // MySQLError is an error type which represents a single MySQL error
 func NewErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
@@ -62,9 +56,13 @@ func NewErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
 	return
 }
 
-// func (me ErrMySQL) Error() string {
-// 	return fmt.Sprintf("ErrMySQL %d: %s", me.Number, me.Message)
-// }
+func (me ErrMySQL) Error() string {
+	return fmt.Sprintf("ErrMySQL %d: %s", me.Number, me.Message)
+}
+
+// var (
+// 	ErrMySQLBadNullError = mysqlerr.ER_BAD_NULL_ERROR // 1048
+// )
 
 // //Errors of go-gorm/gorm
 // var (
