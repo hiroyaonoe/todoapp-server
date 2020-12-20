@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
 	"github.com/jinzhu/gorm"
 )
@@ -67,7 +68,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにtitleが含まれていないならStatusBadRequest",
@@ -83,7 +84,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにdateが含まれていないならStatusBadRequest",
@@ -99,7 +100,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "dateのformatが不正ならStatusBadRequest",
@@ -116,7 +117,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 		{
 			name:   "contentが含まれていなくてもok",
@@ -180,7 +181,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: entity.ErrBadRequest.Error(),
+			wantData: errs.ErrBadRequest.Error(),
 		},
 	}
 

@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
@@ -25,7 +26,7 @@ func NewTaskController(db repository.DBRepository, task repository.TaskRepositor
 func (controller *TaskController) Create(c Context) {
 	task, err := getTaskFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 
@@ -35,12 +36,12 @@ func (controller *TaskController) Create(c Context) {
 	err = controller.Interactor.Create(task)
 
 	if err != nil {
-		if err == entity.ErrInvalidTask {
-			errorToJSON(c, http.StatusBadRequest, entity.ErrBadRequest)
+		if err == errs.ErrInvalidTask {
+			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
 		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, entity.ErrInternalServerError)
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
 	}
 	c.JSON(http.StatusOK, task)

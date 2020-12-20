@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 )
 
@@ -14,11 +15,11 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
 	// databaseのnot null制約があるので不要？
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
 	if task.Title.IsNull() || task.UserID.IsNull() || task.Date.IsNull() {
-		return entity.ErrInvalidTask
+		return errs.ErrInvalidTask
 	}
 	// 不正なユーザーリクエストの判別(TaskIDがnilでない場合)
 	if !task.ID.IsNull() {
-		return entity.ErrInvalidTask
+		return errs.ErrInvalidTask
 	}
 
 	// UUIDを付与

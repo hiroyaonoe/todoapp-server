@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -44,7 +45,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 			name:     "存在しないユーザーの場合はErrRecordNotFound",
 			userid:   uuidUZ,
 			wantUser: nil,
-			wantErr:  entity.ErrRecordNotFound,
+			wantErr:  errs.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -230,7 +231,7 @@ func TestUserRepository_Update(t *testing.T) {
 			name:     "IDが指定されていない場合はErrRecordNotFound",
 			user:     entity.NewUser("", "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  entity.ErrRecordNotFound,
+			wantErr:  errs.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -239,7 +240,7 @@ func TestUserRepository_Update(t *testing.T) {
 			name:     "指定したIDのユーザーが存在しない場合はErrRecordNotFound",
 			user:     entity.NewUser(uuidUZ, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  entity.ErrRecordNotFound,
+			wantErr:  errs.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -299,7 +300,7 @@ func TestUserRepository_Delete(t *testing.T) {
 		{
 			name:    "存在しないユーザーの場合はErrRecordNotFound",
 			userid:  uuidUZ,
-			wantErr: entity.ErrRecordNotFound,
+			wantErr: errs.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},

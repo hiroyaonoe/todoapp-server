@@ -3,6 +3,7 @@ module github.com/hiroyaonoe/todoapp-server
 go 1.14
 
 require (
+	github.com/VividCortex/mysqlerr v0.0.0-20200629151747-c28746d985dd
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/mock v1.4.4

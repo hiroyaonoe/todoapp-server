@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 

@@ -2,35 +2,11 @@ package entity
 
 import (
 	"errors"
+	"fmt"
 
+	// "github.com/VividCortex/mysqlerr"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-)
-
-//Errors of http
-var (
-	// ErrBadRequest is http.StatusBadRequest
-	ErrBadRequest = errors.New("bad request")
-	// ErrInternalServerError is http.StatusInternalServerError
-	ErrInternalServerError = errors.New("internal server error")
-)
-
-//Errors of user
-var (
-	// ErrUserNotFound user not found error
-	ErrUserNotFound = errors.New("user not found")
-	// ErrDuplicatedEmail email already exists error
-	ErrDuplicatedEmail = errors.New("email already exists")
-	// ErrInvalidUser invalid user request error(private)
-	ErrInvalidUser = errors.New("invalid user")
-)
-
-//Errors of task
-var (
-	// ErrTaskNotFound task not found error
-	ErrTaskNotFound = errors.New("task not found")
-	// ErrInvalidTask invalid task request error(private)
-	ErrInvalidTask = errors.New("invalid task")
 )
 
 //Errors of jinzhu/gorm
@@ -69,15 +45,7 @@ var (
 	errBadConnNoWrite = errors.New("bad connection")
 )
 
-// func NewError(err error) error {
-// 	if nerr,ok := err.(*mysql.MySQLError); ok{
-// 		return ErrMySQL(*nerr)
-// 	} else {
-// 		return err
-// 	}
-// }
-
-// type ErrMySQL mysql.MySQLError
+type ErrMySQL mysql.MySQLError
 
 // MySQLError is an error type which represents a single MySQL error
 func NewErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
@@ -88,9 +56,13 @@ func NewErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
 	return
 }
 
-// func (me ErrMySQL) Error() string {
-// 	return fmt.Sprintf("ErrMySQL %d: %s", me.Number, me.Message)
-// }
+func (me ErrMySQL) Error() string {
+	return fmt.Sprintf("ErrMySQL %d: %s", me.Number, me.Message)
+}
+
+// var (
+// 	ErrMySQLBadNullError = mysqlerr.ER_BAD_NULL_ERROR // 1048
+// )
 
 // //Errors of go-gorm/gorm
 // var (

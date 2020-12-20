@@ -7,6 +7,7 @@ package usecase
 
 import (
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 )
 
@@ -27,11 +28,11 @@ func (interactor *UserInteractor) Create(user *entity.User) (err error) {
 	// databaseのnot null制約があるので不要？
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
 	if user.Name.IsNull() || user.Password.IsNull() || user.Email.IsNull() {
-		return entity.ErrInvalidUser
+		return errs.ErrInvalidUser
 	}
 	// 不正なユーザーリクエストの判別(UserIDがnilでない場合)
 	if !user.ID.IsNull() {
-		return entity.ErrInvalidUser
+		return errs.ErrInvalidUser
 	}
 
 	// UUIDを付与
@@ -50,11 +51,11 @@ func (interactor *UserInteractor) Create(user *entity.User) (err error) {
 func (interactor *UserInteractor) Update(user *entity.User) (err error) {
 	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
 	if user.Name.IsNull() && user.Password.IsNull() && user.Email.IsNull() {
-		return entity.ErrInvalidUser
+		return errs.ErrInvalidUser
 	}
 	// 不正なユーザーリクエストの判別(UserIDがnilの場合)
 	if user.ID.IsNull() {
-		return entity.ErrInvalidUser
+		return errs.ErrInvalidUser
 	}
 
 	// Passwordをhash化
