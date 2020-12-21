@@ -6,6 +6,7 @@ routerから要求された処理をusecaseにつなぐ
 package controllers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
@@ -38,7 +39,7 @@ func (controller *UserController) Get(c Context) {
 	user, err := controller.Interactor.Get(id)
 
 	if err != nil {
-		if err == errs.ErrRecordNotFound {
+		if errors.Is(err, errs.ErrRecordNotFound) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
@@ -60,13 +61,14 @@ func (controller *UserController) Create(c Context) {
 	err = controller.Interactor.Create(user)
 
 	if err != nil {
-		if e, ok := err.(*errs.ErrMySQL); ok {
-			if e.Number == 0x426 {
+		var sqlerr *errs.ErrMySQL
+		if errors.As(err, &sqlerr) {
+			if sqlerr.Number == 0x426 {
 				errorToJSON(c, http.StatusBadRequest, errs.ErrDuplicatedEmail)
 				return
 			}
 		}
-		if err == errs.ErrInvalidUser {
+		if errors.Is(err, errs.ErrInvalidUser) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
@@ -94,11 +96,11 @@ func (controller *UserController) Update(c Context) {
 	err = controller.Interactor.Update(user)
 
 	if err != nil {
-		if err == errs.ErrInvalidUser {
+		if errors.Is(err, errs.ErrInvalidUser) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
-		if err == errs.ErrRecordNotFound {
+		if errors.Is(err, errs.ErrRecordNotFound) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
@@ -119,11 +121,11 @@ func (controller *UserController) Delete(c Context) {
 	err = controller.Interactor.Delete(id)
 
 	if err != nil {
-		// if err == errs.ErrInvalidUser {
+		// if errors.Is(err, errs.ErrInvalidUser) {
 		// 	errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		// 	return
 		// }
-		if err == errs.ErrRecordNotFound {
+		if errors.Is(err, errs.ErrRecordNotFound) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}

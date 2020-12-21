@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
@@ -36,7 +37,7 @@ func (controller *TaskController) Create(c Context) {
 	err = controller.Interactor.Create(task)
 
 	if err != nil {
-		if err == errs.ErrInvalidTask {
+		if errors.Is(err, errs.ErrInvalidTask) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
