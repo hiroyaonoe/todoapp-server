@@ -221,24 +221,24 @@ func TestUserController_Create(t *testing.T) {
 			wantCode: http.StatusBadRequest,
 			wantData: errs.ErrBadRequest.Error(),
 		},
-		// {
-		// 	name: "同じemailのユーザーが既に存在するならば",
-		// 	body: `{
-		// 		"name":"username",
-		// 		"password":"password",
-		// 		"email":"example@example.com"
-		// 	}`,
-		// 	prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-		// 		db.EXPECT().Connect()
-		// 	},
-		// 	prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-		// 		user.EXPECT().Create(gomock.Any(), gomock.Any()).Return(
-		// 			entity.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
-		// 	},
-		// 	wantErr:  false,
-		// 	wantCode: http.StatusOK,
-		// 	wantData: entity.NewUser("any id", "username", "", "example@example.com"),
-		// },
+		{
+			name: "同じemailのユーザーが既に存在するならばErrDuplicatedEmail",
+			body: `{
+				"name":"username",
+				"password":"password",
+				"email":"example@example.com"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().Create(gomock.Any(), gomock.Any()).Return(
+					errs.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrDuplicatedEmail.Error(),
+		},
 	}
 
 	for _, tt := range tests {
@@ -471,13 +471,18 @@ func compareResult(t *testing.T, w *httptest.ResponseRecorder, tt testInfo) {
 
 	var want, actual map[string]interface{}
 	err := json.Unmarshal(w.Body.Bytes(), &actual)
-
+	if err != nil {
+		t.Fatal(err)
+	}
 	var jsonByte []byte
 	if tt.wantErr {
 		wantErrRes := newErrorRes(tt.wantCode, tt.wantData.(string))
 		jsonByte, err = json.Marshal(wantErrRes)
 	} else {
 		jsonByte, err = json.Marshal(tt.wantData)
+	}
+	if err != nil {
+		t.Fatal(err)
 	}
 	err = json.Unmarshal(jsonByte, &want)
 	if err != nil {
