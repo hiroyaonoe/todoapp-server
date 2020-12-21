@@ -56,7 +56,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:         "Titleがnilの場合はErrMySQL",
 			task:         entity.NewTask(uuidTA2, "", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask:     nil,
-			wantErr:      entity.NewErrMySQL(0x418, "Column 'title' cannot be null"),
+			wantErr:      errs.NewErrMySQL(0x418, "Column 'title' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
@@ -70,7 +70,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:         "UserIDがnilの場合はErrMySQL",
 			task:         entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask:     nil,
-			wantErr:      entity.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
+			wantErr:      errs.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
@@ -84,7 +84,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:     "指定したIDのタスクが既に存在している場合はErrMySQL",
 			task:     entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
+			wantErr:  errs.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
 			prepareTasks: []*entity.Task{
 				taskA2,
 			},
