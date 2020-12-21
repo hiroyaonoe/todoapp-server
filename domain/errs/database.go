@@ -1,4 +1,4 @@
-package entity
+package errs
 
 import (
 	"errors"
@@ -48,15 +48,15 @@ var (
 type ErrMySQL mysql.MySQLError
 
 // MySQLError is an error type which represents a single MySQL error
-func NewErrMySQL(num uint16, str string) (err *mysql.MySQLError) {
-	err = &mysql.MySQLError{
+func NewErrMySQL(num uint16, str string) (err *ErrMySQL) {
+	err = &ErrMySQL{
 		Number:  num,
 		Message: str,
 	}
 	return
 }
 
-func (me ErrMySQL) Error() string {
+func (me *ErrMySQL) Error() string {
 	return fmt.Sprintf("ErrMySQL %d: %s", me.Number, me.Message)
 }
 

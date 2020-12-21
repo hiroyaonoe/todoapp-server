@@ -1,7 +1,9 @@
 package database
 
 import (
+	"github.com/go-sql-driver/mysql"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
+	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -9,7 +11,21 @@ import (
 type TaskRepository struct{}
 
 func (repo *TaskRepository) Create(db *gorm.DB, t *entity.Task) (err error) {
+	defer func() {
+		if nerr, ok := err.(*mysql.MySQLError); ok {
+			err = (*errs.ErrMySQL)(nerr)
+		}
+	}()
+
 	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
 	err = tx.Create(t).Error
 	if err != nil {
 		tx.Rollback()
