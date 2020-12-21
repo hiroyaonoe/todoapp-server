@@ -60,6 +60,12 @@ func (controller *UserController) Create(c Context) {
 	err = controller.Interactor.Create(user)
 
 	if err != nil {
+		if e, ok := err.(*errs.ErrMySQL); ok {
+			if e.Number == 0x426 {
+				errorToJSON(c, http.StatusBadRequest, errs.ErrDuplicatedEmail)
+				return
+			}
+		}
 		if err == errs.ErrInvalidUser {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
