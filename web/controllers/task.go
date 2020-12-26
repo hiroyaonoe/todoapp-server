@@ -48,6 +48,28 @@ func (controller *TaskController) Create(c Context) {
 	c.JSON(http.StatusOK, task)
 }
 
+func (controller *TaskController) GetByID(c Context) {
+	uid, err := getUserIDFromCookie(c)
+	tid, err := getTaskIDFromParam(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
+
+	task, err := controller.Interactor.GetByID(tid, uid)
+
+	if err != nil {
+		if errors.Is(err, errs.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
+			return
+		}
+		panic(err.Error())
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
+		// return
+	}
+	c.JSON(http.StatusOK, task)
+}
+
 func getTaskFromBody(c Context) (task *entity.Task, err error) {
 	err = c.ShouldBindJSON(&task)
 	return
