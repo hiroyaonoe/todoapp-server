@@ -31,3 +31,10 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
 
 	return
 }
+
+func (interactor *TaskInteractor) GetByID(tid, uid string) (task *entity.Task, err error) {
+	db := interactor.DB.Connect()
+	// User の取得
+	task, err = interactor.Task.FindByID(db, tid, uid)
+	return
+}

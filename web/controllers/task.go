@@ -60,7 +60,7 @@ func (controller *TaskController) GetByID(c Context) {
 
 	if err != nil {
 		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
+			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
 			return
 		}
 		panic(err.Error())
