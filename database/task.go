@@ -35,15 +35,22 @@ func (repo *TaskRepository) Create(db *gorm.DB, t *entity.Task) (err error) {
 	return
 }
 
+func (repo *TaskRepository) FindByID(db *gorm.DB, id string) (task *entity.Task, err error) {
+	defer func() {
+		if nerr, ok := err.(*mysql.MySQLError); ok {
+			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+		}
+		return
+	}()
+
+	task = &entity.Task{}
+	err = db.Where("id = ?", id).First(task).Error
+	return
+}
+
 // func (repo *TaskRepository) FindByUser(db *gorm.DB, uid int) (tasks []entity.Task, err error) {
 // 	tasks = []entity.Task{}
 // 	err = db.Where("userid = ?", uid).Find(&tasks).Error
-// 	return
-// }
-
-// func (repo *TaskRepository) FindByID(db *gorm.DB, id int) (task entity.Task, err error) {
-// 	task = entity.Task{}
-// 	err = db.First(&task, id).Error
 // 	return
 // }
 
