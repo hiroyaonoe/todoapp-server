@@ -7,7 +7,7 @@ func getUserIDFromCookie(c Context) (id string, err error) {
 }
 
 // getTaskIDFromParam はURIのParamかtaskidを取得する
-func getTaskIDFromParam(c Context) (id string, err error) {
-	id = c.Param("id")
+func getTaskIDFromParam(c Context) (tid string) {
+	tid = c.Param("id")
 	return
 }

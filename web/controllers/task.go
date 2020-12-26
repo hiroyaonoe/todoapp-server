@@ -50,11 +50,11 @@ func (controller *TaskController) Create(c Context) {
 
 func (controller *TaskController) GetByID(c Context) {
 	uid, err := getUserIDFromCookie(c)
-	tid, err := getTaskIDFromParam(c)
 	if err != nil {
 		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
+	tid := getTaskIDFromParam(c)
 
 	task, err := controller.Interactor.GetByID(tid, uid)
 
