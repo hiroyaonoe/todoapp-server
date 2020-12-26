@@ -17,19 +17,23 @@ import (
 
 // user_test上にあるので不要
 // const (
-// 	uuid = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
+// 	uuidUA = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
 // )
 // func TestMain(m *testing.M) {
 // 	gin.SetMode("test")
 // 	m.Run()
 // }
 
+const (
+	uuidTA = "65b77c66-99f1-985a-74d1-caccf54cda73"
+)
+
 func TestTaskController_Create(t *testing.T) {
 
 	tests := []testInfo{
 		{
 			name:   "正しくタスクを作成できる",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
@@ -54,7 +58,7 @@ func TestTaskController_Create(t *testing.T) {
 		},
 		{
 			name:   "RequestにtaskIDが含まれているならStatusBadRequest",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"id":taskid,
 				"title":"taskname",
@@ -72,7 +76,7 @@ func TestTaskController_Create(t *testing.T) {
 		},
 		{
 			name:   "Requestにtitleが含まれていないならStatusBadRequest",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"content":"I am content.",
 				"iscomp":false,
@@ -88,7 +92,7 @@ func TestTaskController_Create(t *testing.T) {
 		},
 		{
 			name:   "Requestにdateが含まれていないならStatusBadRequest",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
@@ -104,7 +108,7 @@ func TestTaskController_Create(t *testing.T) {
 		},
 		{
 			name:   "dateのformatが不正ならStatusBadRequest",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
@@ -121,7 +125,7 @@ func TestTaskController_Create(t *testing.T) {
 		},
 		{
 			name:   "contentが含まれていなくてもok",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"title":"taskname",
 				"iscomp":false,
@@ -145,7 +149,7 @@ func TestTaskController_Create(t *testing.T) {
 		},
 		{
 			name:   "iscompが含まれていなければfalseに設定",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
@@ -210,6 +214,87 @@ func TestTaskController_Create(t *testing.T) {
 	}
 }
 
+func TestTaskController_GetByID(t *testing.T) {
+
+	tests := []testInfo{
+		{
+			name:   "正しくタスクを取得できる",
+			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().FindByID(gomock.Any(), uuidTA, uuidUA).Return(&entity.Task{
+					ID:          entity.NewNullString(uuidTA),
+					Title:       entity.NewNullString("title"),
+					Content:     entity.NewNullString("I am Content."),
+					UserID:      entity.NewNullString(uuidUA),
+					IsCompleted: true,
+					Date:        entity.NewNullDate("2020-12-27"),
+					CreatedAt:   time.Unix(100, 0),
+					UpdatedAt:   time.Unix(100, 0),
+				}, nil)
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
+			wantData: entity.NewTask(uuidTA, "title", "I am Content.", uuidUA, "2020-12-27").SetComp(true),
+		},
+		{
+			name:   "DBにTaskがないときはErrTaskNotFound",
+			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().FindByID(gomock.Any(), uuidTA, uuidUA).Return(&entity.Task{}, errs.ErrRecordNotFound)
+			},
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
+			wantData: errs.ErrTaskNotFound.Error(),
+		},
+		// {
+		// 	name: "paramが空ならStatusBadRequest",
+		// 	userid: uuidUA,
+		// 	prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+		// 		db.EXPECT().Connect()
+		// 	},
+		// 	prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+		// 		task.EXPECT().FindByID(gomock.Any(), uuidTA, uuidUA).Return(&entity.Task{}, errs.ErrRecordNotFound)
+		// 	},
+		// 	wantErr:  true,
+		// 	wantCode: http.StatusNotFound,
+		// 	wantData: errs.ErrTaskNotFound.Error(),
+		// },
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			context, w := prepareTaskTT(t)
+
+			// httpRequest
+			context.Request, _ = http.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
+			setParams(t, tt, context)
+
+			// モック,コントローラーの準備
+			ctrl, taskController := prepareMockTaskCtrl(t, tt)
+			defer ctrl.Finish()
+
+			taskController.GetByID(context)
+
+			compareResult(t, w, tt)
+		})
+	}
+}
+
 func prepareTaskTT(t *testing.T) (context *gin.Context, w *httptest.ResponseRecorder) {
 	t.Helper()
 	t.Parallel()
@@ -231,4 +316,16 @@ func prepareMockTaskCtrl(t *testing.T, tt testInfo) (ctrl *gomock.Controller, ta
 
 	taskController = NewTaskController(dbRepo, taskRepo)
 	return
+}
+
+func setParams(t *testing.T, tt testInfo, c *gin.Context) {
+	t.Helper()
+
+	var params gin.Params
+	for k, v := range tt.params {
+		param := gin.Param{k, v}
+		params = append(params, param)
+	}
+
+	c.Params = params
 }

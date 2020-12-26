@@ -22,9 +22,10 @@ const (
 )
 
 type testInfo struct {
-	name                string
-	userid              string
-	body                string
+	name                string            // test名
+	userid              string            // cookieに入れるuserid
+	params              map[string]string // context.Param
+	body                string            // request body
 	prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 	prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 	prepareMockTaskRepo func(task *mock_repository.MockTaskRepository)
