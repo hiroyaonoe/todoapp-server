@@ -254,6 +254,16 @@ func TestTaskController_GetByID(t *testing.T) {
 			wantCode: http.StatusNotFound,
 			wantData: errs.ErrTaskNotFound.Error(),
 		},
+		{
+			name: "Cookieが空ならStatusBadRequest",
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
+		},
 		// {
 		// 	name: "paramが空ならStatusBadRequest",
 		// 	userid: uuidUA,
