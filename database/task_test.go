@@ -112,6 +112,70 @@ func TestTaskRepository_Create(t *testing.T) {
 	db.Exec("TRUNCATE TABLE tasks")
 }
 
+func TestTaskRepository_FindByID(t *testing.T) {
+
+	db, task := prepareTaskT(t)
+
+	tests := []struct {
+		name         string
+		tid          string
+		uid          string
+		wantTask     *entity.Task
+		wantErr      error
+		prepareTasks []*entity.Task
+	}{
+		{
+			name:     "正しくTaskを取得できる",
+			tid:      uuidTA1,
+			uid:      uuidUA,
+			wantTask: entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08"),
+			wantErr:  nil,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "tidが存在しないならErrRecordNotFound",
+			tid:      uuidTA2,
+			uid:      uuidUA,
+			wantTask: nil,
+			wantErr:  errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "tidが存在してもuidが存在しないならErrRecordNotFound",
+			tid:      uuidTA1,
+			uid:      uuidUB,
+			wantTask: nil,
+			wantErr:  errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+
+			prepareTaskTT(t, db, tt.prepareTasks)
+
+			gotTask, err := task.FindByID(db, tt.tid, tt.uid)
+
+			if !reflect.DeepEqual(err, tt.wantErr) {
+				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("Create() got = %s", gotTask)
+				return
+			}
+			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask)) {
+				t.Errorf("Create() = %s, want %s", gotTask, tt.wantTask)
+			}
+		})
+	}
+	db.Exec("TRUNCATE TABLE tasks")
+}
+
 // addTaskData はテスト用のデータをデータベースに追加する
 func addTaskData(t *testing.T, db *gorm.DB, tasks []*entity.Task) (err error) {
 	t.Helper()
