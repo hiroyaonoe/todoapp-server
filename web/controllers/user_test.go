@@ -93,7 +93,7 @@ func TestUserController_Get(t *testing.T) {
 			context, w := prepareUserTT(t)
 
 			// httpRequest
-			context.Request, _ = http.NewRequest("GET", "/user", nil)
+			context.Request = httptest.NewRequest("GET", "/user", nil)
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
 					Name:  "id",
@@ -248,7 +248,7 @@ func TestUserController_Create(t *testing.T) {
 			context, w := prepareUserTT(t)
 
 			// httpRequest
-			context.Request, _ = http.NewRequest("POST", "/user", bytes.NewBufferString(tt.body))
+			context.Request = httptest.NewRequest("POST", "/user", bytes.NewBufferString(tt.body))
 
 			// モック,コントローラーの準備
 			ctrl, userController := prepareMockUserCtrl(t, tt)
@@ -355,7 +355,7 @@ func TestUserController_Update(t *testing.T) {
 			context, w := prepareUserTT(t)
 
 			// httpRequest
-			context.Request, _ = http.NewRequest("PUT", "/user", bytes.NewBufferString(tt.body))
+			context.Request = httptest.NewRequest("PUT", "/user", bytes.NewBufferString(tt.body))
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
 					Name:  "id",
@@ -421,7 +421,7 @@ func TestUserController_Delete(t *testing.T) {
 			context, w := prepareUserTT(t)
 
 			// httpRequest
-			context.Request, _ = http.NewRequest("DELETE", "/user", nil)
+			context.Request = httptest.NewRequest("DELETE", "/user", nil)
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
 					Name:  "id",

@@ -195,7 +195,7 @@ func TestTaskController_Create(t *testing.T) {
 			context, w := prepareTaskTT(t)
 
 			// httpRequest
-			context.Request, _ = http.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
+			context.Request = httptest.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
 					Name:  "id",
@@ -285,7 +285,7 @@ func TestTaskController_GetByID(t *testing.T) {
 			context, w := prepareTaskTT(t)
 
 			// httpRequest
-			context.Request, _ = http.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
+			context.Request = httptest.NewRequest("POST", "/task", bytes.NewBufferString(tt.body))
 			if tt.userid != "" {
 				context.Request.AddCookie(&http.Cookie{
 					Name:  "id",
