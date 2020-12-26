@@ -323,7 +323,7 @@ func setParams(t *testing.T, tt testInfo, c *gin.Context) {
 
 	var params gin.Params
 	for k, v := range tt.params {
-		param := gin.Param{k, v}
+		param := gin.Param{Key: k, Value: v}
 		params = append(params, param)
 	}
 
