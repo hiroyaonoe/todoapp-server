@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	uuid = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
+	uuidUA = "98457fea-708f-bb8e-3e5e-fe1b43f1acad"
 )
 
 type testInfo struct {
@@ -43,13 +43,13 @@ func TestUserController_Get(t *testing.T) {
 	tests := []testInfo{
 		{
 			name:   "正しくユーザが取得できる",
-			userid: uuid,
+			userid: uuidUA,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{
-					ID:        entity.NewNullString(uuid),
+				user.EXPECT().FindByID(gomock.Any(), uuidUA).Return(&entity.User{
+					ID:        entity.NewNullString(uuidUA),
 					Name:      entity.NewNullString("username"),
 					Password:  entity.NewNullString("encrypted_password"),
 					Email:     entity.NewNullString("example@example.com"),
@@ -59,16 +59,16 @@ func TestUserController_Get(t *testing.T) {
 			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
-			wantData: entity.NewUser(uuid, "username", "", "example@example.com"),
+			wantData: entity.NewUser(uuidUA, "username", "", "example@example.com"),
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
-			userid: uuid,
+			userid: uuidUA,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), uuid).Return(&entity.User{}, errs.ErrRecordNotFound)
+				user.EXPECT().FindByID(gomock.Any(), uuidUA).Return(&entity.User{}, errs.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
@@ -267,7 +267,7 @@ func TestUserController_Update(t *testing.T) {
 	tests := []testInfo{
 		{
 			name:   "正しくnameを更新出来る",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"name":"newname"
 			}`,
@@ -277,7 +277,7 @@ func TestUserController_Update(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Update(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
-						user.SetID(uuid)
+						user.SetID(uuidUA)
 						user.Password = entity.NewNullString("encrypted_password")
 						user.Email = entity.NewNullString("example@example.com")
 						user.CreatedAt = time.Unix(100, 0)
@@ -287,11 +287,11 @@ func TestUserController_Update(t *testing.T) {
 			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
-			wantData: entity.NewUser(uuid, "newname", "", "example@example.com"),
+			wantData: entity.NewUser(uuidUA, "newname", "", "example@example.com"),
 		},
 		{
 			name:   "RequestBodyが不正ならStatusBadRequest",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"id":10,
 				"title":"title",
@@ -307,7 +307,7 @@ func TestUserController_Update(t *testing.T) {
 		},
 		{
 			name:   "RequestBodyがJSONでないならStatusBadRequest",
-			userid: uuid,
+			userid: uuidUA,
 			body:   `aaaaa`,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
@@ -319,7 +319,7 @@ func TestUserController_Update(t *testing.T) {
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
-			userid: uuid,
+			userid: uuidUA,
 			body: `{
 				"name":"newname"
 			}`,
@@ -378,12 +378,12 @@ func TestUserController_Delete(t *testing.T) {
 	tests := []testInfo{
 		{
 			name:   "正しくユーザーを削除できる",
-			userid: uuid,
+			userid: uuidUA,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Delete(gomock.Any(), uuid).Return(nil)
+				user.EXPECT().Delete(gomock.Any(), uuidUA).Return(nil)
 			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
@@ -391,12 +391,12 @@ func TestUserController_Delete(t *testing.T) {
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
-			userid: uuid,
+			userid: uuidUA,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 				db.EXPECT().Connect()
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Delete(gomock.Any(), uuid).Return(errs.ErrRecordNotFound)
+				user.EXPECT().Delete(gomock.Any(), uuidUA).Return(errs.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
