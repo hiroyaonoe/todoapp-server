@@ -8,6 +8,8 @@ var (
 	ErrBadRequest = errors.New("bad request")
 	// ErrInternalServerError is http.StatusInternalServerError
 	ErrInternalServerError = errors.New("internal server error")
+	// ErrUnauthorized is http.StatusUnauthorized
+	ErrUnauthorized = errors.New("unauthorized")
 )
 
 //Errors of user

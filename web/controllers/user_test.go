@@ -76,14 +76,14 @@ func TestUserController_Get(t *testing.T) {
 			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 	}
 
@@ -335,7 +335,7 @@ func TestUserController_Update(t *testing.T) {
 			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			body: `{
 				"name":"newname"
 			}`,
@@ -344,8 +344,8 @@ func TestUserController_Update(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 	}
 
@@ -404,14 +404,14 @@ func TestUserController_Delete(t *testing.T) {
 			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 	}
 
