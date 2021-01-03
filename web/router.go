@@ -49,7 +49,7 @@ func (r *Routing) setRouting() {
 	task.GET("/:id", func(c *gin.Context) { taskController.GetByID(c) })
 	// task.PUT("/:id", func(c *gin.Context) { taskController.Update(c) })
 	// task.Delete("/:id", func(c *gin.Context) { taskController.Delete(c) })
-	// task.PUT("/:id/completed", func(c *gin.Context) { taskController.Switch(c) })
+	// task.PUT("/:id/comp", func(c *gin.Context) { taskController.Switch(c) })
 	// task.GET("/date/:date", func(c *gin.Context) { taskController.GetbyDate(c) })
 	// task.GET("/date/from/:start/to/:end", func(c *gin.Context) { taskController.GetbyPeriod(c) })
 

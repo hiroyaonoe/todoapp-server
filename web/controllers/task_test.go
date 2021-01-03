@@ -172,7 +172,7 @@ func TestTaskController_Create(t *testing.T) {
 			wantCode: http.StatusOK,
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
@@ -184,8 +184,8 @@ func TestTaskController_Create(t *testing.T) {
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 	}
 
@@ -255,14 +255,14 @@ func TestTaskController_GetByID(t *testing.T) {
 			wantData: errs.ErrTaskNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 		// {
 		// 	name: "paramが空ならStatusBadRequest",

@@ -76,14 +76,14 @@ func TestUserController_Get(t *testing.T) {
 			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 	}
 
@@ -335,7 +335,7 @@ func TestUserController_Update(t *testing.T) {
 			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			body: `{
 				"name":"newname"
 			}`,
@@ -344,8 +344,25 @@ func TestUserController_Update(t *testing.T) {
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
+		},
+		{
+			name:   "同じemailのユーザーが既に存在するならばErrDuplicatedEmail",
+			userid: uuidUA,
+			body: `{
+				"email":"example@example.com"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(
+					errs.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
+			},
+			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: errs.ErrDuplicatedEmail.Error(),
 		},
 	}
 
@@ -404,14 +421,14 @@ func TestUserController_Delete(t *testing.T) {
 			wantData: errs.ErrUserNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusBadRequest",
+			name: "Cookieが空ならStatusUnauthorized",
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
-			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
 		},
 	}
 

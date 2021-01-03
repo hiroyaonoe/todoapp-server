@@ -32,7 +32,7 @@ func NewUserController(db repository.DBRepository, user repository.UserRepositor
 func (controller *UserController) Get(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
 		return
 	}
 
@@ -81,12 +81,12 @@ func (controller *UserController) Create(c Context) {
 
 // Update is the Handler for PUT /user
 func (controller *UserController) Update(c Context) {
-	user, err := getUserFromBody(c)
+	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
 		return
 	}
-	id, err := getUserIDFromCookie(c)
+	user, err := getUserFromBody(c)
 	if err != nil {
 		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
@@ -104,6 +104,13 @@ func (controller *UserController) Update(c Context) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
+		var sqlerr *errs.ErrMySQL
+		if errors.As(err, &sqlerr) {
+			if sqlerr.Number == 0x426 {
+				errorToJSON(c, http.StatusBadRequest, errs.ErrDuplicatedEmail)
+				return
+			}
+		}
 		panic(err.Error())
 		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
@@ -114,7 +121,7 @@ func (controller *UserController) Update(c Context) {
 func (controller *UserController) Delete(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
 		return
 	}
 

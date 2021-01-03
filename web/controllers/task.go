@@ -25,14 +25,18 @@ func NewTaskController(db repository.DBRepository, task repository.TaskRepositor
 
 // Create is the Handler for POST /task
 func (controller *TaskController) Create(c Context) {
+	uid, err := getUserIDFromCookie(c)
+	if err != nil {
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		return
+	}
 	task, err := getTaskFromBody(c)
 	if err != nil {
 		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 		return
 	}
 
-	userid, err := getUserIDFromCookie(c)
-	task.UserID.Set(userid)
+	task.UserID.Set(uid)
 
 	err = controller.Interactor.Create(task)
 
@@ -41,6 +45,7 @@ func (controller *TaskController) Create(c Context) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
+		// TODO:user not found
 		panic(err.Error())
 		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
@@ -51,7 +56,7 @@ func (controller *TaskController) Create(c Context) {
 func (controller *TaskController) GetByID(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
 		return
 	}
 	tid := getTaskIDFromParam(c)
@@ -63,6 +68,7 @@ func (controller *TaskController) GetByID(c Context) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
 			return
 		}
+		// TODO:user not found
 		panic(err.Error())
 		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
