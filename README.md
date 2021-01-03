@@ -29,6 +29,7 @@ Go, Gin, Gorm, MySQL, Docker, Clean Architecture etc.
 | code | message | 補足 |
 |:---:|:---:|:---:|
 | 400 | bad request | 不正なJSON |
+| 401 | unauthorized | 認証エラー |
 | 500 | internal server error | 不明な内部エラー |
 
 ### GET /user
