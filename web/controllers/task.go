@@ -45,6 +45,7 @@ func (controller *TaskController) Create(c Context) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
+		// TODO:user not found
 		panic(err.Error())
 		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
@@ -67,6 +68,7 @@ func (controller *TaskController) GetByID(c Context) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
 			return
 		}
+		// TODO:user not found
 		panic(err.Error())
 		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return
