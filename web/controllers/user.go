@@ -104,6 +104,13 @@ func (controller *UserController) Update(c Context) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
+		var sqlerr *errs.ErrMySQL
+		if errors.As(err, &sqlerr) {
+			if sqlerr.Number == 0x426 {
+				errorToJSON(c, http.StatusBadRequest, errs.ErrDuplicatedEmail)
+				return
+			}
+		}
 		panic(err.Error())
 		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
 		// return

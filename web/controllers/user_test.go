@@ -347,6 +347,23 @@ func TestUserController_Update(t *testing.T) {
 			wantCode: http.StatusUnauthorized,
 			wantData: errs.ErrUnauthorized.Error(),
 		},
+		{
+			name:   "同じemailのユーザーが既に存在するならばErrDuplicatedEmail",
+			userid: uuidUA,
+			body: `{
+				"email":"example@example.com"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(
+					errs.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrDuplicatedEmail.Error(),
+		},
 	}
 
 	for _, tt := range tests {
