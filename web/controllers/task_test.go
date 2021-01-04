@@ -332,6 +332,22 @@ func TestTaskController_Update(t *testing.T) {
 			wantData: entity.NewTask(uuidTA, "newtitle", "I am new content.", "", "2020-01-05").SetComp(true),
 		},
 		{
+			name:   "フィールドが足りないならStatusBadRequest",
+			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
+			body: `{
+				"iscomp":true,
+				"date":"2020-01-05"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
+		},
+		{
 			name:   "RequestBodyが不正ならStatusBadRequest",
 			userid: uuidUA,
 			params: map[string]string{"id": uuidTA},

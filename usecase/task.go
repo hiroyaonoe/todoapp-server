@@ -41,8 +41,12 @@ func (interactor *TaskInteractor) GetByID(tid, uid string) (task *entity.Task, e
 
 func (interactor *TaskInteractor) Update(task *entity.Task) (err error) {
 	// databaseのnot null制約があるので不要？
-	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
-	if task.Title.IsNull() && task.Date.IsNull() {
+	// // 不正なユーザーリクエストの判別(全フィールドがnilの場合)
+	// if task.Title.IsNull() && task.Date.IsNull() {
+	// 	return errs.ErrInvalidTask
+	// }
+	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
+	if task.Title.IsNull() || task.Date.IsNull() {
 		return errs.ErrInvalidTask
 	}
 	// 不正なユーザーリクエストの判別(UserID or TaskIDがnilの場合)
