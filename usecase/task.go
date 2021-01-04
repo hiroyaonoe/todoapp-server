@@ -45,17 +45,10 @@ func (interactor *TaskInteractor) Update(task *entity.Task) (err error) {
 	if task.Title.IsNull() && task.Date.IsNull() {
 		return errs.ErrInvalidTask
 	}
-	// 不正なユーザーリクエストの判別(UserIDがnilの場合)
-	if task.UserID.IsNull() {
+	// 不正なユーザーリクエストの判別(UserID or TaskIDがnilの場合)
+	if task.UserID.IsNull() || task.ID.IsNull() {
 		return errs.ErrInvalidTask
 	}
-	// 不正なユーザーリクエストの判別(TaskIDがnilでない場合)
-	if !task.ID.IsNull() {
-		return errs.ErrInvalidTask
-	}
-
-	// UUIDを付与
-	task.NewID()
 
 	db := interactor.DB.Connect()
 	// Taskデータを更新
