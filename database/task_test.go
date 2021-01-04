@@ -264,6 +264,60 @@ func TestTaskRepository_Update(t *testing.T) {
 	db.Exec("TRUNCATE TABLE tasks")
 }
 
+func TestTaskRepository_Delete(t *testing.T) {
+
+	db, task := prepareTaskT(t)
+
+	tests := []struct {
+		name         string
+		taskid       string
+		userid       string
+		wantErr      error
+		prepareTasks []*entity.Task
+	}{
+		{
+			name:    "Taskを削除できる",
+			taskid:  uuidTA1,
+			userid:  uuidUA,
+			wantErr: nil,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:         "Taskが存在しないならErrRecordNotFound",
+			taskid:       uuidTA1,
+			userid:       uuidUA,
+			wantErr:      errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{},
+		},
+		{
+			name:    "Taskが存在してもUserIDが異なるならErrRecordNotFound",
+			taskid:  uuidTA1,
+			userid:  uuidUB,
+			wantErr: errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+
+			prepareTaskTT(t, db, tt.prepareTasks)
+
+			err := task.Delete(db, tt.taskid, tt.userid)
+
+			if !reflect.DeepEqual(err, tt.wantErr) {
+				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+	db.Exec("TRUNCATE TABLE tasks")
+}
+
 // addTaskData はテスト用のデータをデータベースに追加する
 func addTaskData(t *testing.T, db *gorm.DB, tasks []*entity.Task) (err error) {
 	t.Helper()
