@@ -264,19 +264,17 @@ func TestTaskController_GetByID(t *testing.T) {
 			wantCode: http.StatusUnauthorized,
 			wantData: errs.ErrUnauthorized.Error(),
 		},
-		// {
-		// 	name: "paramが空ならStatusBadRequest",
-		// 	userid: uuidUA,
-		// 	prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-		// 		db.EXPECT().Connect()
-		// 	},
-		// 	prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
-		// 		task.EXPECT().FindByID(gomock.Any(), uuidTA, uuidUA).Return(&entity.Task{}, errs.ErrRecordNotFound)
-		// 	},
-		// 	wantErr:  true,
-		// 	wantCode: http.StatusNotFound,
-		// 	wantData: errs.ErrTaskNotFound.Error(),
-		// },
+		{
+			name:   "paramが空ならStatusBadRequest",
+			userid: uuidUA,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
+		},
 	}
 
 	for _, tt := range tests {
@@ -311,8 +309,8 @@ func TestTaskController_Update(t *testing.T) {
 		{
 			name:   "全フィールドを更新できる",
 			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
 			body: `{
-				"id":"uuidT",
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
@@ -331,11 +329,12 @@ func TestTaskController_Update(t *testing.T) {
 			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
-			wantData: entity.NewTask("uuidT", "newtitle", "I am new content.", "", "2020-01-05").SetComp(true),
+			wantData: entity.NewTask(uuidTA, "newtitle", "I am new content.", "", "2020-01-05").SetComp(true),
 		},
 		{
 			name:   "RequestBodyが不正ならStatusBadRequest",
 			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
 			body: `{
 				"id":"taskid",
 				"name":"newname"
@@ -351,6 +350,7 @@ func TestTaskController_Update(t *testing.T) {
 		{
 			name:   "RequestBodyがJSONでないならStatusBadRequest",
 			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
 			body:   `aaaaa`,
 			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
 			},
@@ -363,8 +363,8 @@ func TestTaskController_Update(t *testing.T) {
 		{
 			name:   "DBにTaskがないときはErrTaskNotFound",
 			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
 			body: `{
-				"id":"uuidTZ",
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
@@ -383,8 +383,8 @@ func TestTaskController_Update(t *testing.T) {
 		{
 			name:   "DBにUserがないときはErrTaskNotFound",
 			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
 			body: `{
-				"id":"uuidT",
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
@@ -401,9 +401,9 @@ func TestTaskController_Update(t *testing.T) {
 			wantData: errs.ErrTaskNotFound.Error(),
 		},
 		{
-			name: "Cookieが空ならStatusUnauthorized",
+			name:   "Cookieが空ならStatusUnauthorized",
+			params: map[string]string{"id": uuidTA},
 			body: `{
-				"id":"uuidT",
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
@@ -416,6 +416,23 @@ func TestTaskController_Update(t *testing.T) {
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
 			wantData: errs.ErrUnauthorized.Error(),
+		},
+		{
+			name:   "TaskIDが空ならErrBadRequest",
+			userid: uuidUA,
+			body: `{
+				"title":"newtitle",
+				"content":"I am new content.",
+				"iscomp":true,
+				"date":"2020-01-05"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
 		},
 	}
 
@@ -432,6 +449,7 @@ func TestTaskController_Update(t *testing.T) {
 					Value: tt.userid,
 				})
 			}
+			setParams(t, tt, context)
 
 			// モック,コントローラーの準備
 			ctrl, taskController := prepareMockTaskCtrl(t, tt)

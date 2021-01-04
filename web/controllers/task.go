@@ -58,7 +58,11 @@ func (controller *TaskController) GetByID(c Context) {
 		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
 		return
 	}
-	tid := getTaskIDFromParam(c)
+	tid, err := getTaskIDFromParam(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
 
 	task, err := controller.Interactor.GetByID(tid, uid)
 
@@ -92,6 +96,13 @@ func (controller *TaskController) Update(c Context) {
 		return
 	}
 
+	tid, err := getTaskIDFromParam(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
+
+	task.ID.Set(tid)
 	task.UserID.Set(uid)
 
 	err = controller.Interactor.Update(task)
