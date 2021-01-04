@@ -27,8 +27,325 @@ Go, Gin, Gorm, MySQL, Docker, Clean Architecture etc.
 
 #### 共通のエラーレスポンス
 | code | message | 補足 |
-|:--- |:---:| ---:|
+|:---:|:---:|:---:|
 | 400 | bad request | 不正なJSON |
 | 500 | internal server error | 不明な内部エラー |
 
-### 
+### GET /user
+#### 概要
+user情報を取得する
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"userid",
+    "name":"username",
+    "email":"example@example.com"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+| 404 | user not found | userが存在しない |
+
+### POST /user
+#### 概要
+新規userを作成する
+#### 認証
+必要なし
+#### リクエスト
+```
+{
+    "name":"username",
+    "password":"password",
+    "email":"example@example.com"
+}
+```
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"userid",
+    "name":"username",
+    "email":"example@example.com"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+| 400 | email already exists | 同じemailのユーザーが既に存在 |
+
+### PUT /user
+#### 概要
+user情報を更新する
+#### 認証
+必要あり
+#### リクエスト
+更新したいフィールドのみを含めれば良い
+```
+{
+    "name":"username",
+    "password":"password",
+    "email":"example@example.com"
+}
+```
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"userid",
+    "name":"username",
+    "email":"example@example.com"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+| 404 | user not found | userが存在しない |
+| 400 | email already exists | 同じemailのユーザーが既に存在 |
+
+### DELETE /user
+#### 概要
+userを削除する
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+空
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+| 404 | user not found | userが存在しない |
+
+### GET /task/:id
+#### 概要
+taskを取得する
+#### パスパラメータ
+| key | 説明 |
+|:---:|:---:|
+| id | taskのid |
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"taskid",
+    "title":"taskname",
+    "content":"I am content.",
+    "iscomp":false,
+    "date":"2020-12-06"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+| 404 | task not found | taskが存在しない |
+
+### CREATE /task
+#### 概要
+新規taskを作成する
+#### 認証
+必要あり
+#### リクエスト
+```
+{
+    "title":"taskname",
+    "content":"I am content.",
+    "iscomp":false,
+    "date":"2020-12-06"
+}
+```
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"taskid",
+    "title":"taskname",
+    "content":"I am content.",
+    "iscomp":false,
+    "date":"2020-12-06"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+
+---
+**以下は未実装**
+
+### PUT /task
+#### 概要
+task情報を更新する
+#### 認証
+必要あり
+#### リクエスト
+更新したいフィールドのみを含めれば良い
+```
+{
+    "title":"taskname",
+    "content":"I am content.",
+    "iscomp":false,
+    "date":"2020-12-06"
+}
+```
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"taskid",
+    "title":"taskname",
+    "content":"I am content.",
+    "iscomp":false,
+    "date":"2020-12-06"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+
+### DELETE /task
+#### 概要
+taskを削除する
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+空
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+
+### PUT /task/:id/comp
+#### 概要
+taskのcompletedを切り替える
+#### パスパラメータ
+| key | 説明 |
+|:---:|:---:|
+| id | taskのid |
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "id":"taskid",
+    "title":"taskname",
+    "content":"I am content.",
+    "iscomp":false,
+    "date":"2020-12-06"
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+
+### GET /task/date/:date
+#### 概要
+特定の日付のtaskを取得する
+#### パスパラメータ
+| key | 説明 |
+|:---:|:---:|
+| date | 指定する日付(yyyy-mm-dd) |
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "tasks": [
+    {
+        "id":"taskid1",
+        "title":"taskname1",
+        "content":"I am content1.",
+        "iscomp":false,
+        "date":"2020-12-06",
+    },
+    {
+        "id":"taskid2",
+        "title":"taskname2",
+        "content":"I am content2.",
+        "iscomp":true,
+        "date":"2020-12-06",
+    }
+    ]
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+
+### GET /task/date/from/:start/to/:end
+#### 概要
+特定の期間のtaskを取得する
+#### パスパラメータ
+| key | 説明 |
+|:---:|:---:|
+| start | 期間の開始の日付(yyyy-mm-dd) |
+| end | 期間の終了の日付(yyyy-mm-dd) |
+#### 認証
+必要あり
+#### リクエスト
+なし
+#### レスポンス
+| code | 補足 |
+|:---:|:---:|
+| 200 | |
+```
+{
+    "tasks": [
+    {
+        "id":"taskid1",
+        "title":"taskname1",
+        "content":"I am content1.",
+        "iscomp":false,
+        "date":"2020-12-06",
+    },
+    {
+        "id":"taskid2",
+        "title":"taskname2",
+        "content":"I am content2.",
+        "iscomp":true,
+        "date":"2020-12-07",
+    }
+    ]
+}
+```
+#### エラー
+| code | message | 補足 |
+|:---:|:---:|:---:|
+
