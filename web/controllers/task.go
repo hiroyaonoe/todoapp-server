@@ -52,6 +52,7 @@ func (controller *TaskController) Create(c Context) {
 	c.JSON(http.StatusOK, task)
 }
 
+// GetByID is the Handler for GET /task/:id
 func (controller *TaskController) GetByID(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
@@ -78,12 +79,7 @@ func (controller *TaskController) GetByID(c Context) {
 	c.JSON(http.StatusOK, task)
 }
 
-func getTaskFromBody(c Context) (task *entity.Task, err error) {
-	err = c.ShouldBindJSON(&task)
-	return
-}
-
-// Update is the Handler for PUT /task
+// Update is the Handler for PUT /task/:id
 func (controller *TaskController) Update(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
@@ -121,4 +117,9 @@ func (controller *TaskController) Update(c Context) {
 		return
 	}
 	c.JSON(http.StatusOK, task)
+}
+
+func getTaskFromBody(c Context) (task *entity.Task, err error) {
+	err = c.ShouldBindJSON(&task)
+	return
 }

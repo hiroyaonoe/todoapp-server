@@ -115,6 +115,7 @@ func (controller *UserController) Update(c Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+// Update is the Handler for DELETE /user
 func (controller *UserController) Delete(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
