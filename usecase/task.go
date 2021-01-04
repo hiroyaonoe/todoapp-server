@@ -26,7 +26,7 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
 	task.NewID()
 
 	db := interactor.DB.Connect()
-	// 新規Userを作成
+	// 新規Taskを作成
 	err = interactor.Task.Create(db, task)
 
 	return
@@ -34,7 +34,32 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
 
 func (interactor *TaskInteractor) GetByID(tid, uid string) (task *entity.Task, err error) {
 	db := interactor.DB.Connect()
-	// User の取得
+	// Task の取得
 	task, err = interactor.Task.FindByID(db, tid, uid)
+	return
+}
+
+func (interactor *TaskInteractor) Update(task *entity.Task) (err error) {
+	// databaseのnot null制約があるので不要？
+	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
+	if task.Title.IsNull() && task.Date.IsNull() {
+		return errs.ErrInvalidTask
+	}
+	// 不正なユーザーリクエストの判別(UserIDがnilの場合)
+	if task.UserID.IsNull() {
+		return errs.ErrInvalidTask
+	}
+	// 不正なユーザーリクエストの判別(TaskIDがnilでない場合)
+	if !task.ID.IsNull() {
+		return errs.ErrInvalidTask
+	}
+
+	// UUIDを付与
+	task.NewID()
+
+	db := interactor.DB.Connect()
+	// Taskデータを更新
+	err = interactor.Task.Update(db, task)
+
 	return
 }

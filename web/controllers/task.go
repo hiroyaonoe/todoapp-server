@@ -80,3 +80,33 @@ func getTaskFromBody(c Context) (task *entity.Task, err error) {
 	err = c.ShouldBindJSON(&task)
 	return
 }
+
+// Update is the Handler for PUT /task
+func (controller *TaskController) Update(c Context) {
+	uid, err := getUserIDFromCookie(c)
+	if err != nil {
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		return
+	}
+	task, err := getTaskFromBody(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
+
+	task.UserID.Set(uid)
+
+	err = controller.Interactor.Update(task)
+
+	if err != nil {
+		if errors.Is(err, errs.ErrInvalidTask) {
+			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+			return
+		}
+		// TODO:user not found
+		panic(err.Error())
+		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
+		// return
+	}
+	c.JSON(http.StatusOK, task)
+}

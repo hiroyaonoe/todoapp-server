@@ -62,3 +62,17 @@ func (mr *MockTaskRepositoryMockRecorder) FindByID(db, tid, uid interface{}) *go
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockTaskRepository)(nil).FindByID), db, tid, uid)
 }
+
+// Update mocks base method
+func (m *MockTaskRepository) Update(db *gorm.DB, t *entity.Task) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", db, t)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Update indicates an expected call of Update
+func (mr *MockTaskRepositoryMockRecorder) Update(db, t interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockTaskRepository)(nil).Update), db, t)
+}
