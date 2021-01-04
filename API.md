@@ -1,5 +1,6 @@
 # API仕様
 ## エンドポイント
+テスト環境では
 ```localhost:8080/api/v1```
 ## データ形式
 ```application/json```
