@@ -46,9 +46,8 @@ func (controller *TaskController) Create(c Context) {
 			return
 		}
 		// TODO:user not found
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, task)
 }
@@ -69,9 +68,8 @@ func (controller *TaskController) GetByID(c Context) {
 			return
 		}
 		// TODO:user not found
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, task)
 }
@@ -103,10 +101,13 @@ func (controller *TaskController) Update(c Context) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
+		if errors.Is(err, errs.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
+			return
+		}
 		// TODO:user not found
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, task)
 }

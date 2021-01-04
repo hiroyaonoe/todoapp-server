@@ -43,9 +43,8 @@ func (controller *UserController) Get(c Context) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, user)
 }
@@ -72,9 +71,8 @@ func (controller *UserController) Create(c Context) {
 			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
 			return
 		}
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, user)
 }
@@ -111,9 +109,8 @@ func (controller *UserController) Update(c Context) {
 				return
 			}
 		}
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, user)
 }
@@ -136,9 +133,8 @@ func (controller *UserController) Delete(c Context) {
 			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
 			return
 		}
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, nil)
 }
