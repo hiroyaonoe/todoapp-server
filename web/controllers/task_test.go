@@ -305,6 +305,145 @@ func TestTaskController_GetByID(t *testing.T) {
 	}
 }
 
+func TestTaskController_Update(t *testing.T) {
+
+	tests := []testInfo{
+		{
+			name:   "全フィールドを更新できる",
+			userid: uuidUA,
+			body: `{
+				"id":"uuidT",
+				"title":"newtitle",
+				"content":"I am new content.",
+				"iscomp":true,
+				"date":"2020-01-05"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Update(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(db *gorm.DB, task *entity.Task) error {
+						task.CreatedAt = time.Unix(100, 0)
+						task.UpdatedAt = time.Unix(100, 0)
+						return nil
+					})
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
+			wantData: entity.NewTask("uuidT", "newtitle", "I am new content.", "", "2020-01-05").SetComp(true),
+		},
+		{
+			name:   "RequestBodyが不正ならStatusBadRequest",
+			userid: uuidUA,
+			body: `{
+				"id":"taskid",
+				"name":"newname"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
+		},
+		{
+			name:   "RequestBodyがJSONでないならStatusBadRequest",
+			userid: uuidUA,
+			body:   `aaaaa`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
+		},
+		{
+			name:   "DBにTaskがないときはErrTaskNotFound",
+			userid: uuidUA,
+			body: `{
+				"id":"uuidTZ",
+				"title":"newtitle",
+				"content":"I am new content.",
+				"iscomp":true,
+				"date":"2020-01-05"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Update(gomock.Any(), gomock.Any()).Return(errs.ErrRecordNotFound)
+			},
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
+			wantData: errs.ErrTaskNotFound.Error(),
+		},
+		{
+			name:   "DBにUserがないときはErrTaskNotFound",
+			userid: uuidUA,
+			body: `{
+				"id":"uuidT",
+				"title":"newtitle",
+				"content":"I am new content.",
+				"iscomp":true,
+				"date":"2020-01-05"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Update(gomock.Any(), gomock.Any()).Return(errs.ErrRecordNotFound)
+			},
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
+			wantData: errs.ErrTaskNotFound.Error(),
+		},
+		{
+			name: "Cookieが空ならStatusUnauthorized",
+			body: `{
+				"id":"uuidT",
+				"title":"newtitle",
+				"content":"I am new content.",
+				"iscomp":true,
+				"date":"2020-01-05"
+			}`,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			context, w := prepareTaskTT(t)
+
+			// httpRequest
+			context.Request, _ = http.NewRequest("PUT", "/task", bytes.NewBufferString(tt.body))
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
+
+			// モック,コントローラーの準備
+			ctrl, taskController := prepareMockTaskCtrl(t, tt)
+			defer ctrl.Finish()
+
+			taskController.Update(context)
+
+			compareResult(t, w, tt)
+		})
+	}
+}
+
 func prepareTaskTT(t *testing.T) (context *gin.Context, w *httptest.ResponseRecorder) {
 	t.Helper()
 	t.Parallel()
