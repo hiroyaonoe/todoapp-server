@@ -76,3 +76,17 @@ func (mr *MockTaskRepositoryMockRecorder) Update(db, t interface{}) *gomock.Call
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockTaskRepository)(nil).Update), db, t)
 }
+
+// Delete mocks base method
+func (m *MockTaskRepository) Delete(db *gorm.DB, tid, uid string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", db, tid, uid)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete
+func (mr *MockTaskRepositoryMockRecorder) Delete(db, tid, uid interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockTaskRepository)(nil).Delete), db, tid, uid)
+}

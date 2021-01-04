@@ -60,3 +60,10 @@ func (interactor *TaskInteractor) Update(task *entity.Task) (err error) {
 
 	return
 }
+
+func (interactor *TaskInteractor) Delete(tid, uid string) (err error) {
+	db := interactor.DB.Connect()
+	// Taskの削除
+	err = interactor.Task.Delete(db, tid, uid)
+	return
+}
