@@ -71,7 +71,7 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 	if err != nil {
 		return
 	}
-	FillInNilFields(beforeuser, u)
+	FillInUserNilFields(beforeuser, u)
 	err = tx.Save(u).Error
 	if err != nil {
 		return
@@ -110,7 +110,7 @@ func (repo *UserRepository) Delete(db *gorm.DB, id string) (err error) {
 	return
 }
 
-func FillInNilFields(before entity.User, after *entity.User) {
+func FillInUserNilFields(before entity.User, after *entity.User) {
 	if after.Name.IsNull() {
 		after.Name = before.Name
 	}

@@ -47,7 +47,7 @@ func (r *Routing) setRouting() {
 	task := v1.Group("/task")
 	task.POST("", func(c *gin.Context) { taskController.Create(c) })
 	task.GET("/:id", func(c *gin.Context) { taskController.GetByID(c) })
-	// task.PUT("/:id", func(c *gin.Context) { taskController.Update(c) })
+	task.PUT("/:id", func(c *gin.Context) { taskController.Update(c) })
 	// task.Delete("/:id", func(c *gin.Context) { taskController.Delete(c) })
 	// task.PUT("/:id/comp", func(c *gin.Context) { taskController.Switch(c) })
 	// task.GET("/date/:date", func(c *gin.Context) { taskController.GetbyDate(c) })

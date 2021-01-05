@@ -46,20 +46,24 @@ func (controller *TaskController) Create(c Context) {
 			return
 		}
 		// TODO:user not found
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, task)
 }
 
+// GetByID is the Handler for GET /task/:id
 func (controller *TaskController) GetByID(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
 		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
 		return
 	}
-	tid := getTaskIDFromParam(c)
+	tid, err := getTaskIDFromParam(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
 
 	task, err := controller.Interactor.GetByID(tid, uid)
 
@@ -69,9 +73,48 @@ func (controller *TaskController) GetByID(c Context) {
 			return
 		}
 		// TODO:user not found
-		panic(err.Error())
-		// errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
-		// return
+		unexpectedErrorHandling(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, task)
+}
+
+// Update is the Handler for PUT /task/:id
+func (controller *TaskController) Update(c Context) {
+	uid, err := getUserIDFromCookie(c)
+	if err != nil {
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		return
+	}
+	task, err := getTaskFromBody(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
+
+	tid, err := getTaskIDFromParam(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
+
+	task.ID.Set(tid)
+	task.UserID.Set(uid)
+
+	err = controller.Interactor.Update(task)
+
+	if err != nil {
+		if errors.Is(err, errs.ErrInvalidTask) {
+			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+			return
+		}
+		if errors.Is(err, errs.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
+			return
+		}
+		// TODO:user not found
+		unexpectedErrorHandling(c, err)
+		return
 	}
 	c.JSON(http.StatusOK, task)
 }

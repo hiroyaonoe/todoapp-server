@@ -18,9 +18,9 @@ const (
 
 var (
 	taskA1 = entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08")
-	taskA2 = entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08")
-	taskB1 = entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08")
-	taskB2 = entity.NewTask(uuidTB2, "taskB2", "I am ContentB2.", uuidUB, "2020-12-08")
+	taskA2 = entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05")
+	taskB1 = entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-09")
+	taskB2 = entity.NewTask(uuidTB2, "taskB2", "I am ContentB2.", uuidUB, "2020-01-06")
 )
 
 func TestTaskRepository_Create(t *testing.T) {
@@ -170,6 +170,94 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			}
 			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask)) {
 				t.Errorf("Create() = %s, want %s", gotTask, tt.wantTask)
+			}
+		})
+	}
+	db.Exec("TRUNCATE TABLE tasks")
+}
+
+func TestTaskRepository_Update(t *testing.T) {
+
+	db, task := prepareTaskT(t)
+
+	tests := []struct {
+		name         string
+		task         *entity.Task
+		wantTask     *entity.Task
+		wantErr      error
+		prepareTasks []*entity.Task
+	}{
+		{
+			name:     "全フィールドを変更できる",
+			task:     entity.NewTask(uuidTA1, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05"),
+			wantTask: entity.NewTask(uuidTA1, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05"),
+			wantErr:  nil,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "全フィールドがもとと同じでも変更できる",
+			task:     entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08"),
+			wantTask: entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08"),
+			wantErr:  nil,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "指定したIDのTaskが存在しない場合はErrRecordNotFound",
+			task:     entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
+			wantTask: nil,
+			wantErr:  errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "指定したUserIDのTaskが存在しない場合はErrRecordNotFound",
+			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", uuidUZ, "2020-12-08"),
+			wantTask: nil,
+			wantErr:  errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "IDが指定されていない場合はErrRecordNotFound",
+			task:     entity.NewTask("", "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
+			wantTask: nil,
+			wantErr:  errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+		{
+			name:     "UserIDがnilの場合はErrMySQL",
+			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
+			wantTask: nil,
+			wantErr:  errs.ErrRecordNotFound,
+			prepareTasks: []*entity.Task{
+				taskA1,
+			},
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+
+			prepareTaskTT(t, db, tt.prepareTasks)
+
+			err := task.Update(db, tt.task)
+			gotTask := tt.task
+
+			if !reflect.DeepEqual(err, tt.wantErr) {
+				t.Errorf("Update() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("Update() got = %s", gotTask)
+				return
+			}
+			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask)) {
+				t.Errorf("Update() = %s, want %s", gotTask, tt.wantTask)
 			}
 		})
 	}
