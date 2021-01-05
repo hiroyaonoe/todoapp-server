@@ -478,6 +478,87 @@ func TestTaskController_Update(t *testing.T) {
 	}
 }
 
+func TestTaskController_Delete(t *testing.T) {
+
+	tests := []testInfo{
+		{
+			name:   "正しくTaskを削除できる",
+			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Delete(gomock.Any(), uuidTA, uuidUA).Return(nil)
+			},
+			wantErr:  false,
+			wantCode: http.StatusOK,
+			wantData: nil,
+		},
+		{
+			name:   "DBにTaskがないときはErrTaskNotFound",
+			userid: uuidUA,
+			params: map[string]string{"id": uuidTA},
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+				db.EXPECT().Connect()
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+				task.EXPECT().Delete(gomock.Any(), uuidTA, uuidUA).Return(errs.ErrRecordNotFound)
+			},
+			wantErr:  true,
+			wantCode: http.StatusNotFound,
+			wantData: errs.ErrTaskNotFound.Error(),
+		},
+		{
+			name:   "Cookieが空ならStatusUnauthorized",
+			params: map[string]string{"id": uuidTA},
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusUnauthorized,
+			wantData: errs.ErrUnauthorized.Error(),
+		},
+		{
+			name:   "TaskIDが空ならErrBadRequest",
+			userid: uuidUA,
+			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
+			},
+			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: errs.ErrBadRequest.Error(),
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			context, w := prepareTaskTT(t)
+
+			// httpRequest
+			context.Request, _ = http.NewRequest("PUT", "/task", bytes.NewBufferString(tt.body))
+			if tt.userid != "" {
+				context.Request.AddCookie(&http.Cookie{
+					Name:  "id",
+					Value: tt.userid,
+				})
+			}
+			setParams(t, tt, context)
+
+			// モック,コントローラーの準備
+			ctrl, taskController := prepareMockTaskCtrl(t, tt)
+			defer ctrl.Finish()
+
+			taskController.Delete(context)
+
+			compareResult(t, w, tt)
+		})
+	}
+}
+
 func prepareTaskTT(t *testing.T) (context *gin.Context, w *httptest.ResponseRecorder) {
 	t.Helper()
 	t.Parallel()

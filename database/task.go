@@ -77,16 +77,34 @@ func (repo *TaskRepository) Update(db *gorm.DB, t *entity.Task) (err error) {
 	return
 }
 
-// func (repo *TaskRepository) FindByUser(db *gorm.DB, uid int) (tasks []entity.Task, err error) {
-// 	tasks = []entity.Task{}
-// 	err = db.Where("userid = ?", uid).Find(&tasks).Error
-// 	return
-// }
+func (repo *TaskRepository) Delete(db *gorm.DB, tid, uid string) (err error) {
+	defer func() {
+		if nerr, ok := err.(*mysql.MySQLError); ok {
+			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+		}
+	}()
 
-// func (repo *TaskRepository) Delete(db *gorm.DB, id int) (taskid int, err error) {
-// 	err = db.Delete(&entity.Task{}, id).Error
-// 	return id, err
-// }
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		} else {
+			tx.Commit()
+		}
+	}()
+
+	task := &entity.Task{}
+	// idに該当するユーザーがいない場合を弾く
+	err = tx.Where("id = ?", tid).Where("user_id = ?", uid).First(task).Error
+	if err != nil {
+		return
+	}
+	err = db.Where("id = ?", tid).Where("user_id = ?", uid).Delete(&entity.Task{}).Error
+	if err != nil {
+		return //TODO:testなし
+	}
+	return
+}
 
 // func FillInTaskNilFields(before entity.Task, after *entity.Task) {
 // 	if after.Title.IsNull() {

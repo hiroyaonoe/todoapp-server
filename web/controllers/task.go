@@ -119,6 +119,33 @@ func (controller *TaskController) Update(c Context) {
 	c.JSON(http.StatusOK, task)
 }
 
+// Delete is the Handler for DELETE /task/:id
+func (controller *TaskController) Delete(c Context) {
+	uid, err := getUserIDFromCookie(c)
+	if err != nil {
+		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		return
+	}
+	tid, err := getTaskIDFromParam(c)
+	if err != nil {
+		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		return
+	}
+
+	err = controller.Interactor.Delete(tid, uid)
+
+	if err != nil {
+		if errors.Is(err, errs.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
+			return
+		}
+		// TODO:user not found
+		unexpectedErrorHandling(c, err)
+		return
+	}
+	c.JSON(http.StatusOK, nil)
+}
+
 func getTaskFromBody(c Context) (task *entity.Task, err error) {
 	err = c.ShouldBindJSON(&task)
 	return
