@@ -22,7 +22,7 @@ var (
 
 func TestUserRepository_FindByID(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -55,7 +55,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
 			gotUser, err := user.FindByID(tt.userid)
 
@@ -69,12 +69,11 @@ func TestUserRepository_FindByID(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Create(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -145,7 +144,7 @@ func TestUserRepository_Create(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
 			err := user.Create(tt.user)
 			gotUser := tt.user
@@ -160,12 +159,11 @@ func TestUserRepository_Create(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Update(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -260,7 +258,7 @@ func TestUserRepository_Update(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
 			err := user.Update(tt.user)
 			gotUser := tt.user
@@ -275,12 +273,11 @@ func TestUserRepository_Update(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Delete(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -310,7 +307,7 @@ func TestUserRepository_Delete(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
 			err := user.Delete(tt.userid)
 
@@ -320,7 +317,6 @@ func TestUserRepository_Delete(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 // addUserData はテスト用のデータをデータベースに追加する
@@ -344,26 +340,26 @@ func userEqual(t *testing.T, got *entity.User, want *entity.User) bool {
 		(got.Email.Equals(want.Email))
 }
 
-func prepareUserT(t *testing.T) (db *gorm.DB, user *UserRepository) {
+func prepareUserT(t *testing.T) (user *UserRepository) {
 	t.Helper()
 
 	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	user = NewUserRepository(dbRepo)
-	// dbRepo.LogMode(true)
+	db := NewTestDB()
+	db.Migrate()
+	user = NewUserRepository(db)
+	// db.LogMode(true)
 
 	return
 }
 
-func prepareUserTT(t *testing.T, db *gorm.DB, users []*entity.User) {
+func prepareUserTT(t *testing.T, user *UserRepository, users []*entity.User) {
 	t.Helper()
 
 	// databaseを初期化する
-	db.Exec("TRUNCATE TABLE users")
+	user.db.Exec("TRUNCATE TABLE users")
 
 	// 事前データの準備
-	err := addUserData(t, db, users)
+	err := addUserData(t, user.db, users)
 	if err != nil {
 		t.Fatal(err)
 	}

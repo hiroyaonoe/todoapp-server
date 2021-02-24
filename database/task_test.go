@@ -25,7 +25,7 @@ var (
 
 func TestTaskRepository_Create(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -94,7 +94,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
 			err := task.Create(tt.task)
 			gotTask := tt.task
@@ -109,12 +109,11 @@ func TestTaskRepository_Create(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 func TestTaskRepository_FindByID(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -159,7 +158,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
 			gotTask, err := task.FindByID(tt.tid, tt.uid)
 
@@ -173,12 +172,11 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 func TestTaskRepository_Update(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -246,7 +244,7 @@ func TestTaskRepository_Update(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
 			err := task.Update(tt.task)
 			gotTask := tt.task
@@ -261,12 +259,11 @@ func TestTaskRepository_Update(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 func TestTaskRepository_Delete(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -305,7 +302,7 @@ func TestTaskRepository_Delete(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
 			err := task.Delete(tt.taskid, tt.userid)
 
@@ -315,7 +312,6 @@ func TestTaskRepository_Delete(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 // addTaskData はテスト用のデータをデータベースに追加する
@@ -341,26 +337,26 @@ func taskEqual(t *testing.T, got *entity.Task, want *entity.Task) bool {
 		(got.Date.Equals(want.Date))
 }
 
-func prepareTaskT(t *testing.T) (db *gorm.DB, task *TaskRepository) {
+func prepareTaskT(t *testing.T) (task *TaskRepository) {
 	t.Helper()
 
 	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	task = NewTaskRepository(dbRepo)
-	// dbRepo.LogMode(true)
+	db := NewTestDB()
+	db.Migrate()
+	task = NewTaskRepository(db)
+	// db.LogMode(true)
 
 	return
 }
 
-func prepareTaskTT(t *testing.T, db *gorm.DB, tasks []*entity.Task) {
+func prepareTaskTT(t *testing.T, task *TaskRepository, tasks []*entity.Task) {
 	t.Helper()
 
 	// databaseを初期化する
-	db.Exec("TRUNCATE TABLE tasks")
+	task.db.Exec("TRUNCATE TABLE tasks")
 
 	// 事前データの準備
-	err := addTaskData(t, db, tasks)
+	err := addTaskData(t, task.db, tasks)
 	if err != nil {
 		t.Fatal(err)
 	}
