@@ -1,6 +1,6 @@
 module github.com/hiroyaonoe/todoapp-server
 
-go 1.14
+go 1.15
 
 require (
 	github.com/VividCortex/mysqlerr v0.0.0-20200629151747-c28746d985dd
