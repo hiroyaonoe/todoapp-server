@@ -16,16 +16,11 @@ import (
 )
 
 type UserController struct {
-	Interactor usecase.UserInteractor
+	Interactor *usecase.UserInteractor
 }
 
-func NewUserController(db repository.DBRepository, user repository.UserRepository) *UserController {
-	return &UserController{
-		Interactor: usecase.UserInteractor{
-			DB:   db,
-			User: user,
-		},
-	}
+func NewUserController(user repository.UserRepository) *UserController {
+	return &UserController{Interactor: usecase.NewUserInteractor(user)}
 }
 
 // Get is the Handler for GET /user

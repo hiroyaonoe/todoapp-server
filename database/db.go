@@ -12,7 +12,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-// DB はinterface DBRepositoryを満たす
+// DB はデータベースの情報を示す TODO: フィールドをprivate化
 type DB struct {
 	Host       string
 	Username   string

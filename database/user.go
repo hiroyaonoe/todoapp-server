@@ -12,9 +12,15 @@ import (
 )
 
 // UserRepository の具体的な実装
-type UserRepository struct{}
+type UserRepository struct {
+	db *gorm.DB
+}
 
-func (repo *UserRepository) FindByID(db *gorm.DB, id string) (user *entity.User, err error) {
+func NewUserRepository(db *DB) *UserRepository {
+	return &UserRepository{db: db.Connect()}
+}
+
+func (repo *UserRepository) FindByID(id string) (user *entity.User, err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
@@ -22,18 +28,19 @@ func (repo *UserRepository) FindByID(db *gorm.DB, id string) (user *entity.User,
 		return
 	}()
 	user = &entity.User{}
-	err = db.Where("id = ?", id).First(user).Error
+	err = repo.db.Where("id = ?", id).First(user).Error
 	return
 }
 
-func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
+func (repo *UserRepository) Create(u *entity.User) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr)
 		}
+		return
 	}()
 
-	tx := db.Begin()
+	tx := repo.db.Begin()
 	defer func() {
 		if err != nil {
 			tx.Rollback()
@@ -49,7 +56,7 @@ func (repo *UserRepository) Create(db *gorm.DB, u *entity.User) (err error) {
 	return
 }
 
-func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
+func (repo *UserRepository) Update(u *entity.User) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr)
@@ -57,7 +64,7 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 		return
 	}()
 
-	tx := db.Begin()
+	tx := repo.db.Begin()
 	defer func() {
 		if err != nil {
 			tx.Rollback()
@@ -79,14 +86,14 @@ func (repo *UserRepository) Update(db *gorm.DB, u *entity.User) (err error) {
 	return
 }
 
-func (repo *UserRepository) Delete(db *gorm.DB, id string) (err error) {
+func (repo *UserRepository) Delete(id string) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
 		}
 		return
 	}()
-	tx := db.Begin()
+	tx := repo.db.Begin()
 	defer func() {
 		if err != nil {
 			tx.Rollback()

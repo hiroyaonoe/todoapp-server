@@ -57,7 +57,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
 
-			gotUser, err := user.FindByID(db, tt.userid)
+			gotUser, err := user.FindByID(tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -147,7 +147,7 @@ func TestUserRepository_Create(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
 
-			err := user.Create(db, tt.user)
+			err := user.Create(tt.user)
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -262,7 +262,7 @@ func TestUserRepository_Update(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
 
-			err := user.Update(db, tt.user)
+			err := user.Update(tt.user)
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -312,7 +312,7 @@ func TestUserRepository_Delete(t *testing.T) {
 
 			prepareUserTT(t, db, tt.prepareUsers)
 
-			err := user.Delete(db, tt.userid)
+			err := user.Delete(tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -350,7 +350,7 @@ func prepareUserT(t *testing.T) (db *gorm.DB, user *UserRepository) {
 	// dbに接続
 	dbRepo := NewTestDB()
 	dbRepo.Migrate()
-	user = new(UserRepository)
+	user = NewUserRepository(dbRepo)
 	db = dbRepo.Connect()
 	// db.LogMode(true)
 
