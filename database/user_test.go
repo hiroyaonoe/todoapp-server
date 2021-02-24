@@ -351,8 +351,7 @@ func prepareUserT(t *testing.T) (db *gorm.DB, user *UserRepository) {
 	dbRepo := NewTestDB()
 	dbRepo.Migrate()
 	user = NewUserRepository(dbRepo)
-	db = dbRepo.Connect()
-	// db.LogMode(true)
+	// dbRepo.LogMode(true)
 
 	return
 }

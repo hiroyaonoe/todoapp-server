@@ -348,8 +348,7 @@ func prepareTaskT(t *testing.T) (db *gorm.DB, task *TaskRepository) {
 	dbRepo := NewTestDB()
 	dbRepo.Migrate()
 	task = NewTaskRepository(dbRepo)
-	db = dbRepo.Connect()
-	// db.LogMode(true)
+	// dbRepo.LogMode(true)
 
 	return
 }

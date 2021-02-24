@@ -62,3 +62,7 @@ func (db *DB) Migrate() {
 	connection.AutoMigrate(&entity.User{})
 	connection.AutoMigrate(&entity.Task{})
 }
+
+func (db *DB) LogMode(b bool) {
+	db.Connect().LogMode(b)
+}
