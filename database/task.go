@@ -8,16 +8,22 @@ import (
 )
 
 // TaskRepository の具体的な実装
-type TaskRepository struct{}
+type TaskRepository struct {
+	db *gorm.DB
+}
 
-func (repo *TaskRepository) Create(db *gorm.DB, t *entity.Task) (err error) {
+func NewTaskRepository(db *DB) *TaskRepository {
+	return &TaskRepository{db: db.Connect()}
+}
+
+func (repo *TaskRepository) Create(t *entity.Task) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr)
 		}
 	}()
 
-	tx := db.Begin()
+	tx := repo.db.Begin()
 	defer func() {
 		if err != nil {
 			tx.Rollback()
@@ -35,7 +41,7 @@ func (repo *TaskRepository) Create(db *gorm.DB, t *entity.Task) (err error) {
 	return
 }
 
-func (repo *TaskRepository) FindByID(db *gorm.DB, tid, uid string) (task *entity.Task, err error) {
+func (repo *TaskRepository) FindByID(tid, uid string) (task *entity.Task, err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
@@ -44,18 +50,18 @@ func (repo *TaskRepository) FindByID(db *gorm.DB, tid, uid string) (task *entity
 	}()
 
 	task = &entity.Task{}
-	err = db.Where("id = ?", tid).Where("user_id = ?", uid).First(task).Error
+	err = repo.db.Where("id = ?", tid).Where("user_id = ?", uid).First(task).Error
 	return
 }
 
-func (repo *TaskRepository) Update(db *gorm.DB, t *entity.Task) (err error) {
+func (repo *TaskRepository) Update(t *entity.Task) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
 		}
 	}()
 
-	tx := db.Begin()
+	tx := repo.db.Begin()
 	defer func() {
 		if err != nil {
 			tx.Rollback()
@@ -77,14 +83,14 @@ func (repo *TaskRepository) Update(db *gorm.DB, t *entity.Task) (err error) {
 	return
 }
 
-func (repo *TaskRepository) Delete(db *gorm.DB, tid, uid string) (err error) {
+func (repo *TaskRepository) Delete(tid, uid string) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
 			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
 		}
 	}()
 
-	tx := db.Begin()
+	tx := repo.db.Begin()
 	defer func() {
 		if err != nil {
 			tx.Rollback()
@@ -99,7 +105,7 @@ func (repo *TaskRepository) Delete(db *gorm.DB, tid, uid string) (err error) {
 	if err != nil {
 		return
 	}
-	err = db.Where("id = ?", tid).Where("user_id = ?", uid).Delete(&entity.Task{}).Error
+	err = repo.db.Where("id = ?", tid).Where("user_id = ?", uid).Delete(&entity.Task{}).Error
 	if err != nil {
 		return //TODO:testなし
 	}

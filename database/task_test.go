@@ -96,7 +96,7 @@ func TestTaskRepository_Create(t *testing.T) {
 
 			prepareTaskTT(t, db, tt.prepareTasks)
 
-			err := task.Create(db, tt.task)
+			err := task.Create(tt.task)
 			gotTask := tt.task
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -161,7 +161,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 
 			prepareTaskTT(t, db, tt.prepareTasks)
 
-			gotTask, err := task.FindByID(db, tt.tid, tt.uid)
+			gotTask, err := task.FindByID(tt.tid, tt.uid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -248,7 +248,7 @@ func TestTaskRepository_Update(t *testing.T) {
 
 			prepareTaskTT(t, db, tt.prepareTasks)
 
-			err := task.Update(db, tt.task)
+			err := task.Update(tt.task)
 			gotTask := tt.task
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -307,7 +307,7 @@ func TestTaskRepository_Delete(t *testing.T) {
 
 			prepareTaskTT(t, db, tt.prepareTasks)
 
-			err := task.Delete(db, tt.taskid, tt.userid)
+			err := task.Delete(tt.taskid, tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -347,7 +347,7 @@ func prepareTaskT(t *testing.T) (db *gorm.DB, task *TaskRepository) {
 	// dbに接続
 	dbRepo := NewTestDB()
 	dbRepo.Migrate()
-	task = new(TaskRepository)
+	task = NewTaskRepository(dbRepo)
 	db = dbRepo.Connect()
 	// db.LogMode(true)
 

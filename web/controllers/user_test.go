@@ -14,7 +14,6 @@ import (
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
-	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -115,7 +114,7 @@ func TestUserController_Create(t *testing.T) {
 			}`,
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Create(gomock.Any()).
-					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
+					DoAndReturn(func(user *entity.User) error {
 						user.SetID("any id")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
@@ -247,7 +246,7 @@ func TestUserController_Update(t *testing.T) {
 			}`,
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Update(gomock.Any()).
-					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
+					DoAndReturn(func(user *entity.User) error {
 						user.SetID(uuidUA)
 						user.Password = entity.NewNullString("encrypted_password")
 						user.Email = entity.NewNullString("example@example.com")

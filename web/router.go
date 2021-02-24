@@ -31,7 +31,7 @@ func NewRouting(user *database.UserRepository, task *database.TaskRepository) *R
 }
 
 func (r *Routing) setRouting() {
-	taskController := controllers.NewTaskController(r.DB, r.Task)
+	taskController := controllers.NewTaskController(r.Task)
 	userController := controllers.NewUserController(r.User)
 	// authController := controllers.NewAuthController(r.DB)
 

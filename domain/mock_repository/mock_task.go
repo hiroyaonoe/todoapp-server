@@ -7,7 +7,6 @@ package mock_repository
 import (
 	gomock "github.com/golang/mock/gomock"
 	entity "github.com/hiroyaonoe/todoapp-server/domain/entity"
-	gorm "github.com/jinzhu/gorm"
 	reflect "reflect"
 )
 
@@ -35,58 +34,58 @@ func (m *MockTaskRepository) EXPECT() *MockTaskRepositoryMockRecorder {
 }
 
 // Create mocks base method
-func (m *MockTaskRepository) Create(db *gorm.DB, t *entity.Task) error {
+func (m *MockTaskRepository) Create(t *entity.Task) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Create", db, t)
+	ret := m.ctrl.Call(m, "Create", t)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Create indicates an expected call of Create
-func (mr *MockTaskRepositoryMockRecorder) Create(db, t interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) Create(t interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockTaskRepository)(nil).Create), db, t)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockTaskRepository)(nil).Create), t)
 }
 
 // FindByID mocks base method
-func (m *MockTaskRepository) FindByID(db *gorm.DB, tid, uid string) (*entity.Task, error) {
+func (m *MockTaskRepository) FindByID(tid, uid string) (*entity.Task, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindByID", db, tid, uid)
+	ret := m.ctrl.Call(m, "FindByID", tid, uid)
 	ret0, _ := ret[0].(*entity.Task)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FindByID indicates an expected call of FindByID
-func (mr *MockTaskRepositoryMockRecorder) FindByID(db, tid, uid interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) FindByID(tid, uid interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockTaskRepository)(nil).FindByID), db, tid, uid)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockTaskRepository)(nil).FindByID), tid, uid)
 }
 
 // Update mocks base method
-func (m *MockTaskRepository) Update(db *gorm.DB, t *entity.Task) error {
+func (m *MockTaskRepository) Update(t *entity.Task) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Update", db, t)
+	ret := m.ctrl.Call(m, "Update", t)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Update indicates an expected call of Update
-func (mr *MockTaskRepositoryMockRecorder) Update(db, t interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) Update(t interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockTaskRepository)(nil).Update), db, t)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockTaskRepository)(nil).Update), t)
 }
 
 // Delete mocks base method
-func (m *MockTaskRepository) Delete(db *gorm.DB, tid, uid string) error {
+func (m *MockTaskRepository) Delete(tid, uid string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Delete", db, tid, uid)
+	ret := m.ctrl.Call(m, "Delete", tid, uid)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Delete indicates an expected call of Delete
-func (mr *MockTaskRepositoryMockRecorder) Delete(db, tid, uid interface{}) *gomock.Call {
+func (mr *MockTaskRepositoryMockRecorder) Delete(tid, uid interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockTaskRepository)(nil).Delete), db, tid, uid)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockTaskRepository)(nil).Delete), tid, uid)
 }

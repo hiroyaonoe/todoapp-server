@@ -6,9 +6,13 @@ import (
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 )
 
+// TaskInteractor は複数のエンティティを操作する際に活用できる
 type TaskInteractor struct {
-	DB   repository.DBRepository
 	Task repository.TaskRepository
+}
+
+func NewTaskInteractor(task repository.TaskRepository) *TaskInteractor {
+	return &TaskInteractor{Task: task}
 }
 
 func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
@@ -25,17 +29,15 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
 	// UUIDを付与
 	task.NewID()
 
-	db := interactor.DB.Connect()
 	// 新規Taskを作成
-	err = interactor.Task.Create(db, task)
+	err = interactor.Task.Create(task)
 
 	return
 }
 
 func (interactor *TaskInteractor) GetByID(tid, uid string) (task *entity.Task, err error) {
-	db := interactor.DB.Connect()
 	// Task の取得
-	task, err = interactor.Task.FindByID(db, tid, uid)
+	task, err = interactor.Task.FindByID(tid, uid)
 	return
 }
 
@@ -54,16 +56,14 @@ func (interactor *TaskInteractor) Update(task *entity.Task) (err error) {
 		return errs.ErrInvalidTask
 	}
 
-	db := interactor.DB.Connect()
 	// Taskデータを更新
-	err = interactor.Task.Update(db, task)
+	err = interactor.Task.Update(task)
 
 	return
 }
 
 func (interactor *TaskInteractor) Delete(tid, uid string) (err error) {
-	db := interactor.DB.Connect()
 	// Taskの削除
-	err = interactor.Task.Delete(db, tid, uid)
+	err = interactor.Task.Delete(tid, uid)
 	return
 }

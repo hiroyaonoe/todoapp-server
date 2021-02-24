@@ -11,16 +11,11 @@ import (
 )
 
 type TaskController struct {
-	Interactor usecase.TaskInteractor
+	Interactor *usecase.TaskInteractor
 }
 
-func NewTaskController(db repository.DBRepository, task repository.TaskRepository) *TaskController {
-	return &TaskController{
-		Interactor: usecase.TaskInteractor{
-			DB:   db,
-			Task: task,
-		},
-	}
+func NewTaskController(task repository.TaskRepository) *TaskController {
+	return &TaskController{Interactor: usecase.NewTaskInteractor(task)}
 }
 
 // Create is the Handler for POST /task
