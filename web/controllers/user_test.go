@@ -238,17 +238,18 @@ func TestUserController_Update(t *testing.T) {
 
 	tests := []testInfo{
 		{
-			name:   "正しくnameを更新出来る",
+			name:   "正しくフィールドを更新出来る",
 			userid: uuidUA,
 			body: `{
-				"name":"newname"
+				"name":"newname",
+				"password":"newpassword",
+				"email":"newexample@example.com"
 			}`,
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Update(gomock.Any()).
 					DoAndReturn(func(user *entity.User) error {
 						user.SetID(uuidUA)
-						user.Password = entity.NewToken("encrypted_password")
-						user.Email = entity.NewNullString("example@example.com")
+						user.Password = entity.NewToken("encrypted_newpassword")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
 						return nil
@@ -256,7 +257,46 @@ func TestUserController_Update(t *testing.T) {
 			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
-			wantData: entity.NewUser(uuidUA, "newname", "", "example@example.com"),
+			wantData: entity.NewUser(uuidUA, "newname", "", "newexample@example.com"),
+		},
+		{
+			name:   "nameがないならStatusBadRequest",
+			userid: uuidUA,
+			body: `{
+				"password":"password",
+				"email":"example@example.com"
+			}`,
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: ErrBadRequest.Error(),
+		},
+		{
+			name:   "passwordがないならStatusBadRequest",
+			userid: uuidUA,
+			body: `{
+				"name":"newname",
+				"email":"example@example.com"
+			}`,
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: ErrBadRequest.Error(),
+		},
+		{
+			name:   "emailがないならStatusBadRequest",
+			userid: uuidUA,
+			body: `{
+				"name":"newname",
+				"password":"password"
+			}`,
+			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
+			},
+			wantErr:  true,
+			wantCode: http.StatusBadRequest,
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "RequestBodyが不正ならStatusBadRequest",
@@ -286,7 +326,9 @@ func TestUserController_Update(t *testing.T) {
 			name:   "DBにユーザがいないときはErrUserNotFound",
 			userid: uuidUA,
 			body: `{
-				"name":"newname"
+				"name":"newname",
+				"password":"password",
+				"email":"example@example.com"
 			}`,
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 				user.EXPECT().Update(gomock.Any()).Return(entity.ErrRecordNotFound)
@@ -298,7 +340,9 @@ func TestUserController_Update(t *testing.T) {
 		{
 			name: "Cookieが空ならStatusUnauthorized",
 			body: `{
-				"name":"newname"
+				"name":"newname",
+				"password":"password",
+				"email":"example@example.com"
 			}`,
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
@@ -310,6 +354,8 @@ func TestUserController_Update(t *testing.T) {
 			name:   "同じemailのユーザーが既に存在するならばErrDuplicatedEmail",
 			userid: uuidUA,
 			body: `{
+				"name":"username",
+				"password":"password",
 				"email":"example@example.com"
 			}`,
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {

@@ -43,12 +43,11 @@ func (interactor *UserInteractor) Create(user *entity.User) (err error) {
 }
 
 func (interactor *UserInteractor) Update(user *entity.User) (err error) {
-	// 不正なユーザーリクエストの判別(全フィールドがnilの場合)
-	if user.Name.IsNull() && user.Password.IsNull() && user.Email.IsNull() {
-		return ErrInvalidUser
-	}
-	// 不正なユーザーリクエストの判別(UserIDがnilの場合)
-	if user.ID.IsNull() {
+	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
+	if user.Name.IsNull() ||
+		user.Password.IsNull() ||
+		user.Email.IsNull() ||
+		user.ID.IsNull() {
 		return ErrInvalidUser
 	}
 

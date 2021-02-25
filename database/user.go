@@ -77,12 +77,13 @@ func (repo *UserRepository) Update(u *entity.User) (err error) {
 
 	u.EncryptPassword()
 
-	beforeuser := entity.User{}
-	err = tx.Where("id = ?", u.ID).First(&beforeuser).Error
+	// idに該当するユーザーがいない場合を弾く
+	user := &entity.User{}
+	err = tx.Where("id = ?", u.ID).First(user).Error
 	if err != nil {
 		return
 	}
-	FillInUserNilFields(beforeuser, u)
+
 	err = tx.Save(u).Error
 	if err != nil {
 		return
@@ -117,19 +118,6 @@ func (repo *UserRepository) Delete(id string) (err error) {
 	err = tx.Where("id = ?", id).Delete(&entity.User{}).Error
 	if err != nil {
 		return //TODO:testなし
-	}
-	return
-}
-
-func FillInUserNilFields(before entity.User, after *entity.User) {
-	if after.Name.IsNull() {
-		after.Name = before.Name
-	}
-	if after.Password.IsNull() {
-		after.Password = before.Password
-	}
-	if after.Email.IsNull() {
-		after.Email = before.Email
 	}
 	return
 }
