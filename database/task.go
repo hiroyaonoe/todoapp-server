@@ -71,12 +71,13 @@ func (repo *TaskRepository) Update(t *entity.Task) (err error) {
 		}
 	}()
 
-	beforetask := entity.Task{}
-	err = tx.Where("id = ?", t.ID).Where("user_id = ?", t.UserID).First(&beforetask).Error
+	task := &entity.Task{}
+	// idに該当するユーザーがいない場合を弾く
+	err = tx.Where("id = ?", t.ID).Where("user_id = ?", t.UserID).First(task).Error
 	if err != nil {
 		return
 	}
-	// FillInTaskNilFields(beforetask, t)
+
 	err = tx.Save(t).Error
 	if err != nil {
 		return //TODO:testなし
@@ -112,18 +113,3 @@ func (repo *TaskRepository) Delete(tid, uid string) (err error) {
 	}
 	return
 }
-
-// func FillInTaskNilFields(before entity.Task, after *entity.Task) {
-// 	if after.Title.IsNull() {
-// 		after.Title = before.Title
-// 	}
-// 	// TODO: Contentを更新しないのか，空に更新したいのかが判別不能
-// 	if after.Content.IsNull() {
-// 		after.Content = before.Content
-// 	}
-// 	// TODO: IsCompを更新しないのか，falseに更新したいのかが判別不能
-// 	if after.Date.IsNull() {
-// 		after.Date = before.Date
-// 	}
-// 	return
-// }

@@ -194,6 +194,15 @@ func TestTaskRepository_Update(t *testing.T) {
 			},
 		},
 		{
+			name:     "Contentが空でも変更できる",
+			task:     entity.NewTask(uuidTA1, "taskA2", "", uuidUA, "2020-01-05"),
+			wantTask: entity.NewTask(uuidTA1, "taskA2", "", uuidUA, "2020-01-05"),
+			wantErr:  nil,
+			prepareTasks: []entity.Task{
+				taskA1,
+			},
+		},
+		{
 			name:     "指定したIDのTaskが存在しない場合はErrRecordNotFound",
 			task:     entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
