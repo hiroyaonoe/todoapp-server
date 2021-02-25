@@ -16,10 +16,10 @@ const (
 )
 
 var (
-	taskA1 = entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08")
-	taskA2 = entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05")
-	taskB1 = entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-09")
-	taskB2 = entity.NewTask(uuidTB2, "taskB2", "I am ContentB2.", uuidUB, "2020-01-06")
+	taskA1 = *entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08")
+	taskA2 = *entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05")
+	taskB1 = *entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-09")
+	taskB2 = *entity.NewTask(uuidTB2, "taskB2", "I am ContentB2.", uuidUB, "2020-01-06")
 )
 
 func TestTaskRepository_Create(t *testing.T) {
@@ -31,14 +31,14 @@ func TestTaskRepository_Create(t *testing.T) {
 		task         *entity.Task
 		wantTask     *entity.Task
 		wantErr      error
-		prepareTasks []*entity.Task
+		prepareTasks []entity.Task
 	}{
 		{
 			name:     "新しいユーザーのタスクを正しく作成できる",
 			task:     entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08"),
 			wantTask: entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08"),
 			wantErr:  nil,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -47,7 +47,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			task:     entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantErr:  nil,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -79,15 +79,6 @@ func TestTaskRepository_Create(t *testing.T) {
 			wantErr:      nil,
 			prepareTasks: nil,
 		},
-		{
-			name:     "指定したIDのタスクが既に存在している場合はErrMySQL",
-			task:     entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
-			wantTask: nil,
-			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
-			prepareTasks: []*entity.Task{
-				taskA2,
-			},
-		},
 	}
 	for _, tt := range tests {
 		tt := tt
@@ -103,7 +94,7 @@ func TestTaskRepository_Create(t *testing.T) {
 				t.Errorf("Create() got = %s", gotTask)
 				return
 			}
-			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask)) {
+			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, true)) {
 				t.Errorf("Create() = %s, want %s", gotTask, tt.wantTask)
 			}
 		})
@@ -120,7 +111,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 		uid          string
 		wantTask     *entity.Task
 		wantErr      error
-		prepareTasks []*entity.Task
+		prepareTasks []entity.Task
 	}{
 		{
 			name:     "正しくTaskを取得できる",
@@ -128,7 +119,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			uid:      uuidUA,
 			wantTask: entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08"),
 			wantErr:  nil,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -138,7 +129,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			uid:      uuidUA,
 			wantTask: nil,
 			wantErr:  entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -148,7 +139,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			uid:      uuidUB,
 			wantTask: nil,
 			wantErr:  entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -166,7 +157,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 				t.Errorf("Create() got = %s", gotTask)
 				return
 			}
-			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask)) {
+			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, false)) {
 				t.Errorf("Create() = %s, want %s", gotTask, tt.wantTask)
 			}
 		})
@@ -182,14 +173,14 @@ func TestTaskRepository_Update(t *testing.T) {
 		task         *entity.Task
 		wantTask     *entity.Task
 		wantErr      error
-		prepareTasks []*entity.Task
+		prepareTasks []entity.Task
 	}{
 		{
 			name:     "全フィールドを変更できる",
 			task:     entity.NewTask(uuidTA1, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05"),
 			wantTask: entity.NewTask(uuidTA1, "taskA2", "I am ContentA2.", uuidUA, "2020-01-05"),
 			wantErr:  nil,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -198,7 +189,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			task:     entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08"),
 			wantTask: entity.NewTask(uuidTA1, "taskA1", "I am ContentA1.", uuidUA, "2020-12-08"),
 			wantErr:  nil,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -207,7 +198,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			task:     entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
 			wantErr:  entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -216,7 +207,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", uuidUZ, "2020-12-08"),
 			wantTask: nil,
 			wantErr:  entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -225,7 +216,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			task:     entity.NewTask("", "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
 			wantErr:  entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -234,7 +225,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask: nil,
 			wantErr:  entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -253,7 +244,7 @@ func TestTaskRepository_Update(t *testing.T) {
 				t.Errorf("Update() got = %s", gotTask)
 				return
 			}
-			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask)) {
+			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, false)) {
 				t.Errorf("Update() = %s, want %s", gotTask, tt.wantTask)
 			}
 		})
@@ -269,14 +260,14 @@ func TestTaskRepository_Delete(t *testing.T) {
 		taskid       string
 		userid       string
 		wantErr      error
-		prepareTasks []*entity.Task
+		prepareTasks []entity.Task
 	}{
 		{
 			name:    "Taskを削除できる",
 			taskid:  uuidTA1,
 			userid:  uuidUA,
 			wantErr: nil,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -285,14 +276,14 @@ func TestTaskRepository_Delete(t *testing.T) {
 			taskid:       uuidTA1,
 			userid:       uuidUA,
 			wantErr:      entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{},
+			prepareTasks: []entity.Task{},
 		},
 		{
 			name:    "Taskが存在してもUserIDが異なるならErrRecordNotFound",
 			taskid:  uuidTA1,
 			userid:  uuidUB,
 			wantErr: entity.ErrRecordNotFound,
-			prepareTasks: []*entity.Task{
+			prepareTasks: []entity.Task{
 				taskA1,
 			},
 		},
@@ -314,10 +305,10 @@ func TestTaskRepository_Delete(t *testing.T) {
 }
 
 // addTaskData はテスト用のデータをデータベースに追加する
-func addTaskData(t *testing.T, db *gorm.DB, tasks []*entity.Task) (err error) {
+func addTaskData(t *testing.T, db *gorm.DB, tasks []entity.Task) (err error) {
 	t.Helper()
 	for _, task := range tasks {
-		err = db.Create(task).Error
+		err = db.Create(&task).Error
 		if err != nil {
 			return
 		}
@@ -325,15 +316,21 @@ func addTaskData(t *testing.T, db *gorm.DB, tasks []*entity.Task) (err error) {
 	return
 }
 
-// taskEqual はCreatedAt, UpdatedAt以外のTaskのフィールドが同じかどうか判定する
-func taskEqual(t *testing.T, got *entity.Task, want *entity.Task) bool {
+/*
+taskEqual はCreatedAt, UpdatedAt以外のTaskのフィールドが同じかどうか判定する
+IDを比較するかどうかはオプションで指定
+*/
+func taskEqual(t *testing.T, got *entity.Task, want *entity.Task, is_create bool) bool {
 	t.Helper()
-	return (got.ID == want.ID) &&
-		(got.Title.Equals(want.Title)) &&
+	ret := (got.Title.Equals(want.Title)) &&
 		(got.Content.Equals(want.Content)) &&
 		(got.UserID.Equals(want.UserID)) &&
 		(got.IsCompleted == want.IsCompleted) &&
 		(got.Date.Equals(want.Date))
+	if !is_create {
+		ret = ret && (got.ID == want.ID)
+	}
+	return ret
 }
 
 func prepareTaskT(t *testing.T) (task *TaskRepository) {
@@ -348,7 +345,7 @@ func prepareTaskT(t *testing.T) (task *TaskRepository) {
 	return
 }
 
-func prepareTaskTT(t *testing.T, task *TaskRepository, tasks []*entity.Task) {
+func prepareTaskTT(t *testing.T, task *TaskRepository, tasks []entity.Task) {
 	t.Helper()
 
 	// databaseを初期化する

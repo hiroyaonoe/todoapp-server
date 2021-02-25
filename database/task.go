@@ -31,6 +31,8 @@ func (repo *TaskRepository) Create(t *entity.Task) (err error) {
 		}
 	}()
 
+	t.NewID()
+
 	err = tx.Create(t).Error
 	if err != nil {
 		tx.Rollback()

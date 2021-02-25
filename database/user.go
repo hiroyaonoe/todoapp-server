@@ -48,6 +48,9 @@ func (repo *UserRepository) Create(u *entity.User) (err error) {
 		}
 	}()
 
+	u.NewID()
+	u.EncryptPassword()
+
 	err = tx.Create(u).Error
 	if err != nil {
 		return
@@ -71,6 +74,8 @@ func (repo *UserRepository) Update(u *entity.User) (err error) {
 			tx.Commit()
 		}
 	}()
+
+	u.EncryptPassword()
 
 	beforeuser := entity.User{}
 	err = tx.Where("id = ?", u.ID).First(&beforeuser).Error
