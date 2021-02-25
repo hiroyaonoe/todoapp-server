@@ -36,12 +36,6 @@ func (interactor *UserInteractor) Create(user *entity.User) (err error) {
 		return ErrInvalidUser
 	}
 
-	// UUIDを付与
-	user.NewID()
-
-	// Passwordをhash化
-	EncryptPassword(user)
-
 	// 新規Userを作成
 	err = interactor.User.Create(user)
 
@@ -57,9 +51,6 @@ func (interactor *UserInteractor) Update(user *entity.User) (err error) {
 	if user.ID.IsNull() {
 		return ErrInvalidUser
 	}
-
-	// Passwordをhash化
-	EncryptPassword(user)
 
 	// Userデータを更新
 	err = interactor.User.Update(user)

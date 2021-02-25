@@ -25,9 +25,6 @@ func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
 		return ErrInvalidTask
 	}
 
-	// UUIDを付与
-	task.NewID()
-
 	// 新規Taskを作成
 	err = interactor.Task.Create(task)
 

@@ -20,8 +20,6 @@ func NewNullString(s string) NullString {
 func (s *NullString) Set(str string) {
 	s.String = str
 	s.Valid = str != ""
-	// new := NewNullString(str)
-	// s = &new
 }
 
 func (s *NullString) MarshalJSON() ([]byte, error) {
@@ -35,8 +33,7 @@ func (s *NullString) MarshalJSON() ([]byte, error) {
 func (s *NullString) UnmarshalJSON(data []byte) error {
 	var str string
 	json.Unmarshal(data, &str)
-	s.String = str
-	s.Valid = str != ""
+	s.Set(str)
 	return nil
 }
 
