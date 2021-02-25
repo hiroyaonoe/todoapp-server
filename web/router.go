@@ -12,17 +12,15 @@ import (
 )
 
 type Routing struct {
-	DB   *database.DB
 	User *database.UserRepository
 	Task *database.TaskRepository
 	Gin  *gin.Engine
 	Port string
 }
 
-func NewRouting(db *database.DB, user *database.UserRepository, task *database.TaskRepository) *Routing {
+func NewRouting(user *database.UserRepository, task *database.TaskRepository) *Routing {
 	c := config.NewConfig()
 	r := &Routing{
-		DB:   db,
 		User: user,
 		Task: task,
 		Gin:  gin.Default(),
@@ -33,8 +31,8 @@ func NewRouting(db *database.DB, user *database.UserRepository, task *database.T
 }
 
 func (r *Routing) setRouting() {
-	taskController := controllers.NewTaskController(r.DB, r.Task)
-	userController := controllers.NewUserController(r.DB, r.User)
+	taskController := controllers.NewTaskController(r.Task)
+	userController := controllers.NewUserController(r.User)
 	// authController := controllers.NewAuthController(r.DB)
 
 	engine := r.Gin

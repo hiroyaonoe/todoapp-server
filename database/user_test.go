@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -22,7 +21,7 @@ var (
 
 func TestUserRepository_FindByID(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -45,7 +44,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 			name:     "存在しないユーザーの場合はErrRecordNotFound",
 			userid:   uuidUZ,
 			wantUser: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -55,9 +54,9 @@ func TestUserRepository_FindByID(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
-			gotUser, err := user.FindByID(db, tt.userid)
+			gotUser, err := user.FindByID(tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -69,12 +68,11 @@ func TestUserRepository_FindByID(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Create(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -96,28 +94,28 @@ func TestUserRepository_Create(t *testing.T) {
 			name:         "Nameがnilの場合はErrMySQL",
 			user:         entity.NewUser(uuidUB, "", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'name' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'name' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
 			name:         "Passwordがnilの場合はErrMySQL",
 			user:         entity.NewUser(uuidUB, "userB", "", "exampleB@example.com"),
 			wantUser:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'password' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'password' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
 			name:         "Emailがnilの場合はErrMySQL",
 			user:         entity.NewUser(uuidUB, "userB", "encrypted_passwordB", ""),
 			wantUser:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'email' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'email' cannot be null"),
 			prepareUsers: nil,
 		},
 		{
 			name:     "IDがnilの場合はErrMySQL",
 			user:     entity.NewUser("", "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  errs.NewErrMySQL(0x554, "Field 'id' doesn't have a default value"),
+			wantErr:  entity.NewErrMySQL(0x554, "Field 'id' doesn't have a default value"),
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -126,7 +124,7 @@ func TestUserRepository_Create(t *testing.T) {
 			name:     "指定したIDのユーザーが既に存在している場合はErrMySQL",
 			user:     entity.NewUser(uuidUA, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  errs.NewErrMySQL(0x426, "Duplicate entry 'df1ecfbf-e5f8-5eab-d49c-3a3f2e201fa3' for key 'users.PRIMARY'"),
+			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry 'df1ecfbf-e5f8-5eab-d49c-3a3f2e201fa3' for key 'users.PRIMARY'"),
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -135,7 +133,7 @@ func TestUserRepository_Create(t *testing.T) {
 			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
 			user:     entity.NewUser(uuidUA, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  errs.NewErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
+			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
 			prepareUsers: []*entity.User{
 				userB,
 			},
@@ -145,9 +143,9 @@ func TestUserRepository_Create(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
-			err := user.Create(db, tt.user)
+			err := user.Create(tt.user)
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -160,12 +158,11 @@ func TestUserRepository_Create(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Update(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -231,7 +228,7 @@ func TestUserRepository_Update(t *testing.T) {
 			name:     "IDが指定されていない場合はErrRecordNotFound",
 			user:     entity.NewUser("", "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -240,7 +237,7 @@ func TestUserRepository_Update(t *testing.T) {
 			name:     "指定したIDのユーザーが存在しない場合はErrRecordNotFound",
 			user:     entity.NewUser(uuidUZ, "userB", "encrypted_passwordB", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -249,7 +246,7 @@ func TestUserRepository_Update(t *testing.T) {
 			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
 			user:     entity.NewUser(uuidUA, "", "", "exampleB@example.com"),
 			wantUser: nil,
-			wantErr:  errs.NewErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
+			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
 			prepareUsers: []*entity.User{
 				userA,
 				userB,
@@ -260,9 +257,9 @@ func TestUserRepository_Update(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
-			err := user.Update(db, tt.user)
+			err := user.Update(tt.user)
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -275,12 +272,11 @@ func TestUserRepository_Update(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 func TestUserRepository_Delete(t *testing.T) {
 
-	db, user := prepareUserT(t)
+	user := prepareUserT(t)
 
 	tests := []struct {
 		name         string
@@ -300,7 +296,7 @@ func TestUserRepository_Delete(t *testing.T) {
 		{
 			name:    "存在しないユーザーの場合はErrRecordNotFound",
 			userid:  uuidUZ,
-			wantErr: errs.ErrRecordNotFound,
+			wantErr: entity.ErrRecordNotFound,
 			prepareUsers: []*entity.User{
 				userA,
 			},
@@ -310,9 +306,9 @@ func TestUserRepository_Delete(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, db, tt.prepareUsers)
+			prepareUserTT(t, user, tt.prepareUsers)
 
-			err := user.Delete(db, tt.userid)
+			err := user.Delete(tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -320,7 +316,6 @@ func TestUserRepository_Delete(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE users")
 }
 
 // addUserData はテスト用のデータをデータベースに追加する
@@ -344,27 +339,26 @@ func userEqual(t *testing.T, got *entity.User, want *entity.User) bool {
 		(got.Email.Equals(want.Email))
 }
 
-func prepareUserT(t *testing.T) (db *gorm.DB, user *UserRepository) {
+func prepareUserT(t *testing.T) (user *UserRepository) {
 	t.Helper()
 
 	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	user = new(UserRepository)
-	db = dbRepo.Connect()
+	db := NewTestDB()
+	db.Migrate()
+	user = NewUserRepository(db)
 	// db.LogMode(true)
 
 	return
 }
 
-func prepareUserTT(t *testing.T, db *gorm.DB, users []*entity.User) {
+func prepareUserTT(t *testing.T, user *UserRepository, users []*entity.User) {
 	t.Helper()
 
 	// databaseを初期化する
-	db.Exec("TRUNCATE TABLE users")
+	user.db.Exec("TRUNCATE TABLE users")
 
 	// 事前データの準備
-	err := addUserData(t, db, users)
+	err := addUserData(t, user.db, users)
 	if err != nil {
 		t.Fatal(err)
 	}

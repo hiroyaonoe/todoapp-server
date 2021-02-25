@@ -12,9 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
-	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -26,7 +24,6 @@ type testInfo struct {
 	userid              string            // cookieに入れるuserid
 	params              map[string]string // context.Param
 	body                string            // request body
-	prepareMockDBRepo   func(db *mock_repository.MockDBRepository)
 	prepareMockUserRepo func(user *mock_repository.MockUserRepository)
 	prepareMockTaskRepo func(task *mock_repository.MockTaskRepository)
 	wantErr             bool
@@ -45,11 +42,8 @@ func TestUserController_Get(t *testing.T) {
 		{
 			name:   "正しくユーザが取得できる",
 			userid: uuidUA,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), uuidUA).Return(&entity.User{
+				user.EXPECT().FindByID(uuidUA).Return(&entity.User{
 					ID:        entity.NewNullString(uuidUA),
 					Name:      entity.NewNullString("username"),
 					Password:  entity.NewNullString("encrypted_password"),
@@ -65,25 +59,20 @@ func TestUserController_Get(t *testing.T) {
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
 			userid: uuidUA,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().FindByID(gomock.Any(), uuidUA).Return(&entity.User{}, errs.ErrRecordNotFound)
+				user.EXPECT().FindByID(uuidUA).Return(&entity.User{}, entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrUserNotFound.Error(),
+			wantData: ErrUserNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusUnauthorized",
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 	}
 
@@ -122,12 +111,9 @@ func TestUserController_Create(t *testing.T) {
 				"password":"password",
 				"email":"example@example.com"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Create(gomock.Any(), gomock.Any()).
-					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
+				user.EXPECT().Create(gomock.Any()).
+					DoAndReturn(func(user *entity.User) error {
 						user.SetID("any id")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
@@ -146,13 +132,11 @@ func TestUserController_Create(t *testing.T) {
 				"password":"password",
 				"email":"example@example.com"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name: "Requestにnameが含まれていないならStatusBadRequest",
@@ -160,13 +144,11 @@ func TestUserController_Create(t *testing.T) {
 				"password":"password",
 				"email":"example@example.com"
 				}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name: "Requestにpasswordが含まれていないならStatusBadRequest",
@@ -174,13 +156,11 @@ func TestUserController_Create(t *testing.T) {
 				"name":"username",
 				"email":"example@example.com"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name: "Requestにemailが含まれていないならStatusBadRequest",
@@ -188,13 +168,11 @@ func TestUserController_Create(t *testing.T) {
 				"name":"username",
 				"password":"password",
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name: "RequestBodyが不正ならStatusBadRequest",
@@ -203,24 +181,20 @@ func TestUserController_Create(t *testing.T) {
 				"title":"title",
 				"userid":3,
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name: "RequestBodyがJSONでないならStatusBadRequest",
 			body: `aaaaa`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name: "同じemailのユーザーが既に存在するならばErrDuplicatedEmail",
@@ -229,16 +203,13 @@ func TestUserController_Create(t *testing.T) {
 				"password":"password",
 				"email":"example@example.com"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Create(gomock.Any(), gomock.Any()).Return(
-					errs.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
+				user.EXPECT().Create(gomock.Any()).Return(
+					entity.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrDuplicatedEmail.Error(),
+			wantData: ErrDuplicatedEmail.Error(),
 		},
 	}
 
@@ -272,12 +243,9 @@ func TestUserController_Update(t *testing.T) {
 			body: `{
 				"name":"newname"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Update(gomock.Any(), gomock.Any()).
-					DoAndReturn(func(db *gorm.DB, user *entity.User) error {
+				user.EXPECT().Update(gomock.Any()).
+					DoAndReturn(func(user *entity.User) error {
 						user.SetID(uuidUA)
 						user.Password = entity.NewNullString("encrypted_password")
 						user.Email = entity.NewNullString("example@example.com")
@@ -298,25 +266,21 @@ func TestUserController_Update(t *testing.T) {
 				"title":"title",
 				"userid":3
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "RequestBodyがJSONでないならStatusBadRequest",
 			userid: uuidUA,
 			body:   `aaaaa`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
@@ -324,28 +288,23 @@ func TestUserController_Update(t *testing.T) {
 			body: `{
 				"name":"newname"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(errs.ErrRecordNotFound)
+				user.EXPECT().Update(gomock.Any()).Return(entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrUserNotFound.Error(),
+			wantData: ErrUserNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusUnauthorized",
 			body: `{
 				"name":"newname"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 		{
 			name:   "同じemailのユーザーが既に存在するならばErrDuplicatedEmail",
@@ -353,16 +312,13 @@ func TestUserController_Update(t *testing.T) {
 			body: `{
 				"email":"example@example.com"
 			}`,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Update(gomock.Any(), gomock.Any()).Return(
-					errs.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
+				user.EXPECT().Update(gomock.Any()).Return(
+					entity.NewErrMySQL(0x426, "Duplicate entry 'example@example.com' for key 'users.email'"))
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrDuplicatedEmail.Error(),
+			wantData: ErrDuplicatedEmail.Error(),
 		},
 	}
 
@@ -397,11 +353,8 @@ func TestUserController_Delete(t *testing.T) {
 		{
 			name:   "正しくユーザーを削除できる",
 			userid: uuidUA,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Delete(gomock.Any(), uuidUA).Return(nil)
+				user.EXPECT().Delete(uuidUA).Return(nil)
 			},
 			wantErr:  false,
 			wantCode: http.StatusOK,
@@ -410,25 +363,20 @@ func TestUserController_Delete(t *testing.T) {
 		{
 			name:   "DBにユーザがいないときはErrUserNotFound",
 			userid: uuidUA,
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-				db.EXPECT().Connect()
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
-				user.EXPECT().Delete(gomock.Any(), uuidUA).Return(errs.ErrRecordNotFound)
+				user.EXPECT().Delete(uuidUA).Return(entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrUserNotFound.Error(),
+			wantData: ErrUserNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusUnauthorized",
-			prepareMockDBRepo: func(db *mock_repository.MockDBRepository) {
-			},
 			prepareMockUserRepo: func(user *mock_repository.MockUserRepository) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 	}
 
@@ -471,12 +419,10 @@ func prepareMockUserCtrl(t *testing.T, tt testInfo) (ctrl *gomock.Controller, us
 
 	// モックの準備
 	ctrl = gomock.NewController(t)
-	dbRepo := mock_repository.NewMockDBRepository(ctrl)
-	tt.prepareMockDBRepo(dbRepo)
 	userRepo := mock_repository.NewMockUserRepository(ctrl)
 	tt.prepareMockUserRepo(userRepo)
 
-	userController = NewUserController(dbRepo, userRepo)
+	userController = NewUserController(userRepo)
 	return
 }
 

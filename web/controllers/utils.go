@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"net/http"
 )
 
@@ -24,6 +23,6 @@ func getTaskIDFromParam(c Context) (tid string, err error) {
 // unexpectedErrorHandling は予期せぬエラーが発生したときのエラーハンドリングを行う
 func unexpectedErrorHandling(c Context, _ error) {
 	// panic(err.Error())
-	errorToJSON(c, http.StatusInternalServerError, errs.ErrInternalServerError)
+	errorToJSON(c, http.StatusInternalServerError, ErrInternalServerError)
 	return
 }

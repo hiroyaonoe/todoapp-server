@@ -9,9 +9,9 @@ func main() {
 	db := database.NewDB()
 	// db := database.NewTestDB()
 	db.Migrate()
-	db.Connect().LogMode(true)
-	user := new(database.UserRepository)
-	task := new(database.TaskRepository)
-	r := web.NewRouting(db, user, task)
+	db.LogMode(true)
+	user := database.NewUserRepository(db)
+	task := database.NewTaskRepository(db)
+	r := web.NewRouting(user, task)
 	r.Run()
 }

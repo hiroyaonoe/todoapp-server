@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -25,7 +24,7 @@ var (
 
 func TestTaskRepository_Create(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -56,7 +55,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:         "Titleがnilの場合はErrMySQL",
 			task:         entity.NewTask(uuidTA2, "", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'title' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'title' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
@@ -70,7 +69,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:         "UserIDがnilの場合はErrMySQL",
 			task:         entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
@@ -84,7 +83,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:     "指定したIDのタスクが既に存在している場合はErrMySQL",
 			task:     entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
+			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
 			prepareTasks: []*entity.Task{
 				taskA2,
 			},
@@ -94,9 +93,9 @@ func TestTaskRepository_Create(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
-			err := task.Create(db, tt.task)
+			err := task.Create(tt.task)
 			gotTask := tt.task
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -109,12 +108,11 @@ func TestTaskRepository_Create(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 func TestTaskRepository_FindByID(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -139,7 +137,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			tid:      uuidTA2,
 			uid:      uuidUA,
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -149,7 +147,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			tid:      uuidTA1,
 			uid:      uuidUB,
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -159,9 +157,9 @@ func TestTaskRepository_FindByID(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
-			gotTask, err := task.FindByID(db, tt.tid, tt.uid)
+			gotTask, err := task.FindByID(tt.tid, tt.uid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -173,12 +171,11 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 func TestTaskRepository_Update(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -209,7 +206,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "指定したIDのTaskが存在しない場合はErrRecordNotFound",
 			task:     entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -218,7 +215,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "指定したUserIDのTaskが存在しない場合はErrRecordNotFound",
 			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", uuidUZ, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -227,7 +224,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "IDが指定されていない場合はErrRecordNotFound",
 			task:     entity.NewTask("", "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -236,7 +233,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "UserIDがnilの場合はErrMySQL",
 			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -246,9 +243,9 @@ func TestTaskRepository_Update(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
-			err := task.Update(db, tt.task)
+			err := task.Update(tt.task)
 			gotTask := tt.task
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
@@ -261,12 +258,11 @@ func TestTaskRepository_Update(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 func TestTaskRepository_Delete(t *testing.T) {
 
-	db, task := prepareTaskT(t)
+	task := prepareTaskT(t)
 
 	tests := []struct {
 		name         string
@@ -288,14 +284,14 @@ func TestTaskRepository_Delete(t *testing.T) {
 			name:         "Taskが存在しないならErrRecordNotFound",
 			taskid:       uuidTA1,
 			userid:       uuidUA,
-			wantErr:      errs.ErrRecordNotFound,
+			wantErr:      entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{},
 		},
 		{
 			name:    "Taskが存在してもUserIDが異なるならErrRecordNotFound",
 			taskid:  uuidTA1,
 			userid:  uuidUB,
-			wantErr: errs.ErrRecordNotFound,
+			wantErr: entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -305,9 +301,9 @@ func TestTaskRepository_Delete(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, db, tt.prepareTasks)
+			prepareTaskTT(t, task, tt.prepareTasks)
 
-			err := task.Delete(db, tt.taskid, tt.userid)
+			err := task.Delete(tt.taskid, tt.userid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
 				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
@@ -315,7 +311,6 @@ func TestTaskRepository_Delete(t *testing.T) {
 			}
 		})
 	}
-	db.Exec("TRUNCATE TABLE tasks")
 }
 
 // addTaskData はテスト用のデータをデータベースに追加する
@@ -341,27 +336,26 @@ func taskEqual(t *testing.T, got *entity.Task, want *entity.Task) bool {
 		(got.Date.Equals(want.Date))
 }
 
-func prepareTaskT(t *testing.T) (db *gorm.DB, task *TaskRepository) {
+func prepareTaskT(t *testing.T) (task *TaskRepository) {
 	t.Helper()
 
 	// dbに接続
-	dbRepo := NewTestDB()
-	dbRepo.Migrate()
-	task = new(TaskRepository)
-	db = dbRepo.Connect()
+	db := NewTestDB()
+	db.Migrate()
+	task = NewTaskRepository(db)
 	// db.LogMode(true)
 
 	return
 }
 
-func prepareTaskTT(t *testing.T, db *gorm.DB, tasks []*entity.Task) {
+func prepareTaskTT(t *testing.T, task *TaskRepository, tasks []*entity.Task) {
 	t.Helper()
 
 	// databaseを初期化する
-	db.Exec("TRUNCATE TABLE tasks")
+	task.db.Exec("TRUNCATE TABLE tasks")
 
 	// 事前データの準備
-	err := addTaskData(t, db, tasks)
+	err := addTaskData(t, task.db, tasks)
 	if err != nil {
 		t.Fatal(err)
 	}

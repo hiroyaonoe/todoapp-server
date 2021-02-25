@@ -9,15 +9,13 @@ Package repository is Enterprise Business Rules.
 package repository
 
 import (
-	"github.com/jinzhu/gorm"
-
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 )
 
 // UserRepository is interface of User
 type UserRepository interface {
-	FindByID(db *gorm.DB, id string) (user *entity.User, err error)
-	Create(db *gorm.DB, u *entity.User) (err error)
-	Update(db *gorm.DB, u *entity.User) (err error)
-	Delete(db *gorm.DB, id string) (err error)
+	FindByID(id string) (user *entity.User, err error)
+	Create(u *entity.User) (err error)
+	Update(u *entity.User) (err error)
+	Delete(id string) (err error)
 }

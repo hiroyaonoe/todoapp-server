@@ -5,34 +5,28 @@ import (
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
 
 type TaskController struct {
-	Interactor usecase.TaskInteractor
+	Interactor *usecase.TaskInteractor
 }
 
-func NewTaskController(db repository.DBRepository, task repository.TaskRepository) *TaskController {
-	return &TaskController{
-		Interactor: usecase.TaskInteractor{
-			DB:   db,
-			Task: task,
-		},
-	}
+func NewTaskController(task repository.TaskRepository) *TaskController {
+	return &TaskController{Interactor: usecase.NewTaskInteractor(task)}
 }
 
 // Create is the Handler for POST /task
 func (controller *TaskController) Create(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 	task, err := getTaskFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 
@@ -41,8 +35,8 @@ func (controller *TaskController) Create(c Context) {
 	err = controller.Interactor.Create(task)
 
 	if err != nil {
-		if errors.Is(err, errs.ErrInvalidTask) {
-			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		if errors.Is(err, usecase.ErrInvalidTask) {
+			errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 			return
 		}
 		// TODO:user not found
@@ -56,20 +50,20 @@ func (controller *TaskController) Create(c Context) {
 func (controller *TaskController) GetByID(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 	tid, err := getTaskIDFromParam(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 
 	task, err := controller.Interactor.GetByID(tid, uid)
 
 	if err != nil {
-		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, ErrTaskNotFound)
 			return
 		}
 		// TODO:user not found
@@ -83,18 +77,18 @@ func (controller *TaskController) GetByID(c Context) {
 func (controller *TaskController) Update(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 	task, err := getTaskFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 
 	tid, err := getTaskIDFromParam(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 
@@ -104,12 +98,12 @@ func (controller *TaskController) Update(c Context) {
 	err = controller.Interactor.Update(task)
 
 	if err != nil {
-		if errors.Is(err, errs.ErrInvalidTask) {
-			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		if errors.Is(err, usecase.ErrInvalidTask) {
+			errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 			return
 		}
-		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, ErrTaskNotFound)
 			return
 		}
 		// TODO:user not found
@@ -123,20 +117,20 @@ func (controller *TaskController) Update(c Context) {
 func (controller *TaskController) Delete(c Context) {
 	uid, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 	tid, err := getTaskIDFromParam(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 
 	err = controller.Interactor.Delete(tid, uid)
 
 	if err != nil {
-		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrTaskNotFound)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, ErrTaskNotFound)
 			return
 		}
 		// TODO:user not found
