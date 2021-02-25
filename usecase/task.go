@@ -15,7 +15,7 @@ func NewTaskInteractor(task repository.TaskRepository) *TaskInteractor {
 }
 
 func (interactor *TaskInteractor) Create(task *entity.Task) (err error) {
-	// databaseのnot null制約があるので不要？
+	// databaseのnot null制約と重複
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
 	if task.Title.IsNull() || task.UserID.IsNull() || task.Date.IsNull() {
 		return ErrInvalidTask
@@ -38,17 +38,12 @@ func (interactor *TaskInteractor) GetByID(tid, uid string) (task *entity.Task, e
 }
 
 func (interactor *TaskInteractor) Update(task *entity.Task) (err error) {
-	// databaseのnot null制約があるので不要？
-	// // 不正なユーザーリクエストの判別(全フィールドがnilの場合)
-	// if task.Title.IsNull() && task.Date.IsNull() {
-	// 	return ErrInvalidTask
-	// }
+	// databaseのnot null制約と重複
 	// 不正なユーザーリクエストの判別(フィールドのうち少なくともひとつがnilの場合)
-	if task.Title.IsNull() || task.Date.IsNull() {
-		return ErrInvalidTask
-	}
-	// 不正なユーザーリクエストの判別(UserID or TaskIDがnilの場合)
-	if task.UserID.IsNull() || task.ID.IsNull() {
+	if task.Title.IsNull() ||
+		task.Date.IsNull() ||
+		task.UserID.IsNull() ||
+		task.ID.IsNull() {
 		return ErrInvalidTask
 	}
 

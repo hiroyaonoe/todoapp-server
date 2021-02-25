@@ -163,27 +163,28 @@ func TestUserRepository_Update(t *testing.T) {
 			},
 		},
 		{
-			name:     "Nameのみを変更できる",
-			user:     entity.NewUser(uuidUA, "userAA", "", ""),
-			wantUser: entity.NewUser(uuidUA, "userAA", "passwordA", "exampleA@example.com"),
-			wantErr:  nil,
+			name:     "Nameが空ならばErrMySQL",
+			user:     entity.NewUser(uuidUA, "", "passwordAA", "exampleAA@example.com"),
+			wantUser: nil,
+			wantErr:  entity.NewErrMySQL(0x418, "Column 'name' cannot be null"),
 			prepareUsers: []entity.User{
 				userA,
 			},
 		},
 		{
-			name:     "Passwordのみを変更できる",
-			user:     entity.NewUser(uuidUA, "", "passwordAA", ""),
-			wantUser: entity.NewUser(uuidUA, "userA", "passwordAA", "exampleA@example.com"),
-			wantErr:  nil,
+			name:     "Passwordが空ならばErrMySQL",
+			user:     entity.NewUser(uuidUA, "userAA", "", "exampleAA@example.com"),
+			wantUser: nil,
+			wantErr:  entity.NewErrMySQL(0x418, "Column 'password' cannot be null"),
 			prepareUsers: []entity.User{
 				userA,
 			},
 		},
 		{
-			name:     "Emailのみを変更できる",
-			user:     entity.NewUser(uuidUA, "", "", "exampleAA@example.com"),
-			wantUser: entity.NewUser(uuidUA, "userA", "passwordA", "exampleAA@example.com"),
+			name:     "Emailが空ならばErrMySQL",
+			user:     entity.NewUser(uuidUA, "userAA", "passwordAA", ""),
+			wantUser: nil,
+			wantErr:  entity.NewErrMySQL(0x418, "Column 'email' cannot be null"),
 			prepareUsers: []entity.User{
 				userA,
 			},
@@ -191,15 +192,6 @@ func TestUserRepository_Update(t *testing.T) {
 		{
 			name:     "全フィールドがもとと同じでも実行できる",
 			user:     entity.NewUser(uuidUA, "userA", "passwordA", "exampleA@example.com"),
-			wantUser: entity.NewUser(uuidUA, "userA", "passwordA", "exampleA@example.com"),
-			wantErr:  nil,
-			prepareUsers: []entity.User{
-				userA,
-			},
-		},
-		{
-			name:     "全フィールドが空でも実行できる",
-			user:     entity.NewUser(uuidUA, "", "", ""),
 			wantUser: entity.NewUser(uuidUA, "userA", "passwordA", "exampleA@example.com"),
 			wantErr:  nil,
 			prepareUsers: []entity.User{
@@ -226,7 +218,7 @@ func TestUserRepository_Update(t *testing.T) {
 		},
 		{
 			name:     "指定したEmailのユーザーが既に存在している場合はErrMySQL",
-			user:     entity.NewUser(uuidUA, "", "", "exampleB@example.com"),
+			user:     entity.NewUser(uuidUA, "userA", "passwordA", "exampleB@example.com"),
 			wantUser: nil,
 			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry 'exampleB@example.com' for key 'users.email'"),
 			prepareUsers: []entity.User{
