@@ -18,7 +18,7 @@ type User struct {
 	// ID        int        `gorm:"primary_key"`
 	ID        NullString `gorm:"primary_key" json:"id"`
 	Name      NullString `gorm:"not null" json:"name"`
-	Password  NullString `gorm:"not null" json:"password"`
+	Password  Token      `gorm:"not null" json:"password"`
 	Email     NullString `gorm:"not null;unique" json:"email"`
 	CreatedAt time.Time  `json:"-"`
 	UpdatedAt time.Time  `json:"-"`
@@ -46,7 +46,7 @@ func NewUser(id string, name string, pass string, email string) (u *User) {
 	u = &User{
 		ID:       NewNullString(id),
 		Name:     NewNullString(name),
-		Password: NewNullString(pass),
+		Password: NewToken(pass),
 		Email:    NewNullString(email),
 	}
 	return
@@ -62,6 +62,11 @@ func (u *User) NewID() *User {
 // SetID はUserのIDを設定
 func (u *User) SetID(id string) *User {
 	u.ID = NewNullString(id)
+	return u
+}
+
+func (u *User) EncryptPassword() *User {
+	u.Password.Encrypt()
 	return u
 }
 
@@ -84,6 +89,11 @@ func (u *User) SetID(id string) *User {
 
 func (u *User) String() (str string) {
 	str = fmt.Sprintf("&entity.User{ID:%s, Name:%s, Password:%s, Email:%s, CreatedAt:%s, UpdatedAt: %s",
-		u.ID.GetString(), u.Name.GetString(), u.Password.GetString(), u.Email.GetString(), u.CreatedAt, u.UpdatedAt)
+		u.ID.GetString(), u.Name.GetString(), u.Password.String(), u.Email.GetString(), u.CreatedAt, u.UpdatedAt)
 	return
 }
+
+// // BeforeSave はデータベースに保存する際のフック
+// func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+// 	return u.Password.Encrypt()
+// }

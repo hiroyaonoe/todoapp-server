@@ -46,7 +46,7 @@ func TestUserController_Get(t *testing.T) {
 				user.EXPECT().FindByID(uuidUA).Return(&entity.User{
 					ID:        entity.NewNullString(uuidUA),
 					Name:      entity.NewNullString("username"),
-					Password:  entity.NewNullString("encrypted_password"),
+					Password:  entity.NewToken("encrypted_password"),
 					Email:     entity.NewNullString("example@example.com"),
 					CreatedAt: time.Unix(100, 0),
 					UpdatedAt: time.Unix(100, 0),
@@ -247,7 +247,7 @@ func TestUserController_Update(t *testing.T) {
 				user.EXPECT().Update(gomock.Any()).
 					DoAndReturn(func(user *entity.User) error {
 						user.SetID(uuidUA)
-						user.Password = entity.NewNullString("encrypted_password")
+						user.Password = entity.NewToken("encrypted_password")
 						user.Email = entity.NewNullString("example@example.com")
 						user.CreatedAt = time.Unix(100, 0)
 						user.UpdatedAt = time.Unix(100, 0)
