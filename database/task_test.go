@@ -320,14 +320,14 @@ func addTaskData(t *testing.T, db *gorm.DB, tasks []entity.Task) (err error) {
 taskEqual はCreatedAt, UpdatedAt以外のTaskのフィールドが同じかどうか判定する
 IDを比較するかどうかはオプションで指定
 */
-func taskEqual(t *testing.T, got *entity.Task, want *entity.Task, is_create bool) bool {
+func taskEqual(t *testing.T, got *entity.Task, want *entity.Task, isCreate bool) bool {
 	t.Helper()
 	ret := (got.Title.Equals(want.Title)) &&
 		(got.Content.Equals(want.Content)) &&
 		(got.UserID.Equals(want.UserID)) &&
 		(got.IsCompleted == want.IsCompleted) &&
 		(got.Date.Equals(want.Date))
-	if !is_create {
+	if !isCreate {
 		ret = ret && (got.ID == want.ID)
 	}
 	return ret

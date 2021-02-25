@@ -314,12 +314,12 @@ func addUserData(t *testing.T, db *gorm.DB, users []entity.User) (err error) {
 }
 
 // userEqual はCreatedAt, UpdatedAt以外のUserのフィールドが同じかどうか判定する
-func userEqual(t *testing.T, got *entity.User, want *entity.User, is_create bool) bool {
+func userEqual(t *testing.T, got *entity.User, want *entity.User, isCreate bool) bool {
 	t.Helper()
 	ret := (got.Name.Equals(want.Name)) &&
 		(got.Password.Authenticate(&want.Password) == nil) &&
 		(got.Email.Equals(want.Email))
-	if !is_create {
+	if !isCreate {
 		ret = ret && (got.ID == want.ID)
 	}
 	return ret

@@ -18,7 +18,7 @@ type NullDate struct {
 }
 
 func NewNullDate(s string) NullDate {
-	date, err := innerNewNullDate(s)
+	date, err := newNullDate(s)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -26,7 +26,7 @@ func NewNullDate(s string) NullDate {
 }
 
 func (d *NullDate) Set(str string) error {
-	new, err := innerNewNullDate(str)
+	new, err := newNullDate(str)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (d *NullDate) Set(str string) error {
 	return nil
 }
 
-func innerNewNullDate(s string) (*NullDate, error) {
+func newNullDate(s string) (*NullDate, error) {
 	array := strings.Split(s, "-")
 
 	if len(array) != 3 {
