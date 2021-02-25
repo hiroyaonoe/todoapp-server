@@ -1,4 +1,4 @@
-package errs
+package controllers
 
 import "errors"
 

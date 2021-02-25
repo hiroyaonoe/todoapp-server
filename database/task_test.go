@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -56,7 +55,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:         "Titleがnilの場合はErrMySQL",
 			task:         entity.NewTask(uuidTA2, "", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'title' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'title' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
@@ -70,7 +69,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:         "UserIDがnilの場合はErrMySQL",
 			task:         entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask:     nil,
-			wantErr:      errs.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
+			wantErr:      entity.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
@@ -84,7 +83,7 @@ func TestTaskRepository_Create(t *testing.T) {
 			name:     "指定したIDのタスクが既に存在している場合はErrMySQL",
 			task:     entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
+			wantErr:  entity.NewErrMySQL(0x426, "Duplicate entry '38397cad-8865-081f-3482-2a035f875d5c' for key 'tasks.PRIMARY'"),
 			prepareTasks: []*entity.Task{
 				taskA2,
 			},
@@ -138,7 +137,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			tid:      uuidTA2,
 			uid:      uuidUA,
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -148,7 +147,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			tid:      uuidTA1,
 			uid:      uuidUB,
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -207,7 +206,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "指定したIDのTaskが存在しない場合はErrRecordNotFound",
 			task:     entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -216,7 +215,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "指定したUserIDのTaskが存在しない場合はErrRecordNotFound",
 			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", uuidUZ, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -225,7 +224,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "IDが指定されていない場合はErrRecordNotFound",
 			task:     entity.NewTask("", "tasksA2", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -234,7 +233,7 @@ func TestTaskRepository_Update(t *testing.T) {
 			name:     "UserIDがnilの場合はErrMySQL",
 			task:     entity.NewTask(uuidTA1, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask: nil,
-			wantErr:  errs.ErrRecordNotFound,
+			wantErr:  entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},
@@ -285,14 +284,14 @@ func TestTaskRepository_Delete(t *testing.T) {
 			name:         "Taskが存在しないならErrRecordNotFound",
 			taskid:       uuidTA1,
 			userid:       uuidUA,
-			wantErr:      errs.ErrRecordNotFound,
+			wantErr:      entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{},
 		},
 		{
 			name:    "Taskが存在してもUserIDが異なるならErrRecordNotFound",
 			taskid:  uuidTA1,
 			userid:  uuidUB,
-			wantErr: errs.ErrRecordNotFound,
+			wantErr: entity.ErrRecordNotFound,
 			prepareTasks: []*entity.Task{
 				taskA1,
 			},

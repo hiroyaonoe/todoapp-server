@@ -7,7 +7,6 @@ package database
 import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -23,7 +22,7 @@ func NewUserRepository(db *DB) *UserRepository {
 func (repo *UserRepository) FindByID(id string) (user *entity.User, err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+			err = (*entity.ErrMySQL)(nerr) //TODO:testなし
 		}
 		return
 	}()
@@ -35,7 +34,7 @@ func (repo *UserRepository) FindByID(id string) (user *entity.User, err error) {
 func (repo *UserRepository) Create(u *entity.User) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr)
+			err = (*entity.ErrMySQL)(nerr)
 		}
 		return
 	}()
@@ -59,7 +58,7 @@ func (repo *UserRepository) Create(u *entity.User) (err error) {
 func (repo *UserRepository) Update(u *entity.User) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr)
+			err = (*entity.ErrMySQL)(nerr)
 		}
 		return
 	}()
@@ -89,7 +88,7 @@ func (repo *UserRepository) Update(u *entity.User) (err error) {
 func (repo *UserRepository) Delete(id string) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+			err = (*entity.ErrMySQL)(nerr) //TODO:testなし
 		}
 		return
 	}()

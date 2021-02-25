@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
 )
 
@@ -66,7 +65,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにtitleが含まれていないならStatusBadRequest",
@@ -80,7 +79,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "Requestにdateが含まれていないならStatusBadRequest",
@@ -94,7 +93,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "dateのformatが不正ならStatusBadRequest",
@@ -109,7 +108,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "contentが含まれていなくてもok",
@@ -165,7 +164,7 @@ func TestTaskController_Create(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 	}
 
@@ -222,11 +221,11 @@ func TestTaskController_GetByID(t *testing.T) {
 			userid: uuidUA,
 			params: map[string]string{"id": uuidTA},
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
-				task.EXPECT().FindByID(uuidTA, uuidUA).Return(&entity.Task{}, errs.ErrRecordNotFound)
+				task.EXPECT().FindByID(uuidTA, uuidUA).Return(&entity.Task{}, entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrTaskNotFound.Error(),
+			wantData: ErrTaskNotFound.Error(),
 		},
 		{
 			name: "Cookieが空ならStatusUnauthorized",
@@ -234,7 +233,7 @@ func TestTaskController_GetByID(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 		{
 			name:   "paramが空ならStatusBadRequest",
@@ -243,7 +242,7 @@ func TestTaskController_GetByID(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 	}
 
@@ -310,7 +309,7 @@ func TestTaskController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "RequestBodyが不正ならStatusBadRequest",
@@ -324,7 +323,7 @@ func TestTaskController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "RequestBodyがJSONでないならStatusBadRequest",
@@ -335,7 +334,7 @@ func TestTaskController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 		{
 			name:   "DBにTaskがないときはErrTaskNotFound",
@@ -348,11 +347,11 @@ func TestTaskController_Update(t *testing.T) {
 				"date":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
-				task.EXPECT().Update(gomock.Any()).Return(errs.ErrRecordNotFound)
+				task.EXPECT().Update(gomock.Any()).Return(entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrTaskNotFound.Error(),
+			wantData: ErrTaskNotFound.Error(),
 		},
 		{
 			name:   "DBにUserがないときはErrTaskNotFound",
@@ -365,11 +364,11 @@ func TestTaskController_Update(t *testing.T) {
 				"date":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
-				task.EXPECT().Update(gomock.Any()).Return(errs.ErrRecordNotFound)
+				task.EXPECT().Update(gomock.Any()).Return(entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrTaskNotFound.Error(),
+			wantData: ErrTaskNotFound.Error(),
 		},
 		{
 			name:   "Cookieが空ならStatusUnauthorized",
@@ -384,7 +383,7 @@ func TestTaskController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 		{
 			name:   "TaskIDが空ならErrBadRequest",
@@ -399,7 +398,7 @@ func TestTaskController_Update(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 	}
 
@@ -448,11 +447,11 @@ func TestTaskController_Delete(t *testing.T) {
 			userid: uuidUA,
 			params: map[string]string{"id": uuidTA},
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
-				task.EXPECT().Delete(uuidTA, uuidUA).Return(errs.ErrRecordNotFound)
+				task.EXPECT().Delete(uuidTA, uuidUA).Return(entity.ErrRecordNotFound)
 			},
 			wantErr:  true,
 			wantCode: http.StatusNotFound,
-			wantData: errs.ErrTaskNotFound.Error(),
+			wantData: ErrTaskNotFound.Error(),
 		},
 		{
 			name:   "Cookieが空ならStatusUnauthorized",
@@ -461,7 +460,7 @@ func TestTaskController_Delete(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusUnauthorized,
-			wantData: errs.ErrUnauthorized.Error(),
+			wantData: ErrUnauthorized.Error(),
 		},
 		{
 			name:   "TaskIDが空ならErrBadRequest",
@@ -470,7 +469,7 @@ func TestTaskController_Delete(t *testing.T) {
 			},
 			wantErr:  true,
 			wantCode: http.StatusBadRequest,
-			wantData: errs.ErrBadRequest.Error(),
+			wantData: ErrBadRequest.Error(),
 		},
 	}
 

@@ -10,7 +10,6 @@ import (
 	"net/http"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/hiroyaonoe/todoapp-server/domain/repository"
 	"github.com/hiroyaonoe/todoapp-server/usecase"
 )
@@ -27,15 +26,15 @@ func NewUserController(user repository.UserRepository) *UserController {
 func (controller *UserController) Get(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 
 	user, err := controller.Interactor.Get(id)
 
 	if err != nil {
-		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, ErrUserNotFound)
 			return
 		}
 		unexpectedErrorHandling(c, err)
@@ -48,22 +47,22 @@ func (controller *UserController) Get(c Context) {
 func (controller *UserController) Create(c Context) {
 	user, err := getUserFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 
 	err = controller.Interactor.Create(user)
 
 	if err != nil {
-		var sqlerr *errs.ErrMySQL
+		var sqlerr *entity.ErrMySQL
 		if errors.As(err, &sqlerr) {
 			if sqlerr.Number == 0x426 {
-				errorToJSON(c, http.StatusBadRequest, errs.ErrDuplicatedEmail)
+				errorToJSON(c, http.StatusBadRequest, ErrDuplicatedEmail)
 				return
 			}
 		}
-		if errors.Is(err, errs.ErrInvalidUser) {
-			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		if errors.Is(err, usecase.ErrInvalidUser) {
+			errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 			return
 		}
 		unexpectedErrorHandling(c, err)
@@ -76,12 +75,12 @@ func (controller *UserController) Create(c Context) {
 func (controller *UserController) Update(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 	user, err := getUserFromBody(c)
 	if err != nil {
-		errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		return
 	}
 	user.SetID(id)
@@ -89,18 +88,18 @@ func (controller *UserController) Update(c Context) {
 	err = controller.Interactor.Update(user)
 
 	if err != nil {
-		if errors.Is(err, errs.ErrInvalidUser) {
-			errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		if errors.Is(err, usecase.ErrInvalidUser) {
+			errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 			return
 		}
-		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, ErrUserNotFound)
 			return
 		}
-		var sqlerr *errs.ErrMySQL
+		var sqlerr *entity.ErrMySQL
 		if errors.As(err, &sqlerr) {
 			if sqlerr.Number == 0x426 {
-				errorToJSON(c, http.StatusBadRequest, errs.ErrDuplicatedEmail)
+				errorToJSON(c, http.StatusBadRequest, ErrDuplicatedEmail)
 				return
 			}
 		}
@@ -114,19 +113,19 @@ func (controller *UserController) Update(c Context) {
 func (controller *UserController) Delete(c Context) {
 	id, err := getUserIDFromCookie(c)
 	if err != nil {
-		errorToJSON(c, http.StatusUnauthorized, errs.ErrUnauthorized)
+		errorToJSON(c, http.StatusUnauthorized, ErrUnauthorized)
 		return
 	}
 
 	err = controller.Interactor.Delete(id)
 
 	if err != nil {
-		// if errors.Is(err, errs.ErrInvalidUser) {
-		// 	errorToJSON(c, http.StatusBadRequest, errs.ErrBadRequest)
+		// if errors.Is(err, usecase.ErrInvalidUser) {
+		// 	errorToJSON(c, http.StatusBadRequest, ErrBadRequest)
 		// 	return
 		// }
-		if errors.Is(err, errs.ErrRecordNotFound) {
-			errorToJSON(c, http.StatusNotFound, errs.ErrUserNotFound)
+		if errors.Is(err, entity.ErrRecordNotFound) {
+			errorToJSON(c, http.StatusNotFound, ErrUserNotFound)
 			return
 		}
 		unexpectedErrorHandling(c, err)

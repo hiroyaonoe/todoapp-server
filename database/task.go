@@ -3,7 +3,6 @@ package database
 import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/hiroyaonoe/todoapp-server/domain/errs"
 	"github.com/jinzhu/gorm"
 )
 
@@ -19,7 +18,7 @@ func NewTaskRepository(db *DB) *TaskRepository {
 func (repo *TaskRepository) Create(t *entity.Task) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr)
+			err = (*entity.ErrMySQL)(nerr)
 		}
 	}()
 
@@ -44,7 +43,7 @@ func (repo *TaskRepository) Create(t *entity.Task) (err error) {
 func (repo *TaskRepository) FindByID(tid, uid string) (task *entity.Task, err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+			err = (*entity.ErrMySQL)(nerr) //TODO:testなし
 		}
 		return
 	}()
@@ -57,7 +56,7 @@ func (repo *TaskRepository) FindByID(tid, uid string) (task *entity.Task, err er
 func (repo *TaskRepository) Update(t *entity.Task) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+			err = (*entity.ErrMySQL)(nerr) //TODO:testなし
 		}
 	}()
 
@@ -86,7 +85,7 @@ func (repo *TaskRepository) Update(t *entity.Task) (err error) {
 func (repo *TaskRepository) Delete(tid, uid string) (err error) {
 	defer func() {
 		if nerr, ok := err.(*mysql.MySQLError); ok {
-			err = (*errs.ErrMySQL)(nerr) //TODO:testなし
+			err = (*entity.ErrMySQL)(nerr) //TODO:testなし
 		}
 	}()
 
