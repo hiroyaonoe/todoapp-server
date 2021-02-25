@@ -19,12 +19,11 @@ type Routing struct {
 }
 
 func NewRouting(user *database.UserRepository, task *database.TaskRepository) *Routing {
-	c := config.NewConfig()
 	r := &Routing{
 		User: user,
 		Task: task,
 		Gin:  gin.Default(),
-		Port: c.Routing.Port,
+		Port: config.Port(),
 	}
 	r.setRouting()
 	return r

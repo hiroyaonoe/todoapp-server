@@ -1,50 +1,36 @@
 /*
-Package config はconfigファイルを集めたパッケージ
-将来的には環境変数から取得するようにする
+Package config は環境変数から設定を取得するパッケージ
 */
 package config
 
-// Config is a config for connecting DB
-type Config struct {
-	DB struct {
-		Production struct {
-			Host     string
-			Username string
-			Password string
-			DBName   string
-			Port     string
-		}
-		Test struct {
-			Host     string
-			Username string
-			Password string
-			DBName   string
-			Port     string
-		}
-	}
-	Routing struct {
-		Port string
-	}
+import (
+	"fmt"
+	"os"
+)
+
+// Port はRouting用のポートを返す
+func Port() string {
+	return os.Getenv("ROUTING_PORT")
 }
 
-// NewConfig is a constructor of Config
-func NewConfig() *Config {
-
-	c := new(Config)
-
-	c.DB.Production.Host = "mysql-container"
-	c.DB.Production.Username = "golang"
-	c.DB.Production.Password = "golang"
-	c.DB.Production.DBName = "golang"
-	c.DB.Production.Port = ":3306"
-
-	c.DB.Test.Host = "test-mysql-container"
-	c.DB.Test.Username = "golang"
-	c.DB.Test.Password = "golang"
-	c.DB.Test.DBName = "golang"
-	c.DB.Test.Port = ":3306"
-
-	c.Routing.Port = ":8080"
-
-	return c
+// DSN はデータベースに接続するためのData Source Nameを返す
+func DSN(env string) string {
+	dsn := map[string]string{}
+	dsn["Production"] = fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		os.Getenv("MYSQL_USER"),
+		os.Getenv("MYSQL_PASSWORD"),
+		os.Getenv("MYSQL_HOST_DEV"),
+		os.Getenv("MYSQL_PORT"),
+		os.Getenv("MYSQL_DATABASE"),
+	)
+	dsn["Test"] = fmt.Sprintf(
+		"%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+		os.Getenv("MYSQL_USER"),
+		os.Getenv("MYSQL_PASSWORD"),
+		os.Getenv("MYSQL_HOST_TEST"),
+		os.Getenv("MYSQL_PORT"),
+		os.Getenv("MYSQL_DATABASE"),
+	)
+	return dsn[env]
 }
