@@ -1,35 +1,45 @@
 version: '3'
 
 services:
-    golang:
-        build: .
-        ports:
-            - "8080:8080"
-        container_name: go-container
-        depends_on:
-            - mysql
-            - test-mysql
-        # プロセスが終了してコンテナが終了してしまわないように上書きする
-        command: /bin/sh -c "while sleep 1000; do :; done"
-        volumes:
-            - ..:/workspace:cached
-    
-    # mysql のサービスを追加
-    mysql:
-        image: mysql:latest
-        environment:
-            MYSQL_ROOT_PASSWORD: golang
-            MYSQL_USER: golang # 使わないけど一応記述
-            MYSQL_PASSWORD: golang # 使わないけど一応記述
-            MYSQL_DATABASE: golang # 使わないけど一応記述
-        container_name: mysql-container
+  golang:
+    build: .
+    ports:
+      - "8080:8080"
+    container_name: go-container
+    depends_on:
+      - development-mysql
+      - test-mysql
+    # プロセスが終了してコンテナが終了してしまわないように上書きする
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    volumes:
+      - ..:/workspace:cached
+    environment:
+      MYSQL_HOST_DEV: development-mysql
+      MYSQL_HOST_TEST: test-mysql
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golang
+      MYSQL_DATABASE: golang
+      MYSQL_PORT: 3306
+      ROUTING_PORT: 8080
 
-    # テスト用データベース
-    test-mysql:
-        image: mysql:latest
-        environment:
-            MYSQL_ROOT_PASSWORD: golang
-            MYSQL_USER: golang # 使わないけど一応記述
-            MYSQL_PASSWORD: golang # 使わないけど一応記述
-            MYSQL_DATABASE: golang # 使わないけど一応記述
-        container_name: test-mysql-container
+      
+  
+  # mysql のサービスを追加
+  development-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: golang
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golang
+      MYSQL_DATABASE: golang
+    container_name: development-mysql
+
+  # テスト用データベース
+  test-mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: golang
+      MYSQL_USER: golang
+      MYSQL_PASSWORD: golang
+      MYSQL_DATABASE: golang
+    container_name: test-mysql
