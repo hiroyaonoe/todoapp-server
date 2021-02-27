@@ -96,6 +96,6 @@ func (t *Task) SetComp(comp bool) *Task {
 
 func (t *Task) String() (str string) {
 	str = fmt.Sprintf("&entity.Task{ID:%s, Title:%s, Content:%s, UserID:%s, IsCompleted:%t, Deadline:%s, CreatedAt:%s, UpdatedAt: %s",
-		t.ID.GetString(), t.Title.GetString(), t.Content.GetString(), t.UserID.GetString(), t.IsCompleted, t.Deadline, t.CreatedAt, t.UpdatedAt)
+		t.ID.String(), t.Title.String(), t.Content.String(), t.UserID.String(), t.IsCompleted, t.Deadline, t.CreatedAt, t.UpdatedAt)
 	return
 }

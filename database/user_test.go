@@ -317,9 +317,9 @@ func addUserData(t *testing.T, repo *UserRepository, users []entity.User) {
 // userEqual はCreatedAt, UpdatedAt以外のUserのフィールドが同じかどうか判定する
 func userEqual(t *testing.T, got *entity.User, want *entity.User, isCreate bool) bool {
 	t.Helper()
-	ret := (got.Name.Equals(want.Name)) &&
+	ret := (got.Name.Equal(want.Name)) &&
 		(got.Password.Authenticate(&want.Password) == nil) &&
-		(got.Email.Equals(want.Email))
+		(got.Email.Equal(want.Email))
 	if !isCreate {
 		ret = ret && (got.ID == want.ID)
 	}

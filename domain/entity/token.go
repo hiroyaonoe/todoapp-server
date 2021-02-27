@@ -19,7 +19,7 @@ func NewToken(s string) Token {
 }
 
 func (t *Token) String() string {
-	return t.value.GetString()
+	return t.value.String()
 }
 
 func (t *Token) Set(str string) {
@@ -39,11 +39,11 @@ func (t *Token) UnmarshalJSON(data []byte) error {
 }
 
 func (t *Token) IsNull() bool {
-	return !t.value.Valid
+	return !t.value.IsNull()
 }
 
-func (t *Token) Equals(s *Token) bool {
-	return t.value.Equals(s.value) && t.is_encrypted == s.is_encrypted
+func (t *Token) Equal(s *Token) bool {
+	return t.value.Equal(s.value) && t.is_encrypted == s.is_encrypted
 }
 
 // Encrypt はトークンをハッシュ化する

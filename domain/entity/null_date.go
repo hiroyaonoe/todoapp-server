@@ -100,7 +100,7 @@ func isExist(year, month, day int) (time.Time, error) {
 	}
 }
 
-func (s NullDate) Equals(t NullDate) bool {
+func (s NullDate) Equal(t NullDate) bool {
 	if s.Valid {
 		return t.Valid
 	} else {

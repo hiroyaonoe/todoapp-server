@@ -89,7 +89,7 @@ func (u *User) EncryptPassword() *User {
 
 func (u *User) String() (str string) {
 	str = fmt.Sprintf("&entity.User{ID:%s, Name:%s, Password:%s, Email:%s, CreatedAt:%s, UpdatedAt: %s",
-		u.ID.GetString(), u.Name.GetString(), u.Password.String(), u.Email.GetString(), u.CreatedAt, u.UpdatedAt)
+		u.ID.String(), u.Name.String(), u.Password.String(), u.Email.String(), u.CreatedAt, u.UpdatedAt)
 	return
 }
 
@@ -97,3 +97,10 @@ func (u *User) String() (str string) {
 // func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 // 	return u.Password.Encrypt()
 // }
+
+func (u User) Equal(o User) bool {
+	ret := (u.Name.Equal(o.Name)) &&
+		(u.Password.Authenticate(&o.Password) == nil) &&
+		(u.Email.Equal(o.Email))
+	return ret
+}
