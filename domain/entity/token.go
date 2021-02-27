@@ -42,8 +42,9 @@ func (t *Token) IsNull() bool {
 	return !t.value.IsNull()
 }
 
-func (t *Token) Equal(s *Token) bool {
-	return t.value.Equal(s.value) && t.is_encrypted == s.is_encrypted
+// Equal はAuthenticateのエイリアス．go-cmpテストのみでの使用を想定
+func (t Token) Equal(s Token) bool {
+	return t.Authenticate(&s) == nil
 }
 
 // Encrypt はトークンをハッシュ化する
@@ -65,7 +66,10 @@ func (t *Token) Encrypt() error {
 	return nil
 }
 
-// Authenticate は２つのトークンが同一のものか判定する
+/*
+Authenticate は２つのトークンが同一のものか判定する
+(hashedの元となる文字列がplainと等しいかどうか)
+*/
 func (hashed *Token) Authenticate(plain *Token) error {
 	if !hashed.is_encrypted || plain.is_encrypted {
 		return fmt.Errorf("Invalid tokens")

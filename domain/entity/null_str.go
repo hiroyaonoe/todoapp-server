@@ -57,9 +57,5 @@ func (s *NullString) IsNull() bool {
 }
 
 func (s NullString) Equal(t NullString) bool {
-	if s.ns.Valid {
-		return t.ns.Valid
-	} else {
-		return s.String() == t.String()
-	}
+	return s.String() == t.String() && s.IsNull() == t.IsNull()
 }

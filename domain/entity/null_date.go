@@ -101,9 +101,5 @@ func isExist(year, month, day int) (time.Time, error) {
 }
 
 func (s NullDate) Equal(t NullDate) bool {
-	if s.Valid {
-		return t.Valid
-	} else {
-		return s.String() == t.String()
-	}
+	return s.String() == t.String() && s.IsNull() == t.IsNull()
 }

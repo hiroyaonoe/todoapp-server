@@ -97,10 +97,3 @@ func (u *User) String() (str string) {
 // func (u *User) BeforeSave(tx *gorm.DB) (err error) {
 // 	return u.Password.Encrypt()
 // }
-
-func (u User) Equal(o User) bool {
-	ret := (u.Name.Equal(o.Name)) &&
-		(u.Password.Authenticate(&o.Password) == nil) &&
-		(u.Email.Equal(o.Email))
-	return ret
-}
