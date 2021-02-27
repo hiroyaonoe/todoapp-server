@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
+	"github.com/google/go-cmp/cmp"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 	"github.com/hiroyaonoe/todoapp-server/domain/mock_repository"
 )
@@ -476,11 +476,11 @@ func compareResult(t *testing.T, w *httptest.ResponseRecorder, tt testInfo) {
 	t.Helper()
 
 	if w.Code != tt.wantCode {
-		t.Errorf("code = %d, want = %d", w.Code, tt.wantCode)
+		t.Errorf("Code (-want +got) =\n- %d\n+ %d", tt.wantCode, w.Code)
 	}
 
-	var want, actual map[string]interface{}
-	err := json.Unmarshal(w.Body.Bytes(), &actual)
+	var want, got map[string]interface{}
+	err := json.Unmarshal(w.Body.Bytes(), &got)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -498,7 +498,7 @@ func compareResult(t *testing.T, w *httptest.ResponseRecorder, tt testInfo) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(actual, want) {
-		t.Errorf("actual = %#v, want = %#v", actual, want)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("Data (-want +got) =\n%s\n", diff)
 	}
 }
