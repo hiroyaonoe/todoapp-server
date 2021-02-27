@@ -148,12 +148,12 @@ func TestTaskRepository_FindByID(t *testing.T) {
 			gotTask, err := task.FindByID(tt.tid, tt.uid)
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("Create() got = %s", gotTask)
+				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("FindByID() got = %s", gotTask)
 				return
 			}
 			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, false)) {
-				t.Errorf("Create() = %s, want %s", gotTask, tt.wantTask)
+				t.Errorf("FindByID() = %s, want %s", gotTask, tt.wantTask)
 			}
 		})
 	}

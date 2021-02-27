@@ -236,12 +236,12 @@ func TestUserRepository_Update(t *testing.T) {
 			gotUser := tt.user
 
 			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("Create() got = %s", gotUser)
+				t.Errorf("Update() error = %#v, wantErr %#v", err, tt.wantErr)
+				t.Errorf("Update() got = %s", gotUser)
 				return
 			}
 			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser, false)) {
-				t.Errorf("Create() = %s, want %s", gotUser, tt.wantUser)
+				t.Errorf("Update() = %s, want %s", gotUser, tt.wantUser)
 			}
 		})
 	}
