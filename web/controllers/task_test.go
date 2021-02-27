@@ -36,7 +36,7 @@ func TestTaskController_Create(t *testing.T) {
 				"title":"taskname",
 				"content":"I am content.",
 				"iscomp":false,
-				"date":"2020-12-06"
+				"deadline":"2020-12-06"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 				task.EXPECT().Create(gomock.Any()).
@@ -59,7 +59,7 @@ func TestTaskController_Create(t *testing.T) {
 				"title":"taskname",
 				"content":"I am content.",
 				"iscomp":false,
-				"date":"2020-12-06"
+				"deadline":"2020-12-06"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
@@ -73,7 +73,7 @@ func TestTaskController_Create(t *testing.T) {
 			body: `{
 				"content":"I am content.",
 				"iscomp":false,
-				"date":"2020-12-06"
+				"deadline":"2020-12-06"
 			}`,
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
@@ -82,7 +82,7 @@ func TestTaskController_Create(t *testing.T) {
 			wantData: ErrBadRequest.Error(),
 		},
 		{
-			name:   "Requestにdateが含まれていないならStatusBadRequest",
+			name:   "Requestにdeadlineが含まれていないならStatusBadRequest",
 			userid: uuidUA,
 			body: `{
 				"title":"taskname",
@@ -96,13 +96,13 @@ func TestTaskController_Create(t *testing.T) {
 			wantData: ErrBadRequest.Error(),
 		},
 		{
-			name:   "dateのformatが不正ならStatusBadRequest",
+			name:   "deadlineのformatが不正ならStatusBadRequest",
 			userid: uuidUA,
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
 				"iscomp":false,
-				"date":"invalid date"
+				"deadline":"invalid deadline"
 			}`,
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
@@ -116,7 +116,7 @@ func TestTaskController_Create(t *testing.T) {
 			body: `{
 				"title":"taskname",
 				"iscomp":false,
-				"date":"2020-12-06"
+				"deadline":"2020-12-06"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 				task.EXPECT().Create(gomock.Any()).
@@ -137,7 +137,7 @@ func TestTaskController_Create(t *testing.T) {
 			body: `{
 				"title":"taskname",
 				"content":"I am content.",
-				"date":"2020-12-06"
+				"deadline":"2020-12-06"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 				task.EXPECT().Create(gomock.Any()).
@@ -158,7 +158,7 @@ func TestTaskController_Create(t *testing.T) {
 				"title":"taskname",
 				"content":"I am content.",
 				"iscomp":false,
-				"date":"2020-12-06"
+				"deadline":"2020-12-06"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
@@ -207,7 +207,7 @@ func TestTaskController_GetByID(t *testing.T) {
 					Content:     entity.NewNullString("I am Content."),
 					UserID:      entity.NewNullString(uuidUA),
 					IsCompleted: true,
-					Date:        entity.NewNullDate("2020-12-27"),
+					Deadline:    entity.NewNullDate("2020-12-27"),
 					CreatedAt:   time.Unix(100, 0),
 					UpdatedAt:   time.Unix(100, 0),
 				}, nil)
@@ -272,7 +272,7 @@ func TestTaskController_GetByID(t *testing.T) {
 	}
 }
 
-func TestTaskController_Update(t *testing.T) {
+func TestTaskController_Updeadline(t *testing.T) {
 
 	tests := []testInfo{
 		{
@@ -283,7 +283,7 @@ func TestTaskController_Update(t *testing.T) {
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
-				"date":"2020-01-05"
+				"deadline":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 				task.EXPECT().Update(gomock.Any()).
@@ -303,7 +303,7 @@ func TestTaskController_Update(t *testing.T) {
 			params: map[string]string{"id": uuidTA},
 			body: `{
 				"iscomp":true,
-				"date":"2020-01-05"
+				"deadline":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 			},
@@ -344,7 +344,7 @@ func TestTaskController_Update(t *testing.T) {
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
-				"date":"2020-01-05"
+				"deadline":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 				task.EXPECT().Update(gomock.Any()).Return(entity.ErrRecordNotFound)
@@ -361,7 +361,7 @@ func TestTaskController_Update(t *testing.T) {
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
-				"date":"2020-01-05"
+				"deadline":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(task *mock_repository.MockTaskRepository) {
 				task.EXPECT().Update(gomock.Any()).Return(entity.ErrRecordNotFound)
@@ -377,7 +377,7 @@ func TestTaskController_Update(t *testing.T) {
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
-				"date":"2020-01-05"
+				"deadline":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},
@@ -392,7 +392,7 @@ func TestTaskController_Update(t *testing.T) {
 				"title":"newtitle",
 				"content":"I am new content.",
 				"iscomp":true,
-				"date":"2020-01-05"
+				"deadline":"2020-01-05"
 			}`,
 			prepareMockTaskRepo: func(user *mock_repository.MockTaskRepository) {
 			},

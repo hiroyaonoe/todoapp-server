@@ -335,7 +335,7 @@ func taskEqual(t *testing.T, got *entity.Task, want *entity.Task, isCreate bool)
 		(got.Content.Equals(want.Content)) &&
 		(got.UserID.Equals(want.UserID)) &&
 		(got.IsCompleted == want.IsCompleted) &&
-		(got.Date.Equals(want.Date))
+		(got.Deadline.Equals(want.Deadline))
 	if !isCreate {
 		ret = ret && (got.ID == want.ID)
 	}
