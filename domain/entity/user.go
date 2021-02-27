@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jinzhu/gorm"
 )
 
 // User は内部で処理する際のUser情報である
@@ -65,9 +66,8 @@ func (u *User) SetID(id string) *User {
 	return u
 }
 
-func (u *User) EncryptPassword() *User {
-	u.Password.Encrypt()
-	return u
+func (u *User) EncryptPassword() error {
+	return u.Password.Encrypt()
 }
 
 // // UserForJSON はJSONにして外部に公開するUser情報である
@@ -93,7 +93,8 @@ func (u *User) String() (str string) {
 	return
 }
 
-// // BeforeSave はデータベースに保存する際のフック
-// func (u *User) BeforeSave(tx *gorm.DB) (err error) {
-// 	return u.Password.Encrypt()
-// }
+// BeforeSave はデータベースに保存する際のフック
+func (u *User) BeforeSave(tx *gorm.DB) (err error) {
+	u.EncryptPassword()
+	return
+}

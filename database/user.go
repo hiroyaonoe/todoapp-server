@@ -49,7 +49,7 @@ func (repo *UserRepository) Create(u *entity.User) (err error) {
 	}()
 
 	u.NewID()
-	u.EncryptPassword()
+	// u.EncryptPassword()
 
 	err = tx.Create(u).Error
 	if err != nil {
@@ -75,7 +75,7 @@ func (repo *UserRepository) Update(u *entity.User) (err error) {
 		}
 	}()
 
-	u.EncryptPassword()
+	// u.EncryptPassword()
 
 	// idに該当するユーザーがいない場合を弾く
 	user := &entity.User{}
