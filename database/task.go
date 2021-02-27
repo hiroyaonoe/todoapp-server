@@ -35,10 +35,8 @@ func (repo *TaskRepository) Create(t *entity.Task) (err error) {
 
 	err = tx.Create(t).Error
 	if err != nil {
-		tx.Rollback()
 		return
 	}
-	tx.Commit()
 	return
 }
 
