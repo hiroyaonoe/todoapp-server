@@ -87,7 +87,7 @@ func (d NullDate) String() string {
 	return d.GetTime().Format(layout)
 }
 
-func (d *NullDate) IsNull() bool {
+func (d NullDate) IsNull() bool {
 	return !d.Valid
 }
 

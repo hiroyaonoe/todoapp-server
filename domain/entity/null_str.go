@@ -52,7 +52,7 @@ func (s NullString) String() string {
 	return s.ns.String
 }
 
-func (s *NullString) IsNull() bool {
+func (s NullString) IsNull() bool {
 	return !s.ns.Valid
 }
 

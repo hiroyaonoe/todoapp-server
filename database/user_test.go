@@ -1,9 +1,10 @@
 package database
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 )
 
@@ -57,13 +58,24 @@ func TestUserRepository_FindByID(t *testing.T) {
 
 			gotUser, err := user.FindByID(tt.userid)
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("FindByID() got = %s", gotUser)
-				return
+			if errorCompare(t, err, tt.wantErr) {
+				t.Errorf("Data got = %s", gotUser)
 			}
-			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser, false)) {
-				t.Errorf("FindByID() = %s, want %s", gotUser, tt.wantUser)
+			if tt.wantErr == nil {
+				cmpopt := cmpopts.IgnoreFields(entity.User{},
+					"Password",
+					"CreatedAt",
+					"UpdatedAt")
+				diff := cmp.Diff(tt.wantUser, gotUser, cmpopt)
+				if diff != "" {
+					t.Errorf("Data (-want +got) =\n%s\n", diff)
+				}
+				if !gotUser.Password.Authenticate(&tt.wantUser.Password) {
+					t.Errorf("Password (-want +got) =\n- %s\n+ %s",
+						tt.wantUser.Password,
+						gotUser.Password)
+				}
+
 			}
 		})
 	}
@@ -129,13 +141,26 @@ func TestUserRepository_Create(t *testing.T) {
 			err := user.Create(tt.user)
 			gotUser := tt.user
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("Create() got = %s", gotUser)
-				return
+			if errorCompare(t, err, tt.wantErr) {
+				t.Errorf("Data got = %s", gotUser)
 			}
-			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser, true)) {
-				t.Errorf("Create() = %s, want %s", gotUser, tt.wantUser)
+			if tt.wantErr == nil {
+				// IDは一致する必要なし
+				cmpopt := cmpopts.IgnoreFields(entity.User{},
+					"ID",
+					"Password",
+					"CreatedAt",
+					"UpdatedAt")
+				diff := cmp.Diff(tt.wantUser, gotUser, cmpopt)
+				if diff != "" {
+					t.Errorf("Data (-want +got) =\n%s\n", diff)
+				}
+				if !gotUser.Password.Authenticate(&tt.wantUser.Password) {
+					t.Errorf("Password (-want +got) =\n- %s\n+ %s",
+						tt.wantUser.Password,
+						gotUser.Password)
+				}
+
 			}
 		})
 	}
@@ -235,13 +260,24 @@ func TestUserRepository_Update(t *testing.T) {
 			err := user.Update(tt.user)
 			gotUser := tt.user
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Update() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("Update() got = %s", gotUser)
-				return
+			if errorCompare(t, err, tt.wantErr) {
+				t.Errorf("Data got = %s", gotUser)
 			}
-			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser, false)) {
-				t.Errorf("Update() = %s, want %s", gotUser, tt.wantUser)
+			if tt.wantErr == nil {
+				cmpopt := cmpopts.IgnoreFields(entity.User{},
+					"Password",
+					"CreatedAt",
+					"UpdatedAt")
+				diff := cmp.Diff(tt.wantUser, gotUser, cmpopt)
+				if diff != "" {
+					t.Errorf("Data (-want +got) =\n%s\n", diff)
+				}
+				if !gotUser.Password.Authenticate(&tt.wantUser.Password) {
+					t.Errorf("Password (-want +got) =\n- %s\n+ %s",
+						tt.wantUser.Password,
+						gotUser.Password)
+				}
+
 			}
 		})
 	}
@@ -283,10 +319,7 @@ func TestUserRepository_Delete(t *testing.T) {
 
 			err := user.Delete(tt.userid)
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
-				return
-			}
+			errorCompare(t, err, tt.wantErr)
 		})
 	}
 }
@@ -312,18 +345,6 @@ func addUserData(t *testing.T, repo *UserRepository, users []entity.User) {
 		}
 	}
 	return
-}
-
-// userEqual はCreatedAt, UpdatedAt以外のUserのフィールドが同じかどうか判定する
-func userEqual(t *testing.T, got *entity.User, want *entity.User, isCreate bool) bool {
-	t.Helper()
-	ret := (got.Name.Equal(want.Name)) &&
-		(got.Password.Authenticate(&want.Password) == nil) &&
-		(got.Email.Equal(want.Email))
-	if !isCreate {
-		ret = ret && (got.ID == want.ID)
-	}
-	return ret
 }
 
 func prepareUserT(t *testing.T) (user *UserRepository) {

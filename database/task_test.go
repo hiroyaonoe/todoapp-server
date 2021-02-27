@@ -1,9 +1,10 @@
 package database
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
 )
 
@@ -84,13 +85,18 @@ func TestTaskRepository_Create(t *testing.T) {
 			err := task.Create(tt.task)
 			gotTask := tt.task
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Create() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("Create() got = %s", gotTask)
-				return
+			if errorCompare(t, err, tt.wantErr) {
+				t.Errorf("Data got = %s", gotTask)
 			}
-			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, true)) {
-				t.Errorf("Create() = %s, want %s", gotTask, tt.wantTask)
+			if tt.wantErr == nil {
+				// IDは一致する必要なし
+				cmpopt := cmpopts.IgnoreFields(entity.Task{},
+					"ID",
+					"CreatedAt",
+					"UpdatedAt")
+				if diff := cmp.Diff(tt.wantTask, gotTask, cmpopt); diff != "" {
+					t.Errorf("Data (-want +got) =\n%s\n", diff)
+				}
 			}
 		})
 	}
@@ -147,13 +153,16 @@ func TestTaskRepository_FindByID(t *testing.T) {
 
 			gotTask, err := task.FindByID(tt.tid, tt.uid)
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("FindByID() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("FindByID() got = %s", gotTask)
-				return
+			if errorCompare(t, err, tt.wantErr) {
+				t.Errorf("Data got = %s", gotTask)
 			}
-			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, false)) {
-				t.Errorf("FindByID() = %s, want %s", gotTask, tt.wantTask)
+			if tt.wantErr == nil {
+				cmpopt := cmpopts.IgnoreFields(entity.Task{},
+					"CreatedAt",
+					"UpdatedAt")
+				if diff := cmp.Diff(tt.wantTask, gotTask, cmpopt); diff != "" {
+					t.Errorf("Data (-want +got) =\n%s\n", diff)
+				}
 			}
 		})
 	}
@@ -243,13 +252,16 @@ func TestTaskRepository_Update(t *testing.T) {
 			err := task.Update(tt.task)
 			gotTask := tt.task
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Update() error = %#v, wantErr %#v", err, tt.wantErr)
-				t.Errorf("Update() got = %s", gotTask)
-				return
+			if errorCompare(t, err, tt.wantErr) {
+				t.Errorf("Data got = %s", gotTask)
 			}
-			if (tt.wantErr == nil) && (!taskEqual(t, gotTask, tt.wantTask, false)) {
-				t.Errorf("Update() = %s, want %s", gotTask, tt.wantTask)
+			if tt.wantErr == nil {
+				cmpopt := cmpopts.IgnoreFields(entity.Task{},
+					"CreatedAt",
+					"UpdatedAt")
+				if diff := cmp.Diff(tt.wantTask, gotTask, cmpopt); diff != "" {
+					t.Errorf("Data (-want +got) =\n%s\n", diff)
+				}
 			}
 		})
 	}
@@ -300,10 +312,7 @@ func TestTaskRepository_Delete(t *testing.T) {
 
 			err := task.Delete(tt.taskid, tt.userid)
 
-			if !reflect.DeepEqual(err, tt.wantErr) {
-				t.Errorf("Delete() error = %#v, wantErr %#v", err, tt.wantErr)
-				return
-			}
+			errorCompare(t, err, tt.wantErr)
 		})
 	}
 }
@@ -330,23 +339,6 @@ func addTaskData(t *testing.T, repo *TaskRepository, tasks []entity.Task) {
 	return
 }
 
-/*
-taskEqual はCreatedAt, UpdatedAt以外のTaskのフィールドが同じかどうか判定する
-IDを比較するかどうかはオプションで指定
-*/
-func taskEqual(t *testing.T, got *entity.Task, want *entity.Task, isCreate bool) bool {
-	t.Helper()
-	ret := (got.Title.Equals(want.Title)) &&
-		(got.Content.Equals(want.Content)) &&
-		(got.UserID.Equals(want.UserID)) &&
-		(got.IsCompleted == want.IsCompleted) &&
-		(got.Deadline.Equals(want.Deadline))
-	if !isCreate {
-		ret = ret && (got.ID == want.ID)
-	}
-	return ret
-}
-
 func prepareTaskT(t *testing.T) (task *TaskRepository) {
 	t.Helper()
 
@@ -361,4 +353,26 @@ func prepareTaskT(t *testing.T) (task *TaskRepository) {
 	addUserData(t, user, users)
 
 	return
+}
+
+// errorCompare はgo-cmpを利用してerrorを比較
+func errorCompare(t *testing.T, got, want error) bool {
+	t.Helper()
+
+	if got == nil && want == nil {
+		return false
+	}
+	if got == nil {
+		t.Errorf("Error got = nil, want = %s", want)
+		return true
+	}
+	if want == nil {
+		t.Errorf("Error want = nil, got = %s", got)
+		return true
+	}
+	if diff := cmp.Diff(want.Error(), got.Error()); diff != "" {
+		t.Errorf("Error (-want +got) =\n%s", diff)
+		return true
+	}
+	return false
 }

@@ -18,7 +18,7 @@ func NewToken(s string) Token {
 	return Token{value: NewNullString(s), is_encrypted: false}
 }
 
-func (t *Token) String() string {
+func (t Token) String() string {
 	return t.value.String()
 }
 
@@ -38,8 +38,8 @@ func (t *Token) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (t *Token) IsNull() bool {
-	return !t.value.IsNull()
+func (t Token) IsNull() bool {
+	return t.value.IsNull()
 }
 
 func (t Token) Equal(s Token) bool {
