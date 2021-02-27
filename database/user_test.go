@@ -322,7 +322,6 @@ func prepareUserT(t *testing.T) (user *UserRepository) {
 
 	// dbに接続
 	db := NewTestDB()
-	db.Migrate()
 	user = NewUserRepository(db)
 	// db.LogMode(true)
 

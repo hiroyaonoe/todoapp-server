@@ -347,7 +347,6 @@ func prepareTaskT(t *testing.T) (task *TaskRepository) {
 
 	// dbに接続
 	db := NewTestDB()
-	db.Migrate()
 	task = NewTaskRepository(db)
 	// db.LogMode(true)
 

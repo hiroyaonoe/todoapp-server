@@ -8,7 +8,6 @@ import (
 func main() {
 	db := database.NewDB()
 	// db := database.NewTestDB()
-	db.Migrate()
 	db.LogMode(true)
 	user := database.NewUserRepository(db)
 	task := database.NewTaskRepository(db)
