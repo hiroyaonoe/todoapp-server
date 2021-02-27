@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -54,7 +53,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, user, tt.prepareUsers)
+			addUserData(t, user, tt.prepareUsers)
 
 			gotUser, err := user.FindByID(tt.userid)
 
@@ -64,7 +63,7 @@ func TestUserRepository_FindByID(t *testing.T) {
 				return
 			}
 			if (tt.wantErr == nil) && (!userEqual(t, gotUser, tt.wantUser, false)) {
-				t.Errorf("Create() = %s, want %s", gotUser, tt.wantUser)
+				t.Errorf("FindByID() = %s, want %s", gotUser, tt.wantUser)
 			}
 		})
 	}
@@ -125,7 +124,7 @@ func TestUserRepository_Create(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, user, tt.prepareUsers)
+			addUserData(t, user, tt.prepareUsers)
 
 			err := user.Create(tt.user)
 			gotUser := tt.user
@@ -231,7 +230,7 @@ func TestUserRepository_Update(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, user, tt.prepareUsers)
+			addUserData(t, user, tt.prepareUsers)
 
 			err := user.Update(tt.user)
 			gotUser := tt.user
@@ -280,7 +279,7 @@ func TestUserRepository_Delete(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareUserTT(t, user, tt.prepareUsers)
+			addUserData(t, user, tt.prepareUsers)
 
 			err := user.Delete(tt.userid)
 
@@ -292,14 +291,24 @@ func TestUserRepository_Delete(t *testing.T) {
 	}
 }
 
-// addUserData はテスト用のデータをデータベースに追加する
-func addUserData(t *testing.T, db *gorm.DB, users []entity.User) (err error) {
+// addUserData はテスト用のユーザーデータをデータベースに追加する
+func addUserData(t *testing.T, repo *UserRepository, users []entity.User) {
 	t.Helper()
+
+	// databaseを初期化する
+	db := repo.db
+	err := db.Exec("SET FOREIGN_KEY_CHECKS = 0").Error
+	err = db.Exec("TRUNCATE TABLE users").Error
+	err = db.Exec("SET FOREIGN_KEY_CHECKS = 1").Error
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, user := range users {
 		user.EncryptPassword()
 		err = db.Create(&user).Error
 		if err != nil {
-			return
+			t.Fatal(err)
 		}
 	}
 	return
@@ -326,17 +335,4 @@ func prepareUserT(t *testing.T) (user *UserRepository) {
 	// db.LogMode(true)
 
 	return
-}
-
-func prepareUserTT(t *testing.T, user *UserRepository, users []entity.User) {
-	t.Helper()
-
-	// databaseを初期化する
-	user.db.Exec("TRUNCATE TABLE users")
-
-	// 事前データの準備
-	err := addUserData(t, user.db, users)
-	if err != nil {
-		t.Fatal(err)
-	}
 }

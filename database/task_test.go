@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/hiroyaonoe/todoapp-server/domain/entity"
-	"github.com/jinzhu/gorm"
 )
 
 const (
@@ -34,48 +33,44 @@ func TestTaskRepository_Create(t *testing.T) {
 		prepareTasks []entity.Task
 	}{
 		{
-			name:     "新しいユーザーのタスクを正しく作成できる",
-			task:     entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08"),
-			wantTask: entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08"),
-			wantErr:  nil,
-			prepareTasks: []entity.Task{
-				taskA1,
-			},
+			name:         "既存のユーザーのタスクを正しく作成できる",
+			task:         entity.NewTask("", "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
+			wantTask:     entity.NewTask("any id", "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
+			wantErr:      nil,
+			prepareTasks: []entity.Task{},
 		},
 		{
-			name:     "既存のユーザーのタスクを正しく作成できる",
-			task:     entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
-			wantTask: entity.NewTask(uuidTA2, "taskA2", "I am ContentA2.", uuidUA, "2020-12-08"),
-			wantErr:  nil,
-			prepareTasks: []entity.Task{
-				taskA1,
-			},
+			name:         "存在しないユーザーのタスクを追加すればErrMySQL",
+			task:         entity.NewTask("", "taskB1", "I am ContentB1.", uuidUZ, "2020-12-08"),
+			wantTask:     nil,
+			wantErr:      entity.NewErrMySQL(0x5ac, "Cannot add or update a child row: a foreign key constraint fails (`golang`.`tasks`, CONSTRAINT `tasks_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`))"),
+			prepareTasks: []entity.Task{},
 		},
 		{
 			name:         "Titleがnilの場合はErrMySQL",
-			task:         entity.NewTask(uuidTA2, "", "I am ContentA2.", uuidUA, "2020-12-08"),
+			task:         entity.NewTask("", "", "I am ContentA2.", uuidUA, "2020-12-08"),
 			wantTask:     nil,
 			wantErr:      entity.NewErrMySQL(0x418, "Column 'title' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
 			name:         "Contentが空でも正しく作成できる",
-			task:         entity.NewTask(uuidTA2, "taskA2", "", uuidUA, "2020-12-08"),
-			wantTask:     entity.NewTask(uuidTA2, "taskA2", "", uuidUA, "2020-12-08"),
+			task:         entity.NewTask("", "taskA2", "", uuidUA, "2020-12-08"),
+			wantTask:     entity.NewTask("any id", "taskA2", "", uuidUA, "2020-12-08"),
 			wantErr:      nil,
 			prepareTasks: nil,
 		},
 		{
 			name:         "UserIDがnilの場合はErrMySQL",
-			task:         entity.NewTask(uuidTA2, "tasksA2", "I am ContentA2.", "", "2020-12-08"),
+			task:         entity.NewTask("", "tasksA2", "I am ContentA2.", "", "2020-12-08"),
 			wantTask:     nil,
 			wantErr:      entity.NewErrMySQL(0x418, "Column 'user_id' cannot be null"),
 			prepareTasks: nil,
 		},
 		{
 			name:         "IsCompがtrueでも正しく作成できる",
-			task:         entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08").SetComp(true),
-			wantTask:     entity.NewTask(uuidTB1, "taskB1", "I am ContentB1.", uuidUB, "2020-12-08").SetComp(true),
+			task:         entity.NewTask("", "taskB1", "I am ContentB1.", uuidUB, "2020-12-08").SetComp(true),
+			wantTask:     entity.NewTask("any id", "taskB1", "I am ContentB1.", uuidUB, "2020-12-08").SetComp(true),
 			wantErr:      nil,
 			prepareTasks: nil,
 		},
@@ -84,7 +79,7 @@ func TestTaskRepository_Create(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, task, tt.prepareTasks)
+			addTaskData(t, task, tt.prepareTasks)
 
 			err := task.Create(tt.task)
 			gotTask := tt.task
@@ -148,7 +143,7 @@ func TestTaskRepository_FindByID(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, task, tt.prepareTasks)
+			addTaskData(t, task, tt.prepareTasks)
 
 			gotTask, err := task.FindByID(tt.tid, tt.uid)
 
@@ -243,7 +238,7 @@ func TestTaskRepository_Update(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, task, tt.prepareTasks)
+			addTaskData(t, task, tt.prepareTasks)
 
 			err := task.Update(tt.task)
 			gotTask := tt.task
@@ -301,7 +296,7 @@ func TestTaskRepository_Delete(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 
-			prepareTaskTT(t, task, tt.prepareTasks)
+			addTaskData(t, task, tt.prepareTasks)
 
 			err := task.Delete(tt.taskid, tt.userid)
 
@@ -313,13 +308,23 @@ func TestTaskRepository_Delete(t *testing.T) {
 	}
 }
 
-// addTaskData はテスト用のデータをデータベースに追加する
-func addTaskData(t *testing.T, db *gorm.DB, tasks []entity.Task) (err error) {
+// addTaskData はテスト用のタスクデータをデータベースに追加する
+func addTaskData(t *testing.T, repo *TaskRepository, tasks []entity.Task) {
 	t.Helper()
+
+	// databaseを初期化する
+	db := repo.db
+	err := db.Exec("SET FOREIGN_KEY_CHECKS = 0").Error
+	err = db.Exec("TRUNCATE TABLE tasks").Error
+	err = db.Exec("SET FOREIGN_KEY_CHECKS = 1").Error
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, task := range tasks {
 		err = db.Create(&task).Error
 		if err != nil {
-			return
+			t.Fatal(err)
 		}
 	}
 	return
@@ -350,18 +355,10 @@ func prepareTaskT(t *testing.T) (task *TaskRepository) {
 	task = NewTaskRepository(db)
 	// db.LogMode(true)
 
+	// Userデータの準備
+	user := NewUserRepository(db)
+	users := []entity.User{userA, userB}
+	addUserData(t, user, users)
+
 	return
-}
-
-func prepareTaskTT(t *testing.T, task *TaskRepository, tasks []entity.Task) {
-	t.Helper()
-
-	// databaseを初期化する
-	task.db.Exec("TRUNCATE TABLE tasks")
-
-	// 事前データの準備
-	err := addTaskData(t, task.db, tasks)
-	if err != nil {
-		t.Fatal(err)
-	}
 }
